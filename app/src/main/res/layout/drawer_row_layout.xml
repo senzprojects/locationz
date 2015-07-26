@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ns_menu_row"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp">
+
+        <!-- icon -->
+        <ImageView
+                android:id="@+id/menurow_icon"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="6dp"
+                android:visibility="gone"
+                android:layout_marginRight="12dp"
+                android:src="@drawable/new_icon" >
+        </ImageView>
+
+        <!-- text -->
+        <TextView
+                android:id="@+id/menurow_title"
+                android:text="Friends Zenzors"
+                android:layout_width="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/menurow_icon"
+                android:gravity="center_vertical"
+                android:textColor="#4a4a4a"
+                android:textSize="20dp"
+                android:textStyle="bold">
+        </TextView>
+    </RelativeLayout>
+
+    <!-- divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="1dp"
+        android:layout_marginTop="1dp"
+        android:background="#DADADC" >
+    </View>
+</LinearLayout>

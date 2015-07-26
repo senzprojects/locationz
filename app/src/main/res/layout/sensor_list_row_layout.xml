@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/my_sensor_background"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+
+        <TextView
+                android:layout_marginTop="12dp"
+                android:id="@+id/sensor_name_text"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:text="#GPS"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/circle_shape_green">
+        </TextView>
+
+        <LinearLayout
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:orientation="vertical"
+                android:layout_height="wrap_content">
+            <RelativeLayout
+                    android:layout_width="50dp"
+                    android:layout_height="40dp"
+                    android:visibility="visible"
+                    android:layout_marginTop="7dp"
+                    android:layout_marginRight="7dp"
+                    android:id="@+id/sensor_list_row_layout_share"
+                    android:background="@drawable/share_button_selector">
+
+                <!--<TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:textColor="#4a4a4a"
+                        android:text="Share"
+                        android:textSize="16sp">
+                </TextView>-->
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/share_normal">
+                </ImageView>
+
+            </RelativeLayout>
+
+            <!--<RelativeLayout
+                    android:layout_width="70dp"
+                    android:layout_height="38dp"
+                    android:visibility="visible"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginRight="5dp"
+                    android:id="@+id/sensor_list_row_layout_share"
+                    android:background="@drawable/share_button_selector">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:textColor="#4a4a4a"
+                        android:text="Refresh"
+                        android:textSize="16sp">
+                </TextView>
+
+            </RelativeLayout>-->
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            android:background="#cdcbcb">
+        </TextView>
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_marginTop="0dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:id="@+id/sensor_list_row_layout_sensor_user"
+        android:textColor="#5e7d9a"
+        android:textStyle="bold"
+        android:text="eranga"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true">
+    </TextView>
+
+    <TextView
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="22sp"
+        android:id="@+id/sensor_list_row_layout_sensor_value"
+        android:textColor="#4a4a4a"
+        android:gravity="center"
+        android:text="@string/sample_address"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true">
+    </TextView>
+</LinearLayout>

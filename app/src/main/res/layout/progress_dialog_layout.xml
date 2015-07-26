@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="75dp"
+    android:background="#ffffff"
+    android:layout_gravity="center">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            style="@android:style/Widget.ProgressBar.Small">
+        </ProgressBar>
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_toRightOf="@+id/progress"
+            android:id="@+id/progress_message"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:textColor="#4a4a4a"
+            android:layout_marginBottom="10dp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:textSize="16sp"
+            android:text="Login in, please wait ...">
+        </TextView>
+
+    </RelativeLayout>
+</LinearLayout>

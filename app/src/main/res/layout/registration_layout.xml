@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:background="@drawable/freee">
+
+    <ScrollView
+            android:layout_width="fill_parent"
+            android:fillViewport="true"
+            android:layout_height="wrap_content">
+
+        <LinearLayout
+                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:orientation="vertical">
+
+            <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="40dp"
+                    android:layout_marginLeft="40dp">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/registration_header_text"
+                        android:textColor="#ffffff"
+                        android:textSize="42sp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginLeft="0dp"
+                        android:layout_marginBottom="52dp"
+                        android:text="#SignUp">
+                </TextView>
+
+                <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="40dp"
+                    android:id="@+id/phone_no_field"
+                    android:layout_below="@+id/registration_header_text">
+
+                    <TextView
+                        android:layout_width="60dp"
+                        android:id="@+id/country_code"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:text="+94"
+                        android:textColor="#ffffff"
+                        android:background="@drawable/username_field_shape"
+                        android:layout_height="match_parent">
+
+                    </TextView>
+
+                    <EditText
+                            android:layout_width="fill_parent"
+                            android:layout_height="40dp"
+                            android:paddingLeft="15dp"
+                            android:hint="Phone no"
+                            android:textSize="16sp"
+                            android:layout_marginLeft="5dp"
+                            android:singleLine="true"
+                            android:textStyle="bold"
+                            android:textColor="#ffffff"
+                            android:textColorHint="#ffffff"
+                            android:inputType="phone"
+                            android:layout_toRightOf="@+id/country_code"
+                            android:background="@drawable/username_field_shape"
+                            android:id="@+id/registration_phone_no">
+                    </EditText>
+
+                </RelativeLayout>
+
+
+                <EditText
+                        android:layout_width="fill_parent"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="25dp"
+                        android:paddingLeft="15dp"
+                        android:hint="Username"
+                        android:textSize="16sp"
+                        android:singleLine="true"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        android:textColor="#ffffff"
+                        android:textColorHint="#ffffff"
+                        android:inputType="text"
+                        android:layout_below="@+id/phone_no_field"
+                        android:background="@drawable/username_field_shape"
+                        android:id="@+id/registration_username">
+
+                </EditText>
+
+                <EditText
+                        android:layout_width="fill_parent"
+                        android:paddingLeft="15dp"
+                        android:hint="Password"
+                        android:layout_marginTop="25dp"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColorHint="#ffffff"
+                        android:layout_height="40dp"
+                        android:textColor="#ffffff"
+                        android:singleLine="true"
+                        android:password="true"
+                        android:background="@drawable/username_field_shape"
+                        android:layout_below="@+id/registration_username"
+                        android:id="@+id/registration_password">
+                </EditText>
+
+                <EditText
+                        android:layout_width="fill_parent"
+                        android:paddingLeft="15dp"
+                        android:hint="Confirm Password"
+                        android:layout_marginTop="25dp"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColorHint="#ffffff"
+                        android:layout_height="40dp"
+                        android:textColor="#ffffff"
+                        android:singleLine="true"
+                        android:password="true"
+                        android:background="@drawable/username_field_shape"
+                        android:layout_below="@+id/registration_password"
+                        android:id="@+id/registration_confirm_password">
+                </EditText>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="25dp"
+                    android:orientation="horizontal">
+
+                <RelativeLayout
+                        android:layout_marginLeft="40dp"
+                        android:layout_marginRight="40dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_centerVertical="true"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:background="@drawable/login_button_selector"
+                        android:id="@+id/registration_sign_up_button">
+                    <TextView
+                            android:layout_height="wrap_content"
+                            android:layout_width="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="#FFF"
+                            android:id="@+id/registration_sign_up_text"
+                            android:text="Sign up">
+                    </TextView>
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>
+
+
+
+
+

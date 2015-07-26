@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:background="@drawable/my_sensor_background"
+        android:layout_height="60dp">
+
+    <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+        <RelativeLayout
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_margin="10dp"
+                android:id="@+id/country_list_row_layout_icon"
+                android:layout_alignParentLeft="true"
+                android:background="@drawable/circle_shape_gray"
+                android:layout_centerVertical="true">
+            <TextView
+                    android:id="@+id/icon_text"
+                    android:layout_centerInParent="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="24sp"
+                    android:textColor="#ffffff"
+                    android:text="#"/>
+        </RelativeLayout>
+
+        <TextView
+                android:id="@+id/country_list_row_layout_name"
+                android:layout_toRightOf="@+id/country_list_row_layout_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="5dp"
+                android:textSize="20dp"
+                android:text="Sri lanka"
+                android:textColor="#4a4a4a">
+        </TextView>
+
+        <!-- divider -->
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
+                android:background="#DADADC" >
+        </View>
+    </RelativeLayout>
+
+</LinearLayout>

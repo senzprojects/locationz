@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:background="#FFFFFF"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_height="40dp">
+        <LinearLayout
+            android:layout_height="fill_parent"
+            android:layout_width="fill_parent"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/sharing_list_row_layout_phone"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:layout_weight="1"
+                android:text="itseranga"
+                android:textColor="#ffc027"
+                android:layout_gravity="center_vertical">
+            </TextView>
+        </LinearLayout>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="50dp"
+        android:background="#FFFFFF"
+        android:layout_height="fill_parent"
+        android:layout_gravity="bottom"
+        android:layout_margin="1dp"
+        android:orientation="horizontal">
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="@drawable/more_layout_selector_normal"
+            android:layout_alignParentRight="true"
+            android:clickable="true"
+            android:id="@+id/sharing_list_row_layout_unshare">
+            <ImageView
+                android:layout_height="27dp"
+                android:layout_width="27dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/rm_disable">
+            </ImageView>
+            <TextView
+                android:layout_width="1dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_centerVertical="true"
+                android:layout_height="fill_parent"
+                android:layout_alignParentLeft="true"
+                android:background="#cdcbcb">
+            </TextView>
+        </RelativeLayout>
+    </RelativeLayout>
+
+</LinearLayout>

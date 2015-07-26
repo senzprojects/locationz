@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:background="#fff"
+        android:layout_height="wrap_content">
+
+    <RelativeLayout
+            android:layout_width="50dp"
+            android:background="#FFFFFF"
+            android:layout_height="fill_parent"
+            android:layout_gravity="bottom"
+            android:layout_margin="1dp"
+            android:visibility="gone"
+            android:orientation="horizontal">
+        <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:background="#fff"
+                android:layout_alignParentRight="true"
+                android:clickable="true"
+                android:id="@+id/sharing_list_row_layout_unshare">
+            <ImageView
+                    android:layout_height="32dp"
+                    android:layout_width="32dp"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/search">
+            </ImageView>
+            <TextView
+                    android:layout_width="1dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_centerVertical="true"
+                    android:layout_height="fill_parent"
+                    android:visibility="gone"
+                    android:layout_alignParentLeft="true"
+                    android:background="#cdcbcb">
+            </TextView>
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginLeft="15dp"
+            android:layout_height="40dp">
+        <LinearLayout
+                android:layout_height="fill_parent"
+                android:layout_width="fill_parent"
+                android:orientation="horizontal">
+            <TextView
+                    android:id="@+id/attribute_name"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:textStyle="normal"
+                    android:layout_weight="1"
+                    android:text="Contact"
+                    android:textColor="#4a4a4a"
+                    android:layout_gravity="center_vertical">
+            </TextView>
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:id="@+id/attribute_value"
+                    android:textSize="20sp"
+                    android:textColor="#4a4a4a"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="0775432015">
+            </TextView>
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+</LinearLayout>

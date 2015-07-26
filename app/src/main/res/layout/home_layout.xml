@@ -1,0 +1,77 @@
+<android.support.v4.widget.DrawerLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+    <!-- The main content view -->
+    <!-- Replace with fragment -->
+    <FrameLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </FrameLayout>
+
+    <!-- The navigation drawer -->
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/drawer_container"
+            android:layout_gravity="start" >
+
+        <ListView
+                android:paddingLeft="17dp"
+                android:paddingRight="17dp"
+                android:id="@+id/drawer"
+                android:layout_width="240dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:background="#FFFFFF"
+                android:state_activated="true"
+                android:listSelector="@drawable/drawer_list_row_selector"
+                android:choiceMode="singleChoice"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="0dp" />
+
+        <RelativeLayout
+                android:layout_alignParentBottom="true"
+                android:layout_width="240dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:id="@+id/home_logout"
+                android:layout_height="50dp">
+
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:background="@drawable/log_out_button_selector"
+                    android:layout_height="match_parent">
+
+                <!-- divider -->
+                <View
+                        android:layout_width="match_parent"
+                        android:layout_alignParentTop="true"
+                        android:layout_height="1dp"
+                        android:id="@+id/divider"
+                        android:layout_marginBottom="1dp"
+                        android:layout_marginTop="1dp"
+                        android:background="#DADADC">
+                </View>
+
+                <!-- text -->
+                <TextView
+                        android:id="@+id/sign_out_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:textColor="#4a4a4a"
+                        android:text="Sign out"
+                        android:textSize="20dp">
+                </TextView>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</android.support.v4.widget.DrawerLayout>

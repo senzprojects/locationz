@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:background="@drawable/my_sensor_background"
+        android:layout_height="80dp">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <RelativeLayout
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="10dp"
+            android:id="@+id/friend_list_row_layout_user_icon"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/circle_shape_gray"
+            android:layout_centerVertical="true">
+            <TextView
+                android:id="@+id/icon_text"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:textColor="#ffffff"
+                android:text="#"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:layout_toRightOf="@+id/friend_list_row_layout_user_icon"
+            android:layout_height="fill_parent">
+            <TextView
+                    android:id="@+id/friend_list_row_layout_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="5dp"
+                    android:textSize="20dp"
+                    android:text="Eranga herath"
+                    android:textColor="#4a4a4a">
+            </TextView>
+
+            <TextView
+                    android:id="@+id/friend_list_row_layout_phone"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_below="@+id/friend_list_row_layout_name"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="5dp"
+                    android:textSize="15dp"
+                    android:text="0775434015"
+                    android:textColor="#4a4a4a">
+            </TextView>
+
+        </RelativeLayout>
+
+
+        <!-- divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentBottom="true"
+            android:background="#DADADC" >
+        </View>
+    </RelativeLayout>
+
+</LinearLayout>
