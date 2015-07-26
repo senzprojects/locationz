@@ -15,7 +15,7 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import com.score.senzors.R;
-import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.application.SenzApplication;
 import com.score.senzors.listeners.ContactReaderListener;
 import com.score.senzors.pojos.User;
 import com.score.senzors.services.ContactReader;
@@ -30,7 +30,7 @@ import java.util.ArrayList;
  */
 public class FriendListActivity extends Activity implements SearchView.OnQueryTextListener, ContactReaderListener {
 
-    private SenzorApplication application;
+    private SenzApplication application;
     private ListView friendListView;
     private SearchView searchView;
     private MenuItem searchMenuItem;
@@ -43,7 +43,7 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_layout);
-        application = (SenzorApplication) this.getApplication();
+        application = (SenzApplication) this.getApplication();
 
         setActionBar();
         readContacts();

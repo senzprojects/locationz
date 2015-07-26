@@ -10,9 +10,9 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.LocationClient;
+//import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationRequest;
-import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.application.SenzApplication;
 import com.score.senzors.pojos.LatLon;
 import com.score.senzors.pojos.Query;
 import com.score.senzors.utils.QueryParser;
@@ -24,7 +24,7 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
                                                           com.google.android.gms.location.LocationListener {
 
     private static final String TAG = GpsReadingService.class.getName();
-    private SenzorApplication application;
+    private SenzApplication application;
 
     // Milliseconds per second
     private static final int MILLISECONDS_PER_SECOND = 1000;
@@ -38,7 +38,7 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
     private static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
 
     // Define an object that holds accuracy and frequency parameters
-    private LocationClient locationClient;
+    //private LocationClient locationClient;
     private LocationRequest locationRequest;
 
     // two types of location request
@@ -51,8 +51,8 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
      */
     @Override
     public void onCreate() {
-        application = (SenzorApplication) getApplication();
-        locationClient = new LocationClient(getApplicationContext(), this,this);
+        application = (SenzApplication) getApplication();
+        //locationClient = new LocationClient(getApplicationContext(), this,this);
 
         // Create the LocationRequest object
         locationRequest = LocationRequest.create();
@@ -70,7 +70,7 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         isMyLocation = intent.getExtras().getBoolean("isMyLocation");
-        if (isServicesConnected()) locationClient.connect();
+        //if (isServicesConnected()) locationClient.connect();
 
         // If we get killed, after returning from here, restart
         return START_STICKY;
@@ -98,7 +98,7 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
     @Override
     public void onConnected(Bundle arg0) {
         Log.d(TAG, "OnConnected: location client connected");
-        locationClient.requestLocationUpdates(locationRequest, this);
+        //locationClient.requestLocationUpdates(locationRequest, this);
     }
 
     /**
@@ -157,21 +157,21 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
         }
 
         // If the client is connected
-        if (locationClient.isConnected()) {
+        //if (locationClient.isConnected()) {
             /*
              * Remove location updates for a listener.
              * The current Activity is the listener, so
              * the argument is "this".
              */
             Log.d(TAG, "OnLocationChanged: removed location updates");
-            locationClient.removeLocationUpdates(this);
-        }
+            //locationClient.removeLocationUpdates(this);
+        //}
 
         /*
          * After disconnect() is called, the client is
          * considered "dead".
          */
-        locationClient.disconnect();
+        //locationClient.disconnect();
         stopSelf();
     }
 

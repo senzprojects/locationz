@@ -15,7 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.application.SenzApplication;
 import com.score.senzors.R;
 import com.score.senzors.pojos.LatLon;
 import com.score.senzors.pojos.Sensor;
@@ -33,7 +33,7 @@ import java.util.ArrayList;
 public class SensorList extends Fragment implements Handler.Callback {
 
     private static final String TAG = SensorList.class.getName();
-    private SenzorApplication application;
+    private SenzApplication application;
 
     // list view components
     private ListView sensorListView;
@@ -63,7 +63,7 @@ public class SensorList extends Fragment implements Handler.Callback {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        application = (SenzorApplication) getActivity().getApplication();
+        application = (SenzApplication) getActivity().getApplication();
         typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
 
         initEmptyView();
@@ -127,7 +127,7 @@ public class SensorList extends Fragment implements Handler.Callback {
         // two sensor types to display
         //  1. My senzors
         //  2. Friends senzors
-        if(SenzorApplication.SENSOR_TYPE.equalsIgnoreCase(SenzorApplication.MY_SENSORS)) {
+        if(SenzApplication.SENSOR_TYPE.equalsIgnoreCase(SenzApplication.MY_SENSORS)) {
             // display my sensors
             //  1. initialize my sensors
             //  2. initialize location listener

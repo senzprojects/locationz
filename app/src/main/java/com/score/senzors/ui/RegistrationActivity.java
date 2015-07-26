@@ -12,7 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.score.senzors.R;
-import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.application.SenzApplication;
 import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.exceptions.*;
 import com.score.senzors.pojos.User;
@@ -33,7 +33,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
 
     private static final String TAG = RegistrationActivity.class.getName();
     private final WebSocketConnection webSocketConnection = new WebSocketConnection();
-    private SenzorApplication application;
+    private SenzApplication application;
 
     // UI fields
     private EditText editTextPhoneNo;
@@ -53,7 +53,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.registration_layout);
-        application = (SenzorApplication) this.getApplication();
+        application = (SenzApplication) this.getApplication();
         application.setCallback(this);
 
         initUi();
@@ -143,7 +143,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      */
     private void registerUser() {
         try {
-            webSocketConnection.connect(SenzorApplication.WEB_SOCKET_URI, new WebSocketConnectionHandler() {
+            webSocketConnection.connect(SenzApplication.WEB_SOCKET_URI, new WebSocketConnectionHandler() {
                 @Override
                 public void onOpen() {
                     // send put query

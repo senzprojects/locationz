@@ -12,7 +12,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.application.SenzApplication;
 import com.score.senzors.R;
 import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.pojos.Sensor;
@@ -30,7 +30,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
 
     private static final String TAG = ShareActivity.class.getName();
 
-    private SenzorApplication application;
+    private SenzApplication application;
     private Sensor sharingSensor;
     private User sharingUser;
 
@@ -40,7 +40,7 @@ public class ShareActivity extends Activity implements Handler.Callback {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.share_layout);
-        application = (SenzorApplication) getApplication();
+        application = (SenzApplication) getApplication();
 
         initSharingData();
         initUi();

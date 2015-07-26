@@ -4,7 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
-import com.score.senzors.application.SenzorApplication;
+
+import com.score.senzors.application.SenzApplication;
 import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.exceptions.InvalidQueryException;
 import com.score.senzors.pojos.LatLon;
@@ -79,7 +80,7 @@ public class QueryHandler {
      * @param application application object
      * @param payload payload from server
      */
-    public static void handleQuery(SenzorApplication application, String payload) {
+    public static void handleQuery(SenzApplication application, String payload) {
         try {
             // need to parse query in order to further processing
             Query query = QueryParser.parse(payload);
@@ -118,7 +119,7 @@ public class QueryHandler {
      * @param application application
      * @param query parsed query
      */
-    private static void handleStatusQuery(SenzorApplication application, Query query) {
+    private static void handleStatusQuery(SenzApplication application, Query query) {
         // get status from query
         String status = "success";
 
@@ -139,7 +140,7 @@ public class QueryHandler {
      * @param application application
      * @param query parsed query
      */
-    private static void handleShareQuery(SenzorApplication application, Query query) {
+    private static void handleShareQuery(SenzApplication application, Query query) {
         // get or create matching user
         // create/save new sensor in db
         String username = PhoneBookUtils.getContactName(application, query.getUser());
@@ -155,7 +156,7 @@ public class QueryHandler {
 
             // currently we have to launch friend sensor
             // update notification to notify user about incoming query/ share request
-            SenzorApplication.SENSOR_TYPE = SenzorApplication.FRIENDS_SENSORS;
+            SenzApplication.SENSOR_TYPE = SenzApplication.FRIENDS_SENSORS;
             NotificationUtils.updateNotification(application.getApplicationContext(), "Location @" + user.getUsername());
         } catch (Exception e) {
             // Db exception here
@@ -168,7 +169,7 @@ public class QueryHandler {
      * @param application application
      * @param query parsed query
      */
-    private static void handleUnShareQuery(SenzorApplication application, Query query) {
+    private static void handleUnShareQuery(SenzApplication application, Query query) {
         // get match user and sensor
         User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser());
         Sensor sensor = new Sensor("0", "Location", "Location", false, user, null);
@@ -181,7 +182,7 @@ public class QueryHandler {
 
             // currently we have to launch friend sensor
             // update notification to notify user about incoming query/ share request
-            SenzorApplication.SENSOR_TYPE = SenzorApplication.FRIENDS_SENSORS;
+            SenzApplication.SENSOR_TYPE = SenzApplication.FRIENDS_SENSORS;
             NotificationUtils.updateNotification(application.getApplicationContext(), "Unshared Location @" + user.getUsername());
         } catch (Exception e) {
             // Db exception here
@@ -194,7 +195,7 @@ public class QueryHandler {
      * @param application application
      * @param query parsed query
      */
-    private static void handleGetQuery(SenzorApplication application, Query query) {
+    private static void handleGetQuery(SenzApplication application, Query query) {
         // get location by starting location service
         if(application.getWebSocketConnection().isConnected()) {
             // current location request is from web socket service
@@ -213,7 +214,7 @@ public class QueryHandler {
      * @param application application
      * @param query parsed query
      */
-    private static void handleDataQuery(SenzorApplication application, Query query) {
+    private static void handleDataQuery(SenzApplication application, Query query) {
         if(query.getUser().equalsIgnoreCase("mysensors")) {
             if (query.getParams().containsKey("pubkey")) {
                 ExtractServerKeys(application, query);
@@ -239,7 +240,7 @@ public class QueryHandler {
      *      2. session key
      * @param query parsed query
      */
-    private static void ExtractServerKeys(SenzorApplication application, Query query) {
+    private static void ExtractServerKeys(SenzApplication application, Query query) {
         // receives server public key and session key
         // @mysensors DATA #pubkey <public key> #websocketkey <session key>
         try {
@@ -258,7 +259,7 @@ public class QueryHandler {
      * @param application application
      * @param obj payload from server
      */
-    private static void sendMessage(SenzorApplication application, Object obj) {
+    private static void sendMessage(SenzApplication application, Object obj) {
         Message message = Message.obtain();
         message.obj = obj;
         if (application.getHandler()!=null) {

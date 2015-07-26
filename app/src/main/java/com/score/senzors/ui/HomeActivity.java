@@ -14,7 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
-import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.application.SenzApplication;
 import com.score.senzors.pojos.DrawerItem;
 import com.score.senzors.R;
 import com.score.senzors.services.WebSocketService;
@@ -134,7 +134,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         // initialize drawer content
         // need to determine selected item according to the currently selected sensor type
         drawerItemList = new ArrayList<DrawerItem>();
-        if(SenzorApplication.SENSOR_TYPE.equalsIgnoreCase(SenzorApplication.MY_SENSORS)) {
+        if(SenzApplication.SENSOR_TYPE.equalsIgnoreCase(SenzApplication.MY_SENSORS)) {
             drawerItemList.add(new DrawerItem("My.senZors", R.drawable.my_sensz_normal, R.drawable.my_sensz_selected, true));
             drawerItemList.add(new DrawerItem("Friends.senZors", R.drawable.friends_normal, R.drawable.friends_selected, false));
         } else {
@@ -237,13 +237,13 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
             if(position == 0) {
                 // set
                 //  1. sensor type
-                SenzorApplication.SENSOR_TYPE = SenzorApplication.MY_SENSORS;
+                SenzApplication.SENSOR_TYPE = SenzApplication.MY_SENSORS;
                 loadSensors();
                 drawerItemList.get(0).setSelected(true);
             } else if(position==1) {
                 // set
                 //  1. sensor type
-                SenzorApplication.SENSOR_TYPE = SenzorApplication.FRIENDS_SENSORS;
+                SenzApplication.SENSOR_TYPE = SenzApplication.FRIENDS_SENSORS;
                 loadSensors();
                 drawerItemList.get(1).setSelected(true);
             }

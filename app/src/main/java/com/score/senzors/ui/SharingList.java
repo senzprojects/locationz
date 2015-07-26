@@ -13,7 +13,7 @@ import android.view.ViewStub;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.application.SenzApplication;
 import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.pojos.User;
 import com.score.senzors.R;
@@ -33,7 +33,7 @@ public class SharingList extends Fragment implements Handler.Callback {
     private static final String TAG = SharingList.class.getName();
 
     // use to populate list
-    private SenzorApplication application;
+    private SenzApplication application;
     private ListView friendListView;
     private ArrayList<User> userList;
     private SharingListAdapter adapter;
@@ -46,7 +46,7 @@ public class SharingList extends Fragment implements Handler.Callback {
         super.onActivityCreated(savedInstanceState);
 
         // after creating fragment we initialize friend list
-        application = (SenzorApplication) this.getActivity().getApplication();
+        application = (SenzApplication) this.getActivity().getApplication();
         initEmptyView();
         initFriendList();
     }

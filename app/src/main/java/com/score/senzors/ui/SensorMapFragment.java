@@ -14,7 +14,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
 import com.score.senzors.R;
-import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.application.SenzApplication;
 import com.score.senzors.pojos.LatLon;
 import com.score.senzors.services.GpsReadingService;
 import com.score.senzors.utils.ActivityUtils;
@@ -29,7 +29,7 @@ import com.score.senzors.utils.ActivityUtils;
 public class SensorMapFragment extends Fragment implements View.OnClickListener, Handler.Callback, GoogleMap.OnMarkerClickListener {
 
     private static final String TAG = SensorMapFragment.class.getName();
-    private SenzorApplication application;
+    private SenzApplication application;
 
     private GoogleMap map;
     private Marker marker;
@@ -57,7 +57,7 @@ public class SensorMapFragment extends Fragment implements View.OnClickListener,
         super.onActivityCreated(savedInstanceState);
 
         Log.d(TAG, "OnActivityCreated: activity created");
-        application = (SenzorApplication) this.getActivity().getApplication();
+        application = (SenzApplication) this.getActivity().getApplication();
         initUi();
         setUpMapIfNeeded();
     }

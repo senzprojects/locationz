@@ -9,7 +9,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import com.score.senzors.R;
-import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.application.SenzApplication;
 import com.score.senzors.exceptions.NoUserException;
 import com.score.senzors.pojos.User;
 import com.score.senzors.utils.ActivityUtils;
@@ -31,7 +31,7 @@ import java.security.NoSuchAlgorithmException;
 public class WebSocketService extends Service implements Handler.Callback {
 
     private static final String TAG = WebSocketService.class.getName();
-    private SenzorApplication application;
+    private SenzApplication application;
     private boolean isRunning;
 
     public static final String WEB_SOCKET_CONNECTED = "WEB_SOCKET_CONNECTED";
@@ -47,7 +47,7 @@ public class WebSocketService extends Service implements Handler.Callback {
      */
     @Override
     public void onCreate() {
-        application = (SenzorApplication) getApplication();
+        application = (SenzApplication) getApplication();
         isRunning = false;
     }
 
@@ -101,9 +101,9 @@ public class WebSocketService extends Service implements Handler.Callback {
      *
      * @param application application object
      */
-    public void connectToWebSocket(final SenzorApplication application) {
+    public void connectToWebSocket(final SenzApplication application) {
         try {
-            application.getWebSocketConnection().connect(SenzorApplication.WEB_SOCKET_URI, new WebSocketConnectionHandler() {
+            application.getWebSocketConnection().connect(SenzApplication.WEB_SOCKET_URI, new WebSocketConnectionHandler() {
                 @Override
                 public void onOpen() {
                     // connected to web socket so notify it to activity

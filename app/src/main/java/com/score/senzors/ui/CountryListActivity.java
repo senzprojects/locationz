@@ -15,7 +15,7 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import com.score.senzors.R;
-import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.application.SenzApplication;
 import com.score.senzors.pojos.Country;
 import com.score.senzors.utils.ActivityUtils;
 
@@ -27,7 +27,7 @@ import java.util.ArrayList;
  * @author eranga herath(erangaeb@gmail.com)
  */
 public class CountryListActivity extends Activity implements SearchView.OnQueryTextListener {
-    private SenzorApplication application;
+    private SenzApplication application;
     private ListView countryListView;
     private SearchView searchView;
     private MenuItem searchMenuItem;
@@ -40,7 +40,7 @@ public class CountryListActivity extends Activity implements SearchView.OnQueryT
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_layout);
-        application = (SenzorApplication) this.getApplication();
+        application = (SenzApplication) this.getApplication();
 
         setActionBar();
         initCountryList();

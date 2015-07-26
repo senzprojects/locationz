@@ -17,7 +17,7 @@ import java.util.ArrayList;
  *
  * @author erangaeb@gmail.com (eranga herath)
  */
-public class SenzorApplication extends Application {
+public class SenzApplication extends Application {
 
     // determine sensor type
     //  1. my sensors
@@ -25,6 +25,10 @@ public class SenzorApplication extends Application {
     public final static String MY_SENSORS = "MY_SENSORS";
     public final static String FRIENDS_SENSORS = "FRIENDS_SENSORS";
     public static String SENSOR_TYPE = MY_SENSORS;
+
+    // UDP server host and port
+    public final static String SENZ_HOST = "10.2.2.132";
+    public final static int PORT = 9090;
 
     // web socket server up and running in this API
     // need to connect this server when starting the app

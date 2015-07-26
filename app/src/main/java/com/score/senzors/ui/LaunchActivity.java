@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import com.score.senzors.R;
-import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.application.SenzApplication;
 
 /**
  * Empty launch activity, this will determine which activity to launch
@@ -19,7 +19,7 @@ public class LaunchActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.empty);
 
-        SenzorApplication application = (SenzorApplication) this.getApplication();
+        SenzApplication application = (SenzApplication) this.getApplication();
 
         // determine where to go
         if(application.getWebSocketConnection().isConnected()) {

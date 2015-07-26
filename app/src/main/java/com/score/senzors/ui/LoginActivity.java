@@ -16,10 +16,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.score.senzors.R;
-import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.application.SenzApplication;
 import com.score.senzors.db.SenzorsDbSource;
 import com.score.senzors.exceptions.NoUserException;
 import com.score.senzors.pojos.User;
+import com.score.senzors.services.SenzService;
 import com.score.senzors.services.WebSocketService;
 import com.score.senzors.utils.*;
 
@@ -35,7 +36,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
 
     private static final String TAG = LoginActivity.class.getName();
 
-    private SenzorApplication application;
+    private SenzApplication application;
     private DataUpdateReceiver dataUpdateReceiver;
 
     private EditText editTextPhoneNo;
@@ -56,7 +57,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
 
-        application = (SenzorApplication) this.getApplication();
+        application = (SenzApplication) this.getApplication();
         initUi();
     }
 
@@ -129,7 +130,9 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     @Override
     public void onClick(View v) {
         if (v==signInButton) {
-            login();
+            //login();
+            Intent serviceIntent = new Intent(LoginActivity.this, SenzService.class);
+            startService(serviceIntent);
         } else if(v==signUpButton) {
             switchToRegister();
         }

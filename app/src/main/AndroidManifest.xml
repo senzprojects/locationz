@@ -35,7 +35,7 @@
         android:label="@string/app_name"
         android:debuggable="false"
         android:icon="@drawable/senz_logo"
-        android:name=".application.SenzorApplication">
+        android:name=".application.SenzApplication">
 
         <!-- production key -->
         <!--<meta-data-->

@@ -10,7 +10,7 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.score.senzors.R;
-import com.score.senzors.application.SenzorApplication;
+import com.score.senzors.application.SenzApplication;
 import com.score.senzors.exceptions.NoUserException;
 import com.score.senzors.pojos.User;
 import com.score.senzors.services.WebSocketService;
@@ -31,7 +31,7 @@ public class SplashActivity extends Activity implements Handler.Callback {
     private final int SPLASH_DISPLAY_LENGTH = 2000;
     private static final String TAG = SplashActivity.class.getName();
 
-    private SenzorApplication application;
+    private SenzApplication application;
     private User loginUser;
 
     /**
@@ -46,7 +46,7 @@ public class SplashActivity extends Activity implements Handler.Callback {
         TextView appName = (TextView) findViewById(R.id.splash_text);
         appName.setTypeface(typefaceThin, Typeface.BOLD);
 
-        application = (SenzorApplication) getApplication();
+        application = (SenzApplication) getApplication();
     }
 
     /**
