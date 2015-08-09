@@ -2,8 +2,6 @@ package com.score.senz.services;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Handler;
 import android.os.IBinder;
 
 import java.io.IOException;
@@ -12,8 +10,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Service for listen UDP socket
@@ -22,8 +18,7 @@ import java.util.TimerTask;
 public class SenzService extends Service {
 
     private static final String TAG = WebSocketService.class.getName();
-    final Handler handler = new Handler();
-    private boolean isRunning;
+
     // we are listing for UDP socket
     private DatagramSocket socket;
     private InetAddress address;
@@ -33,7 +28,6 @@ public class SenzService extends Service {
      */
     @Override
     public void onCreate() {
-        this.isRunning = false;
     }
 
     /**
@@ -42,12 +36,8 @@ public class SenzService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         initUdpSocket();
-        //new UdpSender().execute("ping");
-        //new UdpListener().execute("UDP");
-        startUdpSender();
-        startUdpListener();
-
-        this.isRunning = true;
+        initUdpSender();
+        initUdpListener();
 
         // If we get killed, after returning from here, restart
         return START_NOT_STICKY;
@@ -67,12 +57,7 @@ public class SenzService extends Service {
      */
     @Override
     public void onDestroy() {
-        // here we
-        //  1. cancel/update all notifications
-        //  2. delete all sensors in my sensor list
-        //  3. send broadcast message about service disconnecting
         stopForeground(true);
-        this.isRunning = false;
     }
 
     /**
@@ -84,27 +69,27 @@ public class SenzService extends Service {
             if (socket == null || socket.isClosed()) {
                 socket = new DatagramSocket();
             }
-        } catch (SocketException e) {
-            e.printStackTrace();
-        } catch (UnknownHostException e) {
+        } catch (SocketException | UnknownHostException e) {
             e.printStackTrace();
         }
     }
 
-    private void startUdpSender() {
+    /**
+     * Start thread to send periodic ping messages to server, in current implementation
+     * we are sending messages in every minute(60, 000  ms)
+     *
+     * The purpose of sending ping message is notify NAT table updates to server
+     */
+    private void initUdpSender() {
         new Thread(new Runnable() {
             public void run() {
-                for (; ; ) {
+                while (true) {
                     try {
                         String message = "ping";
 
                         // send message
                         DatagramPacket sendPacket = new DatagramPacket(message.getBytes(), message.length(), address, 9090);
                         socket.send(sendPacket);
-                    } catch (SocketException e) {
-                        e.printStackTrace();
-                    } catch (UnknownHostException e) {
-                        e.printStackTrace();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -119,13 +104,17 @@ public class SenzService extends Service {
         }).start();
     }
 
-    private void startUdpListener() {
+    /**
+     * Start thread for listen to UDP socket, all the incoming messages receives from
+     * here, when message receives it should be broadcast or delegate to appropriate message
+     * handler
+     */
+    private void initUdpListener() {
         new Thread(new Runnable() {
             public void run() {
                 byte[] message = new byte[1500];
                 DatagramPacket packet = new DatagramPacket(message, message.length, address, 9090);
 
-                // send
                 try {
                     while (true) {
                         socket.receive(packet);
@@ -134,97 +123,10 @@ public class SenzService extends Service {
                         System.out.println("-------------");
                         System.out.println(fromServer);
                     }
-                } catch (SocketException e) {
-                    isRunning = false;
-                    e.printStackTrace();
                 } catch (IOException e) {
-                    isRunning = false;
                     e.printStackTrace();
                 }
             }
         }).start();
-    }
-
-    /**
-     * Async task to send data to senz server
-     */
-    public class UdpSender extends AsyncTask<String, String, String> {
-
-        @Override
-        protected String doInBackground(String[] params) {
-            initSender();
-
-            return null;
-        }
-
-        private void initSender() {
-            Timer timer = new Timer();
-            TimerTask task = new TimerTask() {
-                @Override
-                public void run() {
-                    handler.post(new Runnable() {
-                        public void run() {
-                            try {
-                                String message = "ping";
-
-                                // send message
-                                DatagramPacket sendPacket = new DatagramPacket(message.getBytes(), message.length(), address, 9090);
-                                socket.send(sendPacket);
-                            } catch (SocketException e) {
-                                e.printStackTrace();
-                            } catch (UnknownHostException e) {
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                }
-            };
-            timer.schedule(task, 0, 1000);
-        }
-
-        @Override
-        protected void onPostExecute(String o) {
-            super.onPostExecute(o);
-        }
-    }
-
-    /**
-     * Async tack to listen UDP socket
-     */
-    public class UdpListener extends AsyncTask<String, String, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            initListener();
-
-            return null;
-        }
-
-        /**
-         * Initialize to listen for UDP socket
-         */
-        private void initListener() {
-            byte[] message = new byte[1500];
-            DatagramPacket packet = new DatagramPacket(message, message.length, address, 9090);
-
-            // send
-            try {
-                while (true) {
-                    socket.receive(packet);
-                    String fromServer = new String(message, 0, packet.getLength());
-
-                    System.out.println("-------------");
-                    System.out.println(fromServer);
-                }
-            } catch (SocketException e) {
-                isRunning = false;
-                e.printStackTrace();
-            } catch (IOException e) {
-                isRunning = false;
-                e.printStackTrace();
-            }
-        }
     }
 }
