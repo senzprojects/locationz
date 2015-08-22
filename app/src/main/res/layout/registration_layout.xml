@@ -94,40 +94,6 @@
 
                 </EditText>
 
-                <EditText
-                        android:layout_width="fill_parent"
-                        android:paddingLeft="15dp"
-                        android:hint="Password"
-                        android:layout_marginTop="25dp"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColorHint="#ffffff"
-                        android:layout_height="40dp"
-                        android:textColor="#ffffff"
-                        android:singleLine="true"
-                        android:password="true"
-                        android:background="@drawable/username_field_shape"
-                        android:layout_below="@+id/registration_username"
-                        android:id="@+id/registration_password">
-                </EditText>
-
-                <EditText
-                        android:layout_width="fill_parent"
-                        android:paddingLeft="15dp"
-                        android:hint="Confirm Password"
-                        android:layout_marginTop="25dp"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColorHint="#ffffff"
-                        android:layout_height="40dp"
-                        android:textColor="#ffffff"
-                        android:singleLine="true"
-                        android:password="true"
-                        android:background="@drawable/username_field_shape"
-                        android:layout_below="@+id/registration_password"
-                        android:id="@+id/registration_confirm_password">
-                </EditText>
-
             </RelativeLayout>
 
             <RelativeLayout

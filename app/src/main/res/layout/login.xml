@@ -52,22 +52,6 @@
                         android:id="@+id/login_phone_no">
                 </EditText>
 
-                <EditText
-                        android:layout_width="fill_parent"
-                        android:layout_height="40dp"
-                        android:layout_marginTop="25dp"
-                        android:paddingLeft="15dp"
-                        android:hint="Password"
-                        android:textSize="16sp"
-                        android:singleLine="true"
-                        android:textStyle="bold"
-                        android:textColor="#ffffff"
-                        android:textColorHint="#ffffff"
-                        android:inputType="textPassword"
-                        android:layout_below="@+id/login_phone_no"
-                        android:background="@drawable/username_field_shape"
-                        android:id="@+id/login_password">
-                </EditText>
             </RelativeLayout>
 
             <RelativeLayout

@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.score.senz.exceptions.InvalidInputFieldsException;
 import com.score.senz.exceptions.InvalidPhoneNoException;
-import com.score.senz.exceptions.MismatchPasswordException;
 import com.score.senz.pojos.User;
 
 /**
@@ -28,9 +27,9 @@ public class ActivityUtils {
     /**
      * Hide keyboard
      * Need to hide soft keyboard in following scenarios
-     *  1. When starting background task
-     *  2. When exit from activity
-     *  3. On button submit
+     * 1. When starting background task
+     * 2. When exit from activity
+     * 3. On button submit
      */
     public static void hideSoftKeyboard(Activity activity) {
         InputMethodManager inputMethodManager = (InputMethodManager) activity.getApplicationContext().getSystemService(activity.INPUT_METHOD_SERVICE);
@@ -40,10 +39,11 @@ public class ActivityUtils {
     /**
      * Create and show custom progress dialog
      * Progress dialogs displaying on background tasks
-     *
+     * <p/>
      * So in here
-     *  1. Create custom layout for message dialog
-     *  2, Set messages to dialog
+     * 1. Create custom layout for message dialog
+     * 2, Set messages to dialog
+     *
      * @param context activity context
      * @param message message to be display
      */
@@ -58,7 +58,7 @@ public class ActivityUtils {
      * Cancel progress dialog when background task finish
      */
     public static void cancelProgressDialog() {
-        if (progressDialog!=null) {
+        if (progressDialog != null) {
             progressDialog.cancel();
         }
     }
@@ -66,44 +66,41 @@ public class ActivityUtils {
     /**
      * Validate input fields of registration form,
      * Need to have
-     *      1. non empty valid phone no
-     *      2. non empty username
-     *      3. non empty passwords
-     *      4. two passwords should be match
+     * 1. non empty valid phone no
+     * 2. non empty username
+     * 3. non empty passwords
+     * 4. two passwords should be match
      *
      * @param user User object
-     * @param confirmPassword password
      * @return valid or not
      */
-    public static boolean isValidRegistrationFields(User user, String confirmPassword) throws InvalidInputFieldsException, MismatchPasswordException, InvalidPhoneNoException {
-        if (user.getPhoneNo().isEmpty() || user.getPassword().isEmpty() || confirmPassword.isEmpty()) {
+    public static boolean isValidRegistrationFields(User user) throws InvalidInputFieldsException, InvalidPhoneNoException {
+        if (user.getPhoneNo().isEmpty()) {
             throw new InvalidInputFieldsException();
         }
 
         if (user.getPhoneNo().length() < 9)
             throw new InvalidPhoneNoException();
 
-        if (!user.getPassword().equals(confirmPassword)) {
-            throw new MismatchPasswordException();
-        }
-
         return true;
     }
 
     /**
      * validate input fields of login form
+     *
      * @param user login user
      * @return valid of not
      */
     public static boolean isValidLoginFields(User user) {
-        return !(user.getPhoneNo().isEmpty() || user.getPassword().isEmpty());
+        return !(user.getPhoneNo().isEmpty());
     }
 
     /**
      * Create custom text view for tab view
      * Set custom typeface to the text view as well
+     *
      * @param context application context
-     * @param title tab title
+     * @param title   tab title
      * @return text view
      */
     public static TextView getCustomTextView(Context context, String title) {
