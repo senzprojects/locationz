@@ -38,6 +38,7 @@ import com.score.senz.utils.SenzUtils;
  */
 public class LoginActivity extends Activity implements View.OnClickListener {
 
+    public static final String LOGIN_ACTIVITY_MESSENGER = "LOGIN_ACTIVITY_MESSENGER";
     private static final String TAG = LoginActivity.class.getName();
 
     // keep user object to use in this activity
@@ -45,6 +46,9 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
     // use to send senz messages to SenzService
     Messenger senzServiceMessenger;
+
+    // use to receive messages from the service
+    Messenger activityMessenger;
 
     // connection for SenzService
     private ServiceConnection senzServiceConnection = new ServiceConnection() {
@@ -72,7 +76,11 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
 
+        // init activity messenger
+        // send activity message handler to service in order to send messages to this activity
+        activityMessenger = new Messenger(new SenZMessageHandler());
         Intent serviceIntent = new Intent(LoginActivity.this, SenzService.class);
+        serviceIntent.putExtra(LOGIN_ACTIVITY_MESSENGER, activityMessenger);
         startService(serviceIntent);
 
         initUi();

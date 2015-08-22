@@ -6,7 +6,10 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
+
+import com.score.senz.ui.LoginActivity;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -23,7 +26,10 @@ public class SenzService extends Service {
     private static final String TAG = WebSocketService.class.getName();
 
     // used to receive messages from various activities and services
-    private Messenger serviceMessenger;
+    private Messenger senzServiceMessenger;
+
+    // use to send messages to activity
+    private Messenger activityMessenger;
 
     // we are listing for UDP socket
     private DatagramSocket socket;
@@ -34,7 +40,7 @@ public class SenzService extends Service {
      */
     @Override
     public void onCreate() {
-        serviceMessenger = new Messenger(new MessageHandler());
+        senzServiceMessenger = new Messenger(new MessageHandler());
     }
 
     /**
@@ -42,6 +48,9 @@ public class SenzService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // get activity messenger
+        activityMessenger = intent.getParcelableExtra(LoginActivity.LOGIN_ACTIVITY_MESSENGER);
+
         initUdpSocket();
         initPingSender();
         initUdpListener();
@@ -55,7 +64,7 @@ public class SenzService extends Service {
      */
     @Override
     public IBinder onBind(Intent intent) {
-        return serviceMessenger.getBinder();
+        return senzServiceMessenger.getBinder();
     }
 
     /**
@@ -127,8 +136,15 @@ public class SenzService extends Service {
                         String senz = new String(message, 0, packet.getLength());
 
                         Log.d(TAG, "SenZ received: " + senz);
+
+                        // send message to activity
+                        Message messageToActivity = new Message();
+                        messageToActivity.obj = "this is from service....";
+                        activityMessenger.send(messageToActivity);
                     }
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (RemoteException e) {
                     e.printStackTrace();
                 }
             }

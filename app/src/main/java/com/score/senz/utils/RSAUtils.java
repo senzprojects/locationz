@@ -15,6 +15,7 @@ import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 /**
@@ -25,11 +26,14 @@ public class RSAUtils {
     public static final String PUBLIC_KEY = "PUBLIC_KEY";
     public static final String PRIVATE_KEY = "PRIVATE_KEY";
 
+    // size of RSA keys
+    public static final int KEY_SIZE = 1024;
+
     public static KeyPair initKeys(Context context) throws NoSuchProviderException, NoSuchAlgorithmException {
         // generate keypair
         KeyPairGenerator keyPairGenerator;
         keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        keyPairGenerator.initialize(256, new SecureRandom());
+        keyPairGenerator.initialize(KEY_SIZE, new SecureRandom());
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
         // save keys in shared preferences
@@ -57,7 +61,7 @@ public class RSAUtils {
         PreferenceUtils.saveRsaKey(context, privateKey, RSAUtils.PRIVATE_KEY);
     }
 
-    public static PublicKey getPublicKey(Context context) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public static PublicKey getPublicKey(Context context) throws InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException {
         // get key string from shared preference
         String keyString = PreferenceUtils.getRsaKey(context, RSAUtils.PUBLIC_KEY);
 
@@ -74,7 +78,7 @@ public class RSAUtils {
         String keyString = PreferenceUtils.getRsaKey(context, RSAUtils.PRIVATE_KEY);
 
         // convert to string key public key
-        X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.decode(keyString, Base64.DEFAULT));
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(Base64.decode(keyString, Base64.DEFAULT));
         KeyFactory kf = KeyFactory.getInstance("RSA");
         PrivateKey privateKey = kf.generatePrivate(spec);
 

@@ -16,6 +16,15 @@ import com.score.senz.exceptions.InvalidPhoneNoException;
 import com.score.senz.pojos.User;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.PhoneBookUtils;
+import com.score.senz.utils.RSAUtils;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
 
 /**
  * Activity class that handles user registrations
@@ -121,6 +130,27 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      */
     private void registerUser() {
         // send public key to SenZ server(via senz message)
+        try {
+            RSAUtils.initKeys(this);
+            PublicKey publicKey = RSAUtils.getPublicKey(this);
+            PrivateKey privateKey = RSAUtils.getPrivateKey(this);
+
+            String message = "SenZ";
+            String signature = RSAUtils.getDigitalSignature(message, privateKey);
+            System.out.println("signature: " + signature);
+
+            System.out.println(RSAUtils.verifyDigitalSignature(message, signature, publicKey));
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
