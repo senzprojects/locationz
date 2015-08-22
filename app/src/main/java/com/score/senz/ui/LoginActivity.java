@@ -2,19 +2,25 @@ package com.score.senz.ui;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.score.senz.R;
 import com.score.senz.application.SenzApplication;
 import com.score.senz.db.SenzorsDbSource;
@@ -22,7 +28,12 @@ import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.User;
 import com.score.senz.services.SenzService;
 import com.score.senz.services.WebSocketService;
-import com.score.senz.utils.*;
+import com.score.senz.utils.ActivityUtils;
+import com.score.senz.utils.NetworkUtil;
+import com.score.senz.utils.PhoneBookUtils;
+import com.score.senz.utils.PreferenceUtils;
+import com.score.senz.utils.QueryHandler;
+import com.score.senz.utils.SenzUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -35,10 +46,22 @@ import java.security.NoSuchAlgorithmException;
 public class LoginActivity extends Activity implements View.OnClickListener, Handler.Callback {
 
     private static final String TAG = LoginActivity.class.getName();
+    // keep user object to use in this activity
+    User loginUser;
+    Messenger mService;
 
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mService = new Messenger(service);
+
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            mService = null;
+        }
+    };
     private SenzApplication application;
     private DataUpdateReceiver dataUpdateReceiver;
-
     private EditText editTextPhoneNo;
     private EditText editTextPassword;
     private TextView headerText;
@@ -47,15 +70,15 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     private RelativeLayout signInButton;
     private RelativeLayout signUpButton;
 
-    // keep user object to use in this activity
-    User loginUser;
-
     /**
      * {@inheritDoc}
      */
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
+
+        Intent serviceIntent = new Intent(LoginActivity.this, SenzService.class);
+        startService(serviceIntent);
 
         application = (SenzApplication) this.getApplication();
         initUi();
@@ -66,6 +89,9 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      */
     protected void onResume() {
         super.onResume();
+
+        bindService(new Intent(LoginActivity.this, SenzService.class), mConnection, Context.BIND_AUTO_CREATE);
+
         application.setCallback(this);
         displayUserCredentials();
 
@@ -129,11 +155,16 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
      */
     @Override
     public void onClick(View v) {
-        if (v==signInButton) {
-            //login();
-            Intent serviceIntent = new Intent(LoginActivity.this, SenzService.class);
-            startService(serviceIntent);
-        } else if(v==signUpButton) {
+        if (v == signInButton) {
+            // send
+            Message msg = new Message();
+            msg.obj = "Hi service..";
+            try {
+                mService.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        } else if (v == signUpButton) {
             switchToRegister();
         }
     }
@@ -145,10 +176,10 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
     private void login() {
         initLoginUser();
 
-        if(NetworkUtil.isAvailableNetwork(LoginActivity.this)) {
-            if(ActivityUtils.isValidLoginFields(loginUser)) {
+        if (NetworkUtil.isAvailableNetwork(LoginActivity.this)) {
+            if (ActivityUtils.isValidLoginFields(loginUser)) {
                 // we are authenticate with web sockets
-                if(!application.getWebSocketConnection().isConnected()) {
+                if (!application.getWebSocketConnection().isConnected()) {
                     ActivityUtils.hideSoftKeyboard(this);
                     ActivityUtils.showProgressDialog(LoginActivity.this, "Connecting to senZors...");
 
@@ -231,15 +262,15 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
         ActivityUtils.cancelProgressDialog();
 
         // we handle string messages only from here
-        if(message.obj instanceof String) {
-            String payLoad = (String)message.obj;
+        if (message.obj instanceof String) {
+            String payLoad = (String) message.obj;
             if (payLoad.equalsIgnoreCase("SERVER_KEY_EXTRACTION_SUCCESS")) {
                 Log.d(TAG, "HandleMessage: server key extracted");
 
                 // server key extraction success
                 // so send PUT query to create user
                 try {
-                    if(application.getWebSocketConnection().isConnected()) {
+                    if (application.getWebSocketConnection().isConnected()) {
                         String loginQuery = QueryHandler.getLoginQuery(loginUser, PreferenceUtils.getSessionKey(this));
                         Log.d(TAG, "------login query------");
                         Log.d(TAG, loginQuery);
@@ -250,7 +281,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
                 } catch (NoSuchAlgorithmException e) {
                     Log.e(TAG, e.getMessage());
                 }
-            } else if(payLoad.equalsIgnoreCase("LoginSUCCESS")) {
+            } else if (payLoad.equalsIgnoreCase("LoginSUCCESS")) {
                 Log.d(TAG, "HandleMessage: login success");
 
                 setUpApp();
@@ -268,11 +299,19 @@ public class LoginActivity extends Activity implements View.OnClickListener, Han
         return false;
     }
 
+    private class IncomingHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            String str = (String) msg.obj;
+            System.out.println("message from service :" + str);
+        }
+    }
+
     /**
      * Register this receiver to get connect/ disconnect messages from web socket
      * Need to do relevant action according to the message, actions as below
-     *  1. connect - send login query to server via web socket connections
-     *  2. disconnect - logout user
+     * 1. connect - send login query to server via web socket connections
+     * 2. disconnect - logout user
      */
     private class DataUpdateReceiver extends BroadcastReceiver {
         @Override
