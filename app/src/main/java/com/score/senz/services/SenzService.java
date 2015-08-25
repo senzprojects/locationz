@@ -6,10 +6,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.RemoteException;
 import android.util.Log;
-
-import com.score.senz.ui.LoginActivity;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -25,14 +22,11 @@ public class SenzService extends Service {
     private static final String TAG = SenzService.class.getName();
 
     // senz service host and port
-    private static final String SENZ_HOST = "connect.mysensors.info";
+    private static final String SENZ_HOST = "udp.mysensors.info";
     private static final int SENZ_PORT = 9090;
 
     // used to receive messages from various activities and services
     private Messenger senzServiceMessenger;
-
-    // use to send messages to activity
-    private Messenger activityMessenger;
 
     // we are listing for UDP socket
     private DatagramSocket socket;
@@ -50,9 +44,6 @@ public class SenzService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // get activity messenger
-        activityMessenger = intent.getParcelableExtra(LoginActivity.LOGIN_ACTIVITY_MESSENGER);
-
         initUdpSocket();
         initPingSender();
         initUdpListener();
@@ -136,18 +127,14 @@ public class SenzService extends Service {
 
                         Log.d(TAG, "SenZ received: " + senz);
 
-                        // send message to activity
-                        Message messageToActivity = new Message();
-                        messageToActivity.obj = "this is from service....";
-                        activityMessenger.send(messageToActivity);
+                        // broadcast message or send message to query handler
                     }
-                } catch (IOException | RemoteException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }).start();
     }
-
 
     /**
      * Activities and other Services sends messages to SenzService via this

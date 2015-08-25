@@ -28,7 +28,7 @@ public class SenzApplication extends Application {
 
     // UDP server host and port
     public final static String SENZ_HOST = "10.2.2.132";
-    public final static int PORT = 9090;
+    public final static int SENZ_PORT = 9090;
 
     // web socket server up and running in this API
     // need to connect this server when starting the app

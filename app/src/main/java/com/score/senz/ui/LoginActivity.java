@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
@@ -47,17 +46,13 @@ import java.security.spec.InvalidKeySpecException;
  */
 public class LoginActivity extends Activity implements View.OnClickListener {
 
-    public static final String LOGIN_ACTIVITY_MESSENGER = "LOGIN_ACTIVITY_MESSENGER";
-    private static final String TAG = LoginActivity.class.getName();
-
     // keep user object to use in this activity
     User loginUser;
 
     // use to send senz messages to SenzService
     Messenger senzServiceMessenger;
 
-    // use to receive messages from the service
-    Messenger activityMessenger;
+    private static final String TAG = LoginActivity.class.getName();
 
     // connection for SenzService
     private ServiceConnection senzServiceConnection = new ServiceConnection() {
@@ -85,11 +80,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
 
-        // init activity messenger
-        // send activity message handler to service in order to send messages to this activity
-        activityMessenger = new Messenger(new SenZMessageHandler());
+        // start senz service
         Intent serviceIntent = new Intent(LoginActivity.this, SenzService.class);
-        serviceIntent.putExtra(LOGIN_ACTIVITY_MESSENGER, activityMessenger);
         startService(serviceIntent);
 
         initUi();
@@ -241,17 +233,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
             SenzUtils.addMySensorsToDb(this, user);
         } finally {
             ((SenzApplication) getApplication()).setUpSenzors();
-        }
-    }
-
-    /**
-     * Handle incoming senz messages from SenzService
-     */
-    private class SenZMessageHandler extends Handler {
-        @Override
-        public void handleMessage(Message msg) {
-            String str = (String) msg.obj;
-            System.out.println("message from service :" + str);
         }
     }
 

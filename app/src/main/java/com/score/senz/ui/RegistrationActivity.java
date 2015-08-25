@@ -1,6 +1,7 @@
 package com.score.senz.ui;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,7 @@ import com.score.senz.R;
 import com.score.senz.exceptions.InvalidInputFieldsException;
 import com.score.senz.exceptions.InvalidPhoneNoException;
 import com.score.senz.pojos.User;
+import com.score.senz.services.LocationService;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.PhoneBookUtils;
 import com.score.senz.utils.PreferenceUtils;
@@ -114,8 +116,11 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             ActivityUtils.isValidRegistrationFields(registeringUser);
 
             ActivityUtils.hideSoftKeyboard(this);
-            ActivityUtils.showProgressDialog(this, "Registering...");
-            registerUser();
+            //ActivityUtils.showProgressDialog(this, "Registering...");
+            //registerUser();
+
+            Intent serviceIntent = new Intent(RegistrationActivity.this, LocationService.class);
+            startService(serviceIntent);
         } catch (InvalidInputFieldsException e) {
             Log.e(TAG, e.toString());
             Toast.makeText(this, "Invalid input fields", Toast.LENGTH_LONG).show();
@@ -144,7 +149,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
 
             // generate share query to send
             String encodedPublicKey = PreferenceUtils.getRsaKey(this, RSAUtils.PUBLIC_KEY);
-            String timestamp = ((Long)(System.currentTimeMillis()/1000)).toString();
+            String timestamp = ((Long) (System.currentTimeMillis() / 1000)).toString();
             String query = "SHARE" + " " +
                     "#pubkey" + " " + encodedPublicKey + " " +
                     "#time" + " " + timestamp + " " +
