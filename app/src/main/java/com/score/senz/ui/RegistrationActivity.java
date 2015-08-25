@@ -16,6 +16,7 @@ import com.score.senz.exceptions.InvalidPhoneNoException;
 import com.score.senz.pojos.User;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.PhoneBookUtils;
+import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 
 import java.security.InvalidKeyException;
@@ -140,6 +141,22 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             System.out.println("signature: " + signature);
 
             System.out.println(RSAUtils.verifyDigitalSignature(message, signature, publicKey));
+
+            // generate share query to send
+            String encodedPublicKey = PreferenceUtils.getRsaKey(this, RSAUtils.PUBLIC_KEY);
+            String timestamp = ((Long)(System.currentTimeMillis()/1000)).toString();
+            String query = "SHARE" + " " +
+                    "#pubkey" + " " + encodedPublicKey + " " +
+                    "#time" + " " + timestamp + " " +
+                    "@mysensors";
+            String querySignature = RSAUtils.getDigitalSignature(query, privateKey);
+            String senz = query + " " +
+                    "^" + registeringUser.getPhoneNo() + " " +
+                    querySignature;
+
+            System.out.println("-------------");
+            System.out.println(senz);
+            System.out.println("-------------");
         } catch (NoSuchProviderException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {

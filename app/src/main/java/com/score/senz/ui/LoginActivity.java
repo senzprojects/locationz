@@ -29,7 +29,16 @@ import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.NetworkUtil;
 import com.score.senz.utils.PhoneBookUtils;
 import com.score.senz.utils.PreferenceUtils;
+import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzUtils;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
 
 /**
  * Activity class for login
@@ -148,7 +157,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         if (v == signInButton) {
             // send
             Message msg = new Message();
-            msg.obj = "Hi service..";
+            String senz = registerUser();
+            msg.obj = senz;
             try {
                 senzServiceMessenger.send(msg);
             } catch (RemoteException e) {
@@ -243,6 +253,54 @@ public class LoginActivity extends Activity implements View.OnClickListener {
             String str = (String) msg.obj;
             System.out.println("message from service :" + str);
         }
+    }
+
+    /**
+     * Create user via sending PUT query to server,
+     * need to send the query via the web socket
+     */
+    private String registerUser() {
+        // send public key to SenZ server(via senz message)
+        try {
+            RSAUtils.initKeys(this);
+            PublicKey publicKey = RSAUtils.getPublicKey(this);
+            PrivateKey privateKey = RSAUtils.getPrivateKey(this);
+
+
+            // generate share query to send
+            String encodedPublicKey = PreferenceUtils.getRsaKey(this, RSAUtils.PUBLIC_KEY);
+            String timestamp = ((Long)(System.currentTimeMillis()/1000)).toString();
+            String phoneNo = editTextPhoneNo.getText().toString().trim();
+            String query = "SHARE" + " " +
+                    "#pubkey" + " " + encodedPublicKey + " " +
+                    "@mysensors" + " " +
+                    "#time" + " " + timestamp + " " +
+                    "^" + phoneNo;
+            String querySignature = RSAUtils.getDigitalSignature(query.replaceAll(" ", ""), privateKey);
+
+            System.out.println(RSAUtils.verifyDigitalSignature(query.replaceAll(" ", ""), querySignature, publicKey));
+
+            String senz = query + " " +
+                    querySignature;
+
+            System.out.println("-------------");
+            System.out.println(senz);
+            System.out.println("-------------");
+
+            return senz.replaceAll("\n", "").replaceAll("\r", "");
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 
 }

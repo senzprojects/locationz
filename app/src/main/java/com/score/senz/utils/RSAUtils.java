@@ -46,7 +46,7 @@ public class RSAUtils {
     private static void savePublicKey(Context context, KeyPair keyPair) {
         // get public key from keypair
         byte[] keyContent = keyPair.getPublic().getEncoded();
-        String publicKey = Base64.encodeToString(keyContent, Base64.DEFAULT);
+        String publicKey = Base64.encodeToString(keyContent, Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
 
         // save public key in shared preference
         PreferenceUtils.saveRsaKey(context, publicKey, RSAUtils.PUBLIC_KEY);
@@ -55,7 +55,7 @@ public class RSAUtils {
     private static void savePrivateKey(Context context, KeyPair keyPair) {
         // get public key from keypair
         byte[] keyContent = keyPair.getPrivate().getEncoded();
-        String privateKey = Base64.encodeToString(keyContent, Base64.DEFAULT);
+        String privateKey = Base64.encodeToString(keyContent, Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
 
         // save private key in shared preference
         PreferenceUtils.saveRsaKey(context, privateKey, RSAUtils.PRIVATE_KEY);
@@ -91,7 +91,7 @@ public class RSAUtils {
         signature.update(payload.getBytes());
 
         // Base64 encoded string
-        return Base64.encodeToString(signature.sign(), Base64.DEFAULT);
+        return Base64.encodeToString(signature.sign(), Base64.DEFAULT).replaceAll("\n", "").replaceAll("\r", "");
     }
 
     public static boolean verifyDigitalSignature(String payload, String signedPayload, PublicKey publicKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {

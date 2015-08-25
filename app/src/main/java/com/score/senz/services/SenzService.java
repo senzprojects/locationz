@@ -16,14 +16,17 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 
 /**
  * Service for listen UDP socket
  */
 public class SenzService extends Service {
 
-    private static final String TAG = WebSocketService.class.getName();
+    private static final String TAG = SenzService.class.getName();
+
+    // senz service host and port
+    private static final String SENZ_HOST = "connect.mysensors.info";
+    private static final int SENZ_PORT = 9090;
 
     // used to receive messages from various activities and services
     private Messenger senzServiceMessenger;
@@ -33,7 +36,6 @@ public class SenzService extends Service {
 
     // we are listing for UDP socket
     private DatagramSocket socket;
-    private InetAddress address;
 
     /**
      * {@inheritDoc}
@@ -79,13 +81,12 @@ public class SenzService extends Service {
      * Initialize/Create UDP socket
      */
     private void initUdpSocket() {
-        try {
-            address = InetAddress.getByName("10.2.2.132");
-            if (socket == null || socket.isClosed()) {
+        if (socket == null || socket.isClosed()) {
+            try {
                 socket = new DatagramSocket();
+            } catch (SocketException e) {
+                e.printStackTrace();
             }
-        } catch (SocketException | UnknownHostException e) {
-            e.printStackTrace();
         }
     }
 
@@ -98,22 +99,18 @@ public class SenzService extends Service {
     private void initPingSender() {
         new Thread(new Runnable() {
             public void run() {
-                while (true) {
-                    try {
-                        String message = "#ping";
+                while (true) try {
+                    String message = "#ping";
 
-                        // send message
-                        DatagramPacket sendPacket = new DatagramPacket(message.getBytes(), message.length(), address, 9090);
-                        socket.send(sendPacket);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    // send message
+                    InetAddress address = InetAddress.getByName(SENZ_HOST);
+                    DatagramPacket sendPacket = new DatagramPacket(message.getBytes(), message.length(), address, SENZ_PORT);
+                    socket.send(sendPacket);
 
-                    try {
-                        Thread.sleep(60000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    // send ping in every minute
+                    Thread.sleep(60000);
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         }).start();
@@ -127,11 +124,13 @@ public class SenzService extends Service {
     private void initUdpListener() {
         new Thread(new Runnable() {
             public void run() {
-                byte[] message = new byte[1500];
-                DatagramPacket packet = new DatagramPacket(message, message.length, address, 9090);
-
                 try {
+                    byte[] message = new byte[1500];
+                    InetAddress address = InetAddress.getByName(SENZ_HOST);
+                    DatagramPacket packet = new DatagramPacket(message, message.length, address, SENZ_PORT);
+
                     while (true) {
+                        // listen for senz
                         socket.receive(packet);
                         String senz = new String(message, 0, packet.getLength());
 
@@ -142,9 +141,7 @@ public class SenzService extends Service {
                         messageToActivity.obj = "this is from service....";
                         activityMessenger.send(messageToActivity);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (RemoteException e) {
+                } catch (IOException | RemoteException e) {
                     e.printStackTrace();
                 }
             }
@@ -176,7 +173,8 @@ public class SenzService extends Service {
                 public void run() {
                     try {
                         // send message to SenZ service
-                        DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, 9090);
+                        InetAddress address = InetAddress.getByName(SENZ_HOST);
+                        DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SENZ_PORT);
                         socket.send(sendPacket);
                     } catch (IOException e) {
                         e.printStackTrace();
