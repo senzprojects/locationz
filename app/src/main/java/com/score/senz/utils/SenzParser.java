@@ -3,16 +3,35 @@ package com.score.senz.utils;
 import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.pojos.Senz;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.util.HashMap;
 
 /**
  * Created by eranga on 8/27/15.
  */
 public class SenzParser {
-    public static Senz parseSenz(String senzMessage) {
-        // init sez with empty attributes
+    public static Senz parse(String senzMessage) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        Senz senz = getSenz(senzMessage);
+        if (verifySenz(senz))
+            return senz;
+        else
+            throw new SignatureException("Invalid senz signature");
+    }
+
+    public static String getSenzMessage(Senz senz) {
+        return null;
+    }
+
+    private static Senz getSenz(String senzMessage) {
+        // init sez with
         Senz senz = new Senz();
         senz.setAttributes(new HashMap<String, String>());
+
+        // part except the signature of the senz message is the payload
+        String senzPayload = senzMessage.substring(0, senzMessage.lastIndexOf(" "));
+        senz.setPayload(senzPayload);
 
         // parse senz
         String[] tokens = senzMessage.split(" ");
@@ -54,38 +73,16 @@ public class SenzParser {
         System.out.println(senz.getSignature());
         System.out.println(senz.getAttributes().entrySet());
 
-        // verify digital signature
-        //String senz = senzMessage.substring(0, senzMessage.lastIndexOf(" "));
-        //String senzSignature = senzMessage.substring(senzMessage.lastIndexOf(" ") + 1);
-
-        return null;
+        return senz;
     }
 
-    public static String getSenzMessage(Senz senz) {
-        return null;
-    }
+    private static boolean verifySenz(Senz senz) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        // get public key of sender
+        senz.getSender();
 
-    private void setQueryType(String senzMessage, Senz senz) {
-        // query type in first (SHARE, GET, DATA)
-        String senzType = senzMessage.substring(0, senzMessage.indexOf(" "));
-        senz.setSenzType(SenzTypeEnum.valueOf(senzType.toUpperCase()));
+        // first verify signature of the senz
+        return RSAUtils.verifyDigitalSignature(senz.getPayload(), senz.getSignature(), null);
     }
-
-    private void getSenzSignature(String senzMessage, Senz senz) {
-        senz.setSignature(senzMessage.substring(senzMessage.lastIndexOf(" ") + 1));
-    }
-
-    private void setSenzSender(String senzMessage, Senz senz) {
-        String s = senzMessage.substring(senzMessage.indexOf("@"), senzMessage.)
-        String sender = token.substring(1);
-        senz.setSender(sender);
-    }
-
-    private void setSenzReceiver(String token, Senz senz) {
-        String sender = token.substring(1);
-        senz.setSender(sender);
-    }
-
 
     public static void main(String args[]) {
         String senzMessage1 = "DATA" + " " +
@@ -103,8 +100,7 @@ public class SenzParser {
                 "^0775432015" + " " +
                 "signatureeee";
 
-        parseSenz(senzMessage1);
-        parseSenz(senzMessage2);
-
+        getSenz(senzMessage1);
+        getSenz(senzMessage2);
     }
 }
