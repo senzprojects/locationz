@@ -25,8 +25,9 @@ public class SenzHandler {
 
     public void handleSenz(String senzMessage) {
         try {
-            // parse senz
+            // parse and verify senz
             Senz senz = SenzParser.parse(senzMessage);
+            verifySenz(senz);
             switch (senz.getSenzType()) {
                 case SHARE:
                     handleShareSenz(senz);
@@ -38,11 +39,14 @@ public class SenzHandler {
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
             e.printStackTrace();
         }
-
     }
 
-    private boolean verifySenz(Senz senz) {
+    private static void verifySenz(Senz senz) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        // TODO get public key of sender
+        senz.getSender();
 
+        // TODO verify signature of the senz
+        //RSAUtils.verifyDigitalSignature(senz.getPayload(), senz.getSignature(), null);
     }
 
     private void handleShareSenz(Senz senz) {

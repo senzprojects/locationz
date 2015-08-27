@@ -21,7 +21,9 @@ import android.widget.Toast;
 import com.score.senz.R;
 import com.score.senz.application.SenzApplication;
 import com.score.senz.db.SenzorsDbSource;
+import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
+import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
@@ -29,6 +31,7 @@ import com.score.senz.utils.NetworkUtil;
 import com.score.senz.utils.PhoneBookUtils;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
+import com.score.senz.utils.SenzParser;
 import com.score.senz.utils.SenzUtils;
 
 import java.security.InvalidKeyException;
@@ -38,6 +41,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.HashMap;
 
 /**
  * Activity class for login
@@ -243,32 +247,32 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     private String registerUser() {
         // send public key to SenZ server(via senz message)
         try {
+            // create key pair
             RSAUtils.initKeys(this);
             PublicKey publicKey = RSAUtils.getPublicKey(this);
             PrivateKey privateKey = RSAUtils.getPrivateKey(this);
 
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            senzAttributes.put("pubkey", PreferenceUtils.getRsaKey(this, RSAUtils.PUBLIC_KEY));
 
-            // generate share query to send
-            String encodedPublicKey = PreferenceUtils.getRsaKey(this, RSAUtils.PUBLIC_KEY);
-            String timestamp = ((Long)(System.currentTimeMillis()/1000)).toString();
-            String phoneNo = editTextPhoneNo.getText().toString().trim();
-            String query = "SHARE" + " " +
-                    "#pubkey" + " " + encodedPublicKey + " " +
-                    "@mysensors" + " " +
-                    "#time" + " " + timestamp + " " +
-                    "^" + phoneNo;
-            String querySignature = RSAUtils.getDigitalSignature(query.replaceAll(" ", ""), privateKey);
+            // new senz
+            Senz senz = new Senz();
+            senz.setSenzType(SenzTypeEnum.SHARE);
+            senz.setReceiver("mysensors");
+            senz.setSender(editTextPhoneNo.getText().toString().trim());
+            senz.setAttributes(senzAttributes);
 
-            System.out.println(RSAUtils.verifyDigitalSignature(query.replaceAll(" ", ""), querySignature, publicKey));
-
-            String senz = query + " " +
-                    querySignature;
+            // get digital signature of the senz
+            String senzPayload = SenzParser.getSenzPayload(senz);
+            String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
 
             System.out.println("-------------");
-            System.out.println(senz);
+            System.out.println(senzPayload);
             System.out.println("-------------");
 
-            return senz.replaceAll("\n", "").replaceAll("\r", "");
+            SenzParser.getSenzMessage(senzPayload, senzSignature);
         } catch (NoSuchProviderException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {

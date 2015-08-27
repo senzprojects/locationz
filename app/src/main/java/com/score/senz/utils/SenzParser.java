@@ -3,28 +3,14 @@ package com.score.senz.utils;
 import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.pojos.Senz;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
 import java.util.HashMap;
 
 /**
  * Created by eranga on 8/27/15.
  */
 public class SenzParser {
-    public static Senz parse(String senzMessage) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        Senz senz = getSenz(senzMessage);
-        if (verifySenz(senz))
-            return senz;
-        else
-            throw new SignatureException("Invalid senz signature");
-    }
 
-    public static String getSenzMessage(Senz senz) {
-        return null;
-    }
-
-    private static Senz getSenz(String senzMessage) {
+    public static Senz parse(String senzMessage) {
         // init sez with
         Senz senz = new Senz();
         senz.setAttributes(new HashMap<String, String>());
@@ -76,12 +62,33 @@ public class SenzParser {
         return senz;
     }
 
-    private static boolean verifySenz(Senz senz) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        // get public key of sender
-        senz.getSender();
+    public static String getSenzPayload(Senz senz) {
+        // add senz type to payload
+        String payload = senz.getSenzType().toString();
 
-        // first verify signature of the senz
-        return RSAUtils.verifyDigitalSignature(senz.getPayload(), senz.getSignature(), null);
+        // add attributes to payload
+        for (String key : senz.getAttributes().keySet()) {
+            if (key.equalsIgnoreCase(senz.getAttributes().get(key))) {
+                // GET or SHARE query
+                // param and value equal since no value to store (SHARE #lat #lon)
+                payload = payload.concat(" ").concat("#").concat(senz.getAttributes().get(key));
+            } else {
+                // DATA query
+                payload = payload.concat(" ").concat("#").concat(key).concat(" ").concat(senz.getAttributes().get(key));
+            }
+        }
+
+        // add sender and receiver
+        payload.concat(" ").concat("@").concat(senz.getReceiver());
+        payload.concat(" ").concat("^").concat(senz.getSender());
+
+        return payload;
+    }
+
+    public static String getSenzMessage(String payload, String signature) {
+        String senzMessage = payload + " " + signature;
+
+        return senzMessage.replaceAll("\n", "").replaceAll("\r", "");
     }
 
     public static void main(String args[]) {
@@ -100,7 +107,7 @@ public class SenzParser {
                 "^0775432015" + " " +
                 "signatureeee";
 
-        getSenz(senzMessage1);
-        getSenz(senzMessage2);
+        parse(senzMessage1);
+        parse(senzMessage2);
     }
 }
