@@ -11,7 +11,10 @@ import android.os.IBinder;
 import android.util.Log;
 
 /**
- * Created by eranga on 8/25/15.
+ * Service to get current location
+ * We are listening to location updates via LocationListener here
+ *
+ * @author eranga herath(erangaeb@gmail.com)
  */
 public class LocationService extends Service {
 
@@ -20,26 +23,37 @@ public class LocationService extends Service {
 
     private static final String TAG = LocationService.class.getName();
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onCreate() {
-        locationManager = (LocationManager) this.getSystemService(this.LOCATION_SERVICE);
+        // start to listen location updates from here
         locationListener = new SenzLocationListener();
-
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         locationManager.requestLocationUpdates(getBestLocationProvider(), 0, 0, locationListener);
-        //locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListeners[1]);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -64,6 +78,7 @@ public class LocationService extends Service {
 
     /**
      * Location listener to get accurate location
+     * We only need one location update, so when receives one update we stop the service
      */
     private class SenzLocationListener implements LocationListener {
 
@@ -72,6 +87,7 @@ public class LocationService extends Service {
             Log.d(TAG, String.valueOf(location.getLatitude()));
             Log.d(TAG, String.valueOf(location.getLongitude()));
 
+            // stop the service when receive a location update
             stopSelf();
         }
 
