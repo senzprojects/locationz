@@ -42,7 +42,7 @@ public class PreferenceUtils {
         String username = preferences.getString("username", "");
         String password = preferences.getString("password", "");
 
-        if(phoneNo.isEmpty() || password.isEmpty())
+        if(phoneNo.isEmpty())
             throw new NoUserException();
 
         User user = new User(id, phoneNo, password);

@@ -79,8 +79,8 @@ public class SenzParser {
         }
 
         // add sender and receiver
-        payload.concat(" ").concat("@").concat(senz.getReceiver());
-        payload.concat(" ").concat("^").concat(senz.getSender());
+        payload = payload.concat(" ").concat("@").concat(senz.getReceiver());
+        payload = payload.concat(" ").concat("^").concat(senz.getSender());
 
         return payload;
     }
@@ -109,5 +109,21 @@ public class SenzParser {
 
         parse(senzMessage1);
         parse(senzMessage2);
+
+        Senz senz = new Senz();
+        senz.setSender("03452");
+        senz.setReceiver("mysen");
+        senz.setSenzType(SenzTypeEnum.SHARE);
+
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("pubkey", "public_key");
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senz.setAttributes(senzAttributes);
+
+        String senzPaylod = getSenzPayload(senz);
+        String signature = "digsig";
+        String senzMessage = getSenzMessage(senzPaylod, signature);
+        System.out.println(senzPaylod);
+        System.out.println(senzMessage);
     }
 }

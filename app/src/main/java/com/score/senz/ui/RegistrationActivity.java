@@ -1,33 +1,40 @@
 package com.score.senz.ui;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.score.senz.R;
-import com.score.senz.exceptions.InvalidInputFieldsException;
-import com.score.senz.exceptions.InvalidPhoneNoException;
+import com.score.senz.enums.SenzTypeEnum;
+import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
-import com.score.senz.services.LocationService;
+import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.PhoneBookUtils;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
+import com.score.senz.utils.SenzParser;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.HashMap;
 
 /**
  * Activity class that handles user registrations
@@ -48,6 +55,21 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     private TextView textViewSignUpText;
     private RelativeLayout signUpButton;
 
+    // use to send senz messages to SenzService
+    Messenger senzServiceMessenger;
+
+    // connection for SenzService
+    private ServiceConnection senzServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            senzServiceMessenger = new Messenger(service);
+
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            senzServiceMessenger = null;
+        }
+    };
+
     /**
      * {@inheritDoc}
      */
@@ -56,6 +78,15 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         setContentView(R.layout.registration_layout);
 
         initUi();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void onResume() {
+        super.onResume();
+
+        bindService(new Intent(RegistrationActivity.this, SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     /**
@@ -88,9 +119,9 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     private void initRegisteringUser() {
         String countryCode = countryCodeText.getText().toString().trim();
         String phoneNo = editTextPhoneNo.getText().toString().trim();
-        String internationalPhoneNo = countryCode + phoneNo.substring(phoneNo.length() - 9);
+        //String internationalPhoneNo = countryCode + phoneNo.substring(phoneNo.length() - 9);
 
-        registeringUser = new User("0", internationalPhoneNo, "");
+        registeringUser = new User("0", phoneNo, "");
         registeringUser.setUsername("Me");
     }
 
@@ -111,23 +142,9 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      */
     private void signUp() {
         initRegisteringUser();
-
-        try {
-            ActivityUtils.isValidRegistrationFields(registeringUser);
-
-            ActivityUtils.hideSoftKeyboard(this);
-            //ActivityUtils.showProgressDialog(this, "Registering...");
-            //registerUser();
-
-            Intent serviceIntent = new Intent(RegistrationActivity.this, LocationService.class);
-            startService(serviceIntent);
-        } catch (InvalidInputFieldsException e) {
-            Log.e(TAG, e.toString());
-            Toast.makeText(this, "Invalid input fields", Toast.LENGTH_LONG).show();
-        } catch (InvalidPhoneNoException e) {
-            Log.e(TAG, e.toString());
-            Toast.makeText(this, "Phone no should contains 10 digits", Toast.LENGTH_LONG).show();
-        }
+        PreferenceUtils.saveUser(this, registeringUser);
+        ActivityUtils.hideSoftKeyboard(this);
+        registerUser();
     }
 
     /**
@@ -135,33 +152,42 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      * need to send the query via the web socket
      */
     private void registerUser() {
-        // send public key to SenZ server(via senz message)
         try {
+            // create key pair
             RSAUtils.initKeys(this);
-            PublicKey publicKey = RSAUtils.getPublicKey(this);
             PrivateKey privateKey = RSAUtils.getPrivateKey(this);
 
-            String message = "SenZ";
-            String signature = RSAUtils.getDigitalSignature(message, privateKey);
-            System.out.println("signature: " + signature);
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            senzAttributes.put("pubkey", PreferenceUtils.getRsaKey(this, RSAUtils.PUBLIC_KEY));
 
-            System.out.println(RSAUtils.verifyDigitalSignature(message, signature, publicKey));
+            // new senz
+            Senz senz = new Senz();
+            senz.setSenzType(SenzTypeEnum.SHARE);
+            senz.setReceiver("mysensors");
+            senz.setSender(registeringUser.getPhoneNo());
+            senz.setAttributes(senzAttributes);
 
-            // generate share query to send
-            String encodedPublicKey = PreferenceUtils.getRsaKey(this, RSAUtils.PUBLIC_KEY);
-            String timestamp = ((Long) (System.currentTimeMillis() / 1000)).toString();
-            String query = "SHARE" + " " +
-                    "#pubkey" + " " + encodedPublicKey + " " +
-                    "#time" + " " + timestamp + " " +
-                    "@mysensors";
-            String querySignature = RSAUtils.getDigitalSignature(query, privateKey);
-            String senz = query + " " +
-                    "^" + registeringUser.getPhoneNo() + " " +
-                    querySignature;
+            // get digital signature of the senz
+            String senzPayload = SenzParser.getSenzPayload(senz);
+            String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+            String senzMessage = SenzParser.getSenzMessage(senzPayload, senzSignature);
 
             System.out.println("-------------");
-            System.out.println(senz);
+            System.out.println(senzPayload);
+            System.out.println(senzMessage);
             System.out.println("-------------");
+
+            // send senz to server
+            Message msg = new Message();
+            msg.obj = senzMessage;
+            try {
+                senzServiceMessenger.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+
         } catch (NoSuchProviderException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {

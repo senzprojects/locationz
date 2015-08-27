@@ -1,7 +1,7 @@
 package com.score.senz.ui;
 
 import android.app.Activity;
-import android.content.*;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -9,16 +9,18 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.score.senz.R;
 import com.score.senz.application.SenzApplication;
 import com.score.senz.pojos.DrawerItem;
-import com.score.senz.R;
 import com.score.senz.services.WebSocketService;
-import com.score.senz.utils.ActivityUtils;
 
 import java.util.ArrayList;
 
@@ -31,8 +33,6 @@ import java.util.ArrayList;
 public class HomeActivity extends FragmentActivity implements View.OnClickListener {
 
     private static final String TAG = HomeActivity.class.getName();
-
-    private DataUpdateReceiver dataUpdateReceiver;
 
     // Ui components
     private ListView drawerListView;
@@ -63,11 +63,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
      */
     protected void onResume() {
         super.onResume();
-
-        // register broadcast receiver from here
-        if (dataUpdateReceiver == null) dataUpdateReceiver = new DataUpdateReceiver();
-        IntentFilter intentFilter = new IntentFilter(WebSocketService.WEB_SOCKET_DISCONNECTED);
-        registerReceiver(dataUpdateReceiver, intentFilter);
     }
 
     /**
@@ -75,9 +70,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
      */
     protected void onPause() {
         super.onPause();
-
-        // unregister broadcast receiver from here
-        if (dataUpdateReceiver != null) unregisterReceiver(dataUpdateReceiver);
     }
 
     /**
@@ -134,7 +126,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         // initialize drawer content
         // need to determine selected item according to the currently selected sensor type
         drawerItemList = new ArrayList<DrawerItem>();
-        if(SenzApplication.SENSOR_TYPE.equalsIgnoreCase(SenzApplication.MY_SENSORS)) {
+        if (SenzApplication.SENSOR_TYPE.equalsIgnoreCase(SenzApplication.MY_SENSORS)) {
             drawerItemList.add(new DrawerItem("My.senZors", R.drawable.my_sensz_normal, R.drawable.my_sensz_selected, true));
             drawerItemList.add(new DrawerItem("Friends.senZors", R.drawable.friends_normal, R.drawable.friends_selected, false));
         } else {
@@ -182,8 +174,8 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
 
     /**
      * Logout action
-     *      1. close drawer
-     *      2. disconnect from sensors
+     * 1. close drawer
+     * 2. disconnect from sensors
      */
     private void actionLogout() {
         drawerLayout.closeDrawer(drawerContainer);
@@ -197,7 +189,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
      */
     private class HomeActionBarDrawerToggle extends ActionBarDrawerToggle {
 
-        public HomeActionBarDrawerToggle(Activity mActivity, DrawerLayout mDrawerLayout){
+        public HomeActionBarDrawerToggle(Activity mActivity, DrawerLayout mDrawerLayout) {
             super(mActivity, mDrawerLayout, R.drawable.ic_navigation_drawer, R.string.ns_menu_open, R.string.ns_menu_close);
         }
 
@@ -230,17 +222,17 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
             drawerLayout.closeDrawer(drawerContainer);
 
             //  reset content in drawer list
-            for(DrawerItem drawerItem: drawerItemList) {
+            for (DrawerItem drawerItem : drawerItemList) {
                 drawerItem.setSelected(false);
             }
 
-            if(position == 0) {
+            if (position == 0) {
                 // set
                 //  1. sensor type
                 SenzApplication.SENSOR_TYPE = SenzApplication.MY_SENSORS;
                 loadSensors();
                 drawerItemList.get(0).setSelected(true);
-            } else if(position==1) {
+            } else if (position == 1) {
                 // set
                 //  1. sensor type
                 SenzApplication.SENSOR_TYPE = SenzApplication.FRIENDS_SENSORS;
@@ -271,25 +263,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
      */
     private void exit() {
         HomeActivity.this.finish();
-    }
-
-    /**
-     * Register this receiver to get disconnect messages from web socket
-     * Need to do relevant action according to the message, actions as below
-     *  1. connect - send login query to server via web socket connections
-     *  2. disconnect - disconnect from server
-     */
-    private class DataUpdateReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "OnReceive: received broadcast message");
-            ActivityUtils.cancelProgressDialog();
-            if (intent.getAction().equals(WebSocketService.WEB_SOCKET_DISCONNECTED)) {
-                // cancel existing notifications after disconnect
-                Log.d(TAG, "OnReceive: received broadcast message " + WebSocketService.WEB_SOCKET_DISCONNECTED);
-                exit();
-            }
-        }
     }
 
 }

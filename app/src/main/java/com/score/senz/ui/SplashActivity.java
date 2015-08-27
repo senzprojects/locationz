@@ -5,34 +5,21 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
-import com.score.senz.R;
-import com.score.senz.application.SenzApplication;
-import com.score.senz.exceptions.NoUserException;
-import com.score.senz.pojos.User;
-import com.score.senz.services.WebSocketService;
-import com.score.senz.utils.ActivityUtils;
-import com.score.senz.utils.NetworkUtil;
-import com.score.senz.utils.PreferenceUtils;
-import com.score.senz.utils.QueryHandler;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
+import com.score.senz.R;
+import com.score.senz.exceptions.NoUserException;
+import com.score.senz.services.SenzService;
+import com.score.senz.utils.PreferenceUtils;
 
 /**
  * Splash activity, send login query from here
  *
  * @author eranga herath(erangaeb@gmail.com)
  */
-public class SplashActivity extends Activity implements Handler.Callback {
+public class SplashActivity extends Activity {
     private final int SPLASH_DISPLAY_LENGTH = 2000;
     private static final String TAG = SplashActivity.class.getName();
-
-    private SenzApplication application;
-    private User loginUser;
 
     /**
      * {@inheritDoc}
@@ -42,11 +29,27 @@ public class SplashActivity extends Activity implements Handler.Callback {
         super.onCreate(icicle);
         setContentView(R.layout.splash_layout);
 
+        initUi();
+        initSenzService();
+        initNavigation();
+    }
+
+    /**
+     * Initialize UI components
+     */
+    private void initUi() {
         Typeface typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
         TextView appName = (TextView) findViewById(R.id.splash_text);
         appName.setTypeface(typefaceThin, Typeface.BOLD);
+    }
 
-        application = (SenzApplication) getApplication();
+    /**
+     * Initialize senz service
+     */
+    private void initSenzService() {
+        // start senz service
+        Intent serviceIntent = new Intent(SplashActivity.this, SenzService.class);
+        startService(serviceIntent);
     }
 
     /**
@@ -54,9 +57,6 @@ public class SplashActivity extends Activity implements Handler.Callback {
      */
     protected void onResume() {
         super.onResume();
-        application.setCallback(this);
-
-        initNavigation();
     }
 
     /**
@@ -65,27 +65,26 @@ public class SplashActivity extends Activity implements Handler.Callback {
     private void initNavigation() {
         // decide where to go
         // 1. goto registration
-        // 2. send login query
+        // 2. goto home
         try {
-            loginUser = PreferenceUtils.getUser(this);
-            navigateToLogin();
-            //login();
+            PreferenceUtils.getUser(this);
+            navigateToHome();
         } catch (NoUserException e) {
             e.printStackTrace();
 
             // no user means navigate to login
-            navigateToLogin();
+            navigateToRegistration();
         }
     }
 
     /**
-     * Navigate to login activity
+     * Navigate to Register activity
      */
-    private void navigateToLogin() {
+    private void navigateToRegistration() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                Intent intent = new Intent(SplashActivity.this, RegistrationActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 SplashActivity.this.startActivity(intent);
                 SplashActivity.this.finish();
@@ -94,68 +93,12 @@ public class SplashActivity extends Activity implements Handler.Callback {
     }
 
     /**
-     * Connect to web socket
-     */
-    private void login() {
-        if(NetworkUtil.isAvailableNetwork(SplashActivity.this)) {
-            ActivityUtils.hideSoftKeyboard(this);
-
-            Intent serviceIntent = new Intent(SplashActivity.this, WebSocketService.class);
-            startService(serviceIntent);
-        } else {
-            Toast.makeText(this, "No network connection", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    /**
      * Switch to home activity
      * This method will be call after successful login
      */
-    private void switchToHome() {
+    private void navigateToHome() {
         Intent intent = new Intent(this, HomeActivity.class);
-        this.startActivity(intent);
-
+        SplashActivity.this.startActivity(intent);
         SplashActivity.this.finish();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean handleMessage(Message message) {
-        // we handle string messages only from here
-        if(message.obj instanceof String) {
-            String payLoad = (String)message.obj;
-            if (payLoad.equalsIgnoreCase("SERVER_KEY_EXTRACTION_SUCCESS")) {
-                Log.d(TAG, "HandleMessage: server key extracted");
-
-                try {
-                    if(application.getWebSocketConnection().isConnected()) {
-                        String loginQuery = QueryHandler.getLoginQuery(loginUser, PreferenceUtils.getSessionKey(this));
-                        Log.d(TAG, "------login query------");
-                        Log.d(TAG, loginQuery);
-                        application.getWebSocketConnection().sendTextMessage(loginQuery);
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    Log.e(TAG, e.getMessage());
-                } catch (NoSuchAlgorithmException e) {
-                    Log.e(TAG, e.getMessage());
-                }
-            } else if(payLoad.equalsIgnoreCase("LoginSUCCESS")) {
-                Log.d(TAG, "HandleMessage: login success");
-                application.setCallback(null);
-                application.setUpSenzors();
-                switchToHome();
-            } else {
-                Log.d(TAG, "HandleMessage: login fail");
-                stopService(new Intent(getApplicationContext(), WebSocketService.class));
-
-                Toast.makeText(SplashActivity.this, "Login fail", Toast.LENGTH_LONG).show();
-            }
-        } else {
-            Log.e(TAG, "HandleMessage: message is NOT a string(may be location object)");
-        }
-
-        return false;
     }
 }
