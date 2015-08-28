@@ -97,8 +97,14 @@ public class SplashActivity extends Activity {
      * This method will be call after successful login
      */
     private void navigateToHome() {
-        Intent intent = new Intent(this, HomeActivity.class);
-        SplashActivity.this.startActivity(intent);
-        SplashActivity.this.finish();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(SplashActivity.this, ShareActivity.class);
+                SplashActivity.this.startActivity(intent);
+                SplashActivity.this.finish();
+            }
+        }, SPLASH_DISPLAY_LENGTH);
+
     }
 }

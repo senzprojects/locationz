@@ -8,11 +8,25 @@ import android.os.Message;
 import android.os.Messenger;
 import android.util.Log;
 
+import com.score.senz.enums.SenzTypeEnum;
+import com.score.senz.exceptions.NoUserException;
+import com.score.senz.pojos.Senz;
+import com.score.senz.pojos.User;
+import com.score.senz.utils.PreferenceUtils;
+import com.score.senz.utils.RSAUtils;
+import com.score.senz.utils.SenzParser;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.HashMap;
 
 /**
  * Service for listen UDP socket
@@ -23,6 +37,7 @@ public class SenzService extends Service {
 
     // senz service host and port
     private static final String SENZ_HOST = "udp.mysensors.info";
+    //private static final String SENZ_HOST = "10.2.2.132";
     private static final int SENZ_PORT = 9090;
 
     // used to receive messages from various activities and services
@@ -92,6 +107,37 @@ public class SenzService extends Service {
             public void run() {
                 while (true) try {
                     String message = "#ping";
+                    try {
+                        PrivateKey privateKey = RSAUtils.getPrivateKey(SenzService.this);
+                        User user = PreferenceUtils.getUser(SenzService.this);
+
+                        // create senz attributes
+                        HashMap<String, String> senzAttributes = new HashMap<>();
+                        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+
+                        Senz senz = new Senz();
+                        senz.setSenzType(SenzTypeEnum.DATA);
+                        senz.setSender(user.getPhoneNo());
+                        senz.setReceiver("mysensors");
+                        senz.setAttributes(senzAttributes);
+
+                        // get digital signature of the senz
+                        String senzPayload = SenzParser.getSenzPayload(senz);
+                        String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+                        message = SenzParser.getSenzMessage(senzPayload, senzSignature);
+
+                        System.out.println(message);
+                    } catch (InvalidKeySpecException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchAlgorithmException e) {
+                        e.printStackTrace();
+                    } catch (NoUserException e) {
+                        e.printStackTrace();
+                    } catch (SignatureException e) {
+                        e.printStackTrace();
+                    } catch (InvalidKeyException e) {
+                        e.printStackTrace();
+                    }
 
                     // send message
                     InetAddress address = InetAddress.getByName(SENZ_HOST);

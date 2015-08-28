@@ -110,13 +110,25 @@ public class SenzParser {
         parse(senzMessage1);
         parse(senzMessage2);
 
+//        Senz senz = new Senz();
+//        senz.setSender("03452");
+//        senz.setReceiver("mysen");
+//        senz.setSenzType(SenzTypeEnum.SHARE);
+//
+//        HashMap<String, String> senzAttributes = new HashMap<>();
+//        senzAttributes.put("pubkey", "public_key");
+//        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+//        senz.setAttributes(senzAttributes);
+
+
         Senz senz = new Senz();
-        senz.setSender("03452");
-        senz.setReceiver("mysen");
+        senz.setSender("222");
+        senz.setReceiver("111");
         senz.setSenzType(SenzTypeEnum.SHARE);
 
         HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("pubkey", "public_key");
+        senzAttributes.put("lat", "lat");
+        senzAttributes.put("lat", "lon");
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
         senz.setAttributes(senzAttributes);
 
