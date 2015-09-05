@@ -10,8 +10,10 @@ import android.util.Log;
 
 import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
+import com.score.senz.handlers.SenzHandler;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
+import com.score.senz.utils.NetworkUtil;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;
@@ -108,49 +110,21 @@ public class SenzService extends Service {
     private void initPingSender() {
         new Thread(new Runnable() {
             public void run() {
-                while (true) try {
-                    String message = "#ping";
+                while (true) {
                     try {
-                        PrivateKey privateKey = RSAUtils.getPrivateKey(SenzService.this);
-                        User user = PreferenceUtils.getUser(SenzService.this);
-
-                        // create senz attributes
-                        HashMap<String, String> senzAttributes = new HashMap<>();
-                        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-
-                        Senz senz = new Senz();
-                        senz.setSenzType(SenzTypeEnum.DATA);
-                        senz.setSender(user.getPhoneNo());
-                        senz.setReceiver("mysensors");
-                        senz.setAttributes(senzAttributes);
-
-                        // get digital signature of the senz
-                        String senzPayload = SenzParser.getSenzPayload(senz);
-                        String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
-                        message = SenzParser.getSenzMessage(senzPayload, senzSignature);
-
-                        System.out.println(message);
-                    } catch (InvalidKeySpecException e) {
+                        // send ping message
+                        sendPing();
+                    } catch (IOException | NoSuchAlgorithmException | NoUserException | SignatureException |
+                            InvalidKeyException | InvalidKeySpecException e) {
                         e.printStackTrace();
-                    } catch (NoSuchAlgorithmException e) {
-                        e.printStackTrace();
-                    } catch (NoUserException e) {
-                        e.printStackTrace();
-                    } catch (SignatureException e) {
-                        e.printStackTrace();
-                    } catch (InvalidKeyException e) {
-                        e.printStackTrace();
+                    } finally {
+                        // send ping in every 20 seconds
+                        try {
+                            Thread.sleep(20000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
-
-                    // send message
-                    if (address == null) address = InetAddress.getByName(SENZ_HOST);
-                    DatagramPacket sendPacket = new DatagramPacket(message.getBytes(), message.length(), address, SENZ_PORT);
-                    socket.send(sendPacket);
-
-                    // send ping in every minute
-                    Thread.sleep(20000);
-                } catch (IOException | InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
         }).start();
@@ -175,17 +149,56 @@ public class SenzService extends Service {
 
                         Log.d(TAG, "SenZ received: " + senz);
 
-                        if (senz.startsWith("SHARE")) {
-                            Intent serviceIntent = new Intent(SenzService.this, LocationService.class);
-                            startService(serviceIntent);
-                        }
-                        // broadcast message or send message to query handler
+                        SenzHandler.getInstance().handleSenz(SenzService.this, senz);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }).start();
+    }
+
+    /**
+     * Send ping message to server, this method will be invoked by a thread
+     *
+     * @throws InvalidKeySpecException
+     * @throws NoSuchAlgorithmException
+     * @throws NoUserException
+     * @throws SignatureException
+     * @throws InvalidKeyException
+     * @throws IOException
+     */
+    private void sendPing() throws InvalidKeySpecException, NoSuchAlgorithmException, NoUserException, SignatureException, InvalidKeyException, IOException {
+        if (NetworkUtil.isAvailableNetwork(SenzService.this)) {
+            String message;
+            PrivateKey privateKey = RSAUtils.getPrivateKey(SenzService.this);
+            User user = PreferenceUtils.getUser(SenzService.this);
+
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+
+            // new senz object
+            Senz senz = new Senz();
+            senz.setSenzType(SenzTypeEnum.DATA);
+            senz.setSender(user.getPhoneNo());
+            senz.setReceiver("mysensors");
+            senz.setAttributes(senzAttributes);
+
+            // get digital signature of the senz
+            String senzPayload = SenzParser.getSenzPayload(senz);
+            String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+            message = SenzParser.getSenzMessage(senzPayload, senzSignature);
+
+            Log.d(TAG, "Ping to be send: " + message);
+
+            // send message
+            if (address == null) address = InetAddress.getByName(SENZ_HOST);
+            DatagramPacket sendPacket = new DatagramPacket(message.getBytes(), message.length(), address, SENZ_PORT);
+            socket.send(sendPacket);
+        } else {
+            Log.e(TAG, "Cannot send ping, No connection available");
+        }
     }
 
     /**
@@ -221,7 +234,6 @@ public class SenzService extends Service {
                 }
             }).start();
         }
-
     }
 
 }

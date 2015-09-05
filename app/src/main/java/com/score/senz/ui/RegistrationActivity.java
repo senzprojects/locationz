@@ -1,9 +1,11 @@
 package com.score.senz.ui;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -11,11 +13,13 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.score.senz.R;
 import com.score.senz.enums.SenzTypeEnum;
@@ -65,7 +69,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     private ServiceConnection senzServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             senzServiceMessenger = new Messenger(service);
-
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -81,6 +84,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         setContentView(R.layout.registration_layout);
 
         initUi();
+        LocalBroadcastManager.getInstance(this).registerReceiver(senzMessageReciver, new IntentFilter("DATA"));
     }
 
     /**
@@ -102,6 +106,8 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             bindService(new Intent(RegistrationActivity.this, SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
             isServiceBound = true;
         }
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(senzMessageReciver, new IntentFilter("DATA"));
     }
 
     /**
@@ -116,8 +122,9 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             unbindService(senzServiceConnection);
             isServiceBound = false;
         }
-    }
 
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(senzMessageReciver);
+    }
 
     /**
      * Initialize UI components,
@@ -217,7 +224,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-
         } catch (NoSuchProviderException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
@@ -228,6 +234,33 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             e.printStackTrace();
         } catch (SignatureException e) {
             e.printStackTrace();
+        }
+    }
+
+    private BroadcastReceiver senzMessageReciver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got message from Senz service");
+            handleMessage(intent);
+        }
+    };
+
+    /**
+     * @param intent
+     */
+    private void handleMessage(Intent intent) {
+        String action = intent.getAction();
+
+        if (action.equals("DATA")) {
+            boolean senzMessage = intent.getExtras().getBoolean("extra");
+            if (senzMessage) {
+                Toast.makeText(this, "success", Toast.LENGTH_LONG).show();
+                // navigate home
+            } else {
+                Toast.makeText(this, "fail", Toast.LENGTH_LONG).show();
+                // ask user to retry
+
+            }
         }
     }
 

@@ -1,6 +1,12 @@
 package com.score.senz.handlers;
 
+import android.content.Context;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
+
+import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.pojos.Senz;
+import com.score.senz.services.LocationService;
 import com.score.senz.utils.SenzParser;
 
 import java.security.InvalidKeyException;
@@ -23,25 +29,25 @@ public class SenzHandler {
         return instance;
     }
 
-    public void handleSenz(String senzMessage) {
+    public void handleSenz(Context context, String senzMessage) {
         try {
             // parse and verify senz
             Senz senz = SenzParser.parse(senzMessage);
-            verifySenz(senz);
+            verifySenz(context, senz);
             switch (senz.getSenzType()) {
                 case SHARE:
-                    handleShareSenz(senz);
+                    handleShareSenz(context, senz);
                 case GET:
-                    handleGetSenz(senz);
+                    handleGetSenz(context, senz);
                 case DATA:
-                    handleDataSenz(senz);
+                    handleDataSenz(context, senz);
             }
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
             e.printStackTrace();
         }
     }
 
-    private static void verifySenz(Senz senz) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    private static void verifySenz(Context context, Senz senz) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         // TODO get public key of sender
         senz.getSender();
 
@@ -49,15 +55,25 @@ public class SenzHandler {
         //RSAUtils.verifyDigitalSignature(senz.getPayload(), senz.getSignature(), null);
     }
 
-    private void handleShareSenz(Senz senz) {
+    private void handleShareSenz(Context context, Senz senz) {
+            //Intent serviceIntent = new Intent(context, LocationService.class);
+            //context.startService(serviceIntent);
+    }
+
+    private void handleGetSenz(Context context, Senz senz) {
         //
     }
 
-    private void handleGetSenz(Senz senz) {
-        //
-    }
+    private void handleDataSenz(Context context, Senz senz) {
+        Intent intent = new Intent("DATA");
 
-    private void handleDataSenz(Senz senz) {
-        //
+        // we are broadcasting DATA sensors
+        if (senz.getAttributes().get("msg").equalsIgnoreCase("UserCreated")) {
+            intent.putExtra("extra", true);
+        } else {
+            intent.putExtra("extra", false);
+        }
+
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 }
