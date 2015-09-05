@@ -46,6 +46,9 @@ public class SenzService extends Service {
     // we are listing for UDP socket
     private DatagramSocket socket;
 
+    // server address
+    private InetAddress address;
+
     /**
      * {@inheritDoc}
      */
@@ -140,12 +143,12 @@ public class SenzService extends Service {
                     }
 
                     // send message
-                    InetAddress address = InetAddress.getByName(SENZ_HOST);
+                    if (address == null) address = InetAddress.getByName(SENZ_HOST);
                     DatagramPacket sendPacket = new DatagramPacket(message.getBytes(), message.length(), address, SENZ_PORT);
                     socket.send(sendPacket);
 
                     // send ping in every minute
-                    Thread.sleep(60000);
+                    Thread.sleep(20000);
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -162,17 +165,20 @@ public class SenzService extends Service {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    byte[] message = new byte[1500];
-                    InetAddress address = InetAddress.getByName(SENZ_HOST);
-                    DatagramPacket packet = new DatagramPacket(message, message.length, address, SENZ_PORT);
+                    byte[] message = new byte[512];
 
                     while (true) {
                         // listen for senz
-                        socket.receive(packet);
-                        String senz = new String(message, 0, packet.getLength());
+                        DatagramPacket receivePacket = new DatagramPacket(message, message.length);
+                        socket.receive(receivePacket);
+                        String senz = new String(message, 0, receivePacket.getLength());
 
                         Log.d(TAG, "SenZ received: " + senz);
 
+                        if (senz.startsWith("SHARE")) {
+                            Intent serviceIntent = new Intent(SenzService.this, LocationService.class);
+                            startService(serviceIntent);
+                        }
                         // broadcast message or send message to query handler
                     }
                 } catch (IOException e) {
@@ -206,7 +212,7 @@ public class SenzService extends Service {
                 public void run() {
                     try {
                         // send message to SenZ service
-                        InetAddress address = InetAddress.getByName(SENZ_HOST);
+                        if (address == null) address = InetAddress.getByName(SENZ_HOST);
                         DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SENZ_PORT);
                         socket.send(sendPacket);
                     } catch (IOException e) {

@@ -55,6 +55,9 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     private TextView textViewSignUpText;
     private RelativeLayout signUpButton;
 
+    // keeps weather service already bound or not
+    boolean isServiceBound = false;
+
     // use to send senz messages to SenzService
     Messenger senzServiceMessenger;
 
@@ -85,9 +88,36 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      */
     protected void onResume() {
         super.onResume();
-
-        bindService(new Intent(RegistrationActivity.this, SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // bind to senz service
+        if (!isServiceBound) {
+            bindService(new Intent(RegistrationActivity.this, SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
+            isServiceBound = true;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // Unbind from the service
+        if (isServiceBound) {
+            unbindService(senzServiceConnection);
+            isServiceBound = false;
+        }
+    }
+
 
     /**
      * Initialize UI components,
