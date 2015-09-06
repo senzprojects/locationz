@@ -13,7 +13,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.score.senz.R;
-import com.score.senz.application.SenzApplication;
 import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.pojos.Sensor;
 
@@ -27,7 +26,6 @@ import java.util.ArrayList;
 public class SensorListFragment extends Fragment {
 
     private static final String TAG = SensorListFragment.class.getName();
-    private SenzApplication application;
 
     // list view components
     private ListView sensorListView;
@@ -57,13 +55,10 @@ public class SensorListFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        application = (SenzApplication) getActivity().getApplication();
         typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
 
-        setUpActionBarTitle("#Friend #Senz");
         initEmptyView();
         initSensorListView();
-        displaySensorList();
     }
 
     /**
@@ -72,7 +67,7 @@ public class SensorListFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        setUpActionBarTitle("#friend #senz");
+        setUpActionBarTitle("#Friend #Senz");
         displaySensorList();
     }
 
@@ -81,7 +76,6 @@ public class SensorListFragment extends Fragment {
      */
     public void onPause() {
         super.onPause();
-        application.setCallback(null);
     }
 
     /**

@@ -210,7 +210,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
                 loadSensors();
             } else if (position == 1) {
                 drawerItemList.get(1).setSelected(true);
-                // load share
+                loadShare();
             }
 
             drawerAdapter.notifyDataSetChanged();
@@ -228,6 +228,17 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         // and add the transaction to the back stack so the user can navigate back
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.main, sensorListFragment);
+        transaction.commit();
+    }
+
+    private void loadShare() {
+        ShareActivity shareFragment = new ShareActivity();
+
+        // fragment transitions
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack so the user can navigate back
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.main, shareFragment);
         transaction.commit();
     }
 
