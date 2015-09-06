@@ -10,7 +10,6 @@ import java.util.HashMap;
  */
 public class SenzParser {
 
-
     public static Senz parse(String senzMessage) {
         // init sez with
         Senz senz = new Senz();

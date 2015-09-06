@@ -84,7 +84,7 @@ public class WebSocketService extends Service implements Handler.Callback {
         stopForeground(true);
         isRunning = false;
 
-        application.emptyMySensors();
+        //application.emptyMySensors();
         Intent disconnectMessage = new Intent(WebSocketService.WEB_SOCKET_DISCONNECTED);
         sendBroadcast(disconnectMessage);
         NotificationUtils.cancelNotification(this);
@@ -103,7 +103,7 @@ public class WebSocketService extends Service implements Handler.Callback {
      */
     public void connectToWebSocket(final SenzApplication application) {
         try {
-            application.getWebSocketConnection().connect(SenzApplication.WEB_SOCKET_URI, new WebSocketConnectionHandler() {
+            application.getWebSocketConnection().connect("URL", new WebSocketConnectionHandler() {
                 @Override
                 public void onOpen() {
                     // connected to web socket so notify it to activity

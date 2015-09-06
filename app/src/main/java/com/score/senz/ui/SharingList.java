@@ -28,7 +28,7 @@ import java.util.Iterator;
  *
  * @author erangaeb@gmail.com (eranga herath)
  */
-public class SharingList extends Fragment implements Handler.Callback {
+public class SharingList extends Fragment {
 
     private static final String TAG = SharingList.class.getName();
 
@@ -65,7 +65,6 @@ public class SharingList extends Fragment implements Handler.Callback {
     @Override
     public void onResume() {
         super.onResume();
-        application.setCallback(this);
 
         // construct list adapter
         if(userList.size()>0) {
@@ -106,25 +105,25 @@ public class SharingList extends Fragment implements Handler.Callback {
      * Create sensor list
      */
     private void initFriendList() {
-        // populate sample data to list
-        userList = new ArrayList<User>();
-
-        if(application.getCurrentSensor().isMySensor()) {
-            // add shared users if available
-            if(application.getCurrentSensor().getSharedUsers() != null)
-                userList = application.getCurrentSensor().getSharedUsers();
-        } else {
-            // add sensor owner
-            userList.add(application.getCurrentSensor().getUser());
-        }
-
-        // construct list adapter
-        if(userList.size()>0) {
-            adapter = new SharingListAdapter(SharingList.this, userList);
-            friendListView.setAdapter(adapter);
-        } else {
-            friendListView.setEmptyView(emptyView);
-        }
+//        // populate sample data to list
+//        userList = new ArrayList<User>();
+//
+//        if(application.getCurrentSensor().isMySensor()) {
+//            // add shared users if available
+//            if(application.getCurrentSensor().getSharedUsers() != null)
+//                userList = application.getCurrentSensor().getSharedUsers();
+//        } else {
+//            // add sensor owner
+//            userList.add(application.getCurrentSensor().getUser());
+//        }
+//
+//        // construct list adapter
+//        if(userList.size()>0) {
+//            adapter = new SharingListAdapter(SharingList.this, userList);
+//            friendListView.setAdapter(adapter);
+//        } else {
+//            friendListView.setEmptyView(emptyView);
+//        }
     }
 
     /**
@@ -175,58 +174,5 @@ public class SharingList extends Fragment implements Handler.Callback {
             Log.e(TAG, "UnShare: empty username");
             Toast.makeText(this.getActivity(), "Make sure non empty username", Toast.LENGTH_LONG).show();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean handleMessage(Message message) {
-        // we handle string messages only from here
-        Log.d(TAG, "HandleMessage: message from server");
-        if(message.obj instanceof String) {
-            String payLoad = (String)message.obj;
-            Log.d(TAG, "HandleMessage: message is a string " + payLoad);
-
-            // successful login returns "ShareDone"
-            if(payLoad.equalsIgnoreCase(":ShareDone")) {
-                Log.d(TAG, "HandleMessage: un-sharing success");
-                ActivityUtils.cancelProgressDialog();
-                Toast.makeText(this.getActivity(), "Sensor has been unshared successfully", Toast.LENGTH_LONG).show();
-
-                // post un-share action differ according to sensor type(my sensor or friends sensor)
-                if(application.getCurrentSensor().isMySensor()) {
-                    // my sensor
-                    // remove shared user from db
-                    if(unSharingUser != null) {
-                        new SenzorsDbSource(application.getApplicationContext()).deleteSharedUser(unSharingUser);
-
-                        // get sensor list again
-                        // refresh list
-                        SharingList.this.removeUserFromList(unSharingUser);
-                        SharingList.this.initFriendList();
-                    }
-                } else {
-                    // friend sensor
-                    // delete sensor from db and go back to sensor list
-                    new SenzorsDbSource(application.getApplicationContext()).deleteSensorOfUser(application.getCurrentSensor());
-                    application.initFriendsSensors();
-
-                    // go back to previous activity
-                    this.getActivity().finish();
-                    this.getActivity().overridePendingTransition(R.anim.stay_in, R.anim.right_out);
-                }
-
-                return true;
-            } else if (payLoad.equalsIgnoreCase(":ShareFailed")) {
-                Log.d(TAG, "HandleMessage: sharing fail");
-                ActivityUtils.cancelProgressDialog();
-                Toast.makeText(this.getActivity(), "Un-sharing fail", Toast.LENGTH_LONG).show();
-            } else {
-                Log.d(TAG, "HandleMessage: ignore message");
-            }
-        }
-
-        return false;
     }
 }

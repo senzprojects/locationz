@@ -236,7 +236,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
             PreferenceUtils.saveUser(this, user);
             SenzUtils.addMySensorsToDb(this, user);
         } finally {
-            ((SenzApplication) getApplication()).setUpSenzors();
+            //((SenzApplication) getApplication()).setUpSenzors();
         }
     }
 

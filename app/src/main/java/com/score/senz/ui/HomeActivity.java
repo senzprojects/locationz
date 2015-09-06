@@ -1,7 +1,6 @@
 package com.score.senz.ui;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -18,9 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.score.senz.R;
-import com.score.senz.application.SenzApplication;
 import com.score.senz.pojos.DrawerItem;
-import com.score.senz.services.WebSocketService;
 
 import java.util.ArrayList;
 
@@ -125,14 +122,9 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     private void initDrawerList() {
         // initialize drawer content
         // need to determine selected item according to the currently selected sensor type
-        drawerItemList = new ArrayList<DrawerItem>();
-        if (SenzApplication.SENSOR_TYPE.equalsIgnoreCase(SenzApplication.MY_SENSORS)) {
-            drawerItemList.add(new DrawerItem("My.senZors", R.drawable.my_sensz_normal, R.drawable.my_sensz_selected, true));
-            drawerItemList.add(new DrawerItem("Friends.senZors", R.drawable.friends_normal, R.drawable.friends_selected, false));
-        } else {
-            drawerItemList.add(new DrawerItem("My.senZors", R.drawable.my_sensz_normal, R.drawable.my_sensz_selected, false));
-            drawerItemList.add(new DrawerItem("Friends.senZors", R.drawable.friends_normal, R.drawable.friends_selected, true));
-        }
+        drawerItemList = new ArrayList();
+        drawerItemList.add(new DrawerItem("#Friend #Senz", R.drawable.my_sensz_normal, R.drawable.my_sensz_selected, true));
+        drawerItemList.add(new DrawerItem("#Share", R.drawable.friends_normal, R.drawable.friends_selected, false));
 
         drawerAdapter = new DrawerAdapter(HomeActivity.this, drawerItemList);
         drawerListView = (ListView) findViewById(R.id.drawer);
@@ -168,20 +160,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     @Override
     public void onClick(View view) {
         if (view == logout) {
-            actionLogout();
         }
-    }
-
-    /**
-     * Logout action
-     * 1. close drawer
-     * 2. disconnect from sensors
-     */
-    private void actionLogout() {
-        drawerLayout.closeDrawer(drawerContainer);
-
-        // disconnect from sensor service
-        stopService(new Intent(getApplicationContext(), WebSocketService.class));
     }
 
     /**
@@ -227,17 +206,11 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
             }
 
             if (position == 0) {
-                // set
-                //  1. sensor type
-                SenzApplication.SENSOR_TYPE = SenzApplication.MY_SENSORS;
-                loadSensors();
                 drawerItemList.get(0).setSelected(true);
-            } else if (position == 1) {
-                // set
-                //  1. sensor type
-                SenzApplication.SENSOR_TYPE = SenzApplication.FRIENDS_SENSORS;
                 loadSensors();
+            } else if (position == 1) {
                 drawerItemList.get(1).setSelected(true);
+                // load share
             }
 
             drawerAdapter.notifyDataSetChanged();
@@ -248,7 +221,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
      * Load my sensor list fragment
      */
     private void loadSensors() {
-        SensorList sensorListFragment = new SensorList();
+        SensorListFragment sensorListFragment = new SensorListFragment();
 
         // fragment transitions
         // Replace whatever is in the fragment_container view with this fragment,

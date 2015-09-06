@@ -148,20 +148,20 @@ public class QueryHandler {
         user.setUsername(username);
         Sensor sensor = new Sensor("0", "Location", "Location", false, user, null);
 
-        try {
-            // save sensor in db and refresh friend sensor list
-            new SenzorsDbSource(application.getApplicationContext()).addSensor(sensor);
-            application.initFriendsSensors();
-            Log.d(TAG, "HandleShareQuery: saved sensor from - " + user.getUsername());
-
-            // currently we have to launch friend sensor
-            // update notification to notify user about incoming query/ share request
-            SenzApplication.SENSOR_TYPE = SenzApplication.FRIENDS_SENSORS;
-            NotificationUtils.updateNotification(application.getApplicationContext(), "Location @" + user.getUsername());
-        } catch (Exception e) {
-            // Db exception here
-            Log.e(TAG, "HandleShareQuery: db error " + e.toString());
-        }
+//        try {
+//            // save sensor in db and refresh friend sensor list
+//            new SenzorsDbSource(application.getApplicationContext()).addSensor(sensor);
+//            application.initFriendsSensors();
+//            Log.d(TAG, "HandleShareQuery: saved sensor from - " + user.getUsername());
+//
+//            // currently we have to launch friend sensor
+//            // update notification to notify user about incoming query/ share request
+//            SenzApplication.SENSOR_TYPE = SenzApplication.FRIENDS_SENSORS;
+//            NotificationUtils.updateNotification(application.getApplicationContext(), "Location @" + user.getUsername());
+//        } catch (Exception e) {
+//            // Db exception here
+//            Log.e(TAG, "HandleShareQuery: db error " + e.toString());
+//        }
     }
 
     /**
@@ -171,23 +171,23 @@ public class QueryHandler {
      */
     private static void handleUnShareQuery(SenzApplication application, Query query) {
         // get match user and sensor
-        User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser());
-        Sensor sensor = new Sensor("0", "Location", "Location", false, user, null);
-        try {
-            // delete sensor  from db
-            // new SenzorsDbSource(application.getApplicationContext()).deleteSharedUser(user);
-            new SenzorsDbSource(application.getApplicationContext()).deleteSensorOfUser(sensor);
-            application.initFriendsSensors();
-            Log.d(TAG, "HandleUnShareQuery: deleted sensor from - " + user.getPhoneNo());
-
-            // currently we have to launch friend sensor
-            // update notification to notify user about incoming query/ share request
-            SenzApplication.SENSOR_TYPE = SenzApplication.FRIENDS_SENSORS;
-            NotificationUtils.updateNotification(application.getApplicationContext(), "Unshared Location @" + user.getUsername());
-        } catch (Exception e) {
-            // Db exception here
-            Log.e(TAG, "HandleUnShareQuery: db error " + e.toString());
-        }
+//        User user = new SenzorsDbSource(application.getApplicationContext()).getOrCreateUser(query.getUser());
+//        Sensor sensor = new Sensor("0", "Location", "Location", false, user, null);
+//        try {
+//            // delete sensor  from db
+//            // new SenzorsDbSource(application.getApplicationContext()).deleteSharedUser(user);
+//            new SenzorsDbSource(application.getApplicationContext()).deleteSensorOfUser(sensor);
+//            application.initFriendsSensors();
+//            Log.d(TAG, "HandleUnShareQuery: deleted sensor from - " + user.getPhoneNo());
+//
+//            // currently we have to launch friend sensor
+//            // update notification to notify user about incoming query/ share request
+//            SenzApplication.SENSOR_TYPE = SenzApplication.FRIENDS_SENSORS;
+//            NotificationUtils.updateNotification(application.getApplicationContext(), "Unshared Location @" + user.getUsername());
+//        } catch (Exception e) {
+//            // Db exception here
+//            Log.e(TAG, "HandleUnShareQuery: db error " + e.toString());
+//        }
     }
 
     /**
@@ -200,7 +200,7 @@ public class QueryHandler {
         if(application.getWebSocketConnection().isConnected()) {
             // current location request is from web socket service
             // start location service
-            application.setRequestQuery(query);
+            //application.setRequestQuery(query);
             Intent serviceIntent = new Intent(application.getApplicationContext(), GpsReadingService.class);
             Bundle bundle = new Bundle();
             bundle.putBoolean("isMyLocation", false);

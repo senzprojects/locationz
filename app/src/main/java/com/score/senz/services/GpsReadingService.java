@@ -181,20 +181,20 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
      * @param location current location
      */
     private void handleLocationRequestFromSever(Location location) {
-        String command = "DATA";
-        String user = application.getRequestQuery().getUser();
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put("lat", Double.toString(location.getLatitude()));
-        params.put("lon", Double.toString(location.getLongitude()));
-        String message = QueryParser.getMessage(new Query(command, user, params));
-
-        // send data to server
-        if(application.getWebSocketConnection().isConnected()) {
-            Log.d(TAG, "HandleLocationRequestFromSever: web socket connected, so sending reply to server");
-            application.getWebSocketConnection().sendTextMessage(message);
-        } else {
-            Log.e(TAG, "HandleLocationRequestFromSever: web socket not connected");
-        }
+//        String command = "DATA";
+//        //String user = application.getRequestQuery().getUser();
+//        HashMap<String, String> params = new HashMap<String, String>();
+//        params.put("lat", Double.toString(location.getLatitude()));
+//        params.put("lon", Double.toString(location.getLongitude()));
+//        String message = QueryParser.getMessage(new Query(command, user, params));
+//
+//        // send data to server
+//        if(application.getWebSocketConnection().isConnected()) {
+//            Log.d(TAG, "HandleLocationRequestFromSever: web socket connected, so sending reply to server");
+//            application.getWebSocketConnection().sendTextMessage(message);
+//        } else {
+//            Log.e(TAG, "HandleLocationRequestFromSever: web socket not connected");
+//        }
     }
 
     /**

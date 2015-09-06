@@ -26,7 +26,7 @@ import com.score.senz.utils.ActivityUtils;
  * Time: 3:06 PM
  * To change this template use File | Settings | File Templates.
  */
-public class SensorMapFragment extends Fragment implements View.OnClickListener, Handler.Callback, GoogleMap.OnMarkerClickListener {
+public class SensorMapFragment extends Fragment implements View.OnClickListener, GoogleMap.OnMarkerClickListener {
 
     private static final String TAG = SensorMapFragment.class.getName();
     private SenzApplication application;
@@ -82,7 +82,6 @@ public class SensorMapFragment extends Fragment implements View.OnClickListener,
         super.onResume();
 
         Log.d(TAG, "OnResume: setting up map, set handler callback MapActivity");
-        application.setCallback(this);
         setUpMapIfNeeded();
     }
 
@@ -143,29 +142,29 @@ public class SensorMapFragment extends Fragment implements View.OnClickListener,
         if(marker != null) marker.remove();
         if(circle != null) circle.remove();
 
-        // add location marker
-        try {
-            LatLon latLon = application.getLatLon();
-            if(latLon!=null) {
-                LatLng currentCoordinates = new LatLng(Double.parseDouble(latLon.getLat()), Double.parseDouble(latLon.getLon()));
-                marker = map.addMarker(new MarkerOptions().position(currentCoordinates).title("My location").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 10));
-
-                // ... get a map.
-                // Add a circle in Sydney
-                circle = map.addCircle(new CircleOptions()
-                        .center(currentCoordinates)
-                        .radius(14000)
-                        .strokeColor(0xFF0000FF)
-                        .strokeWidth(0.5f)
-                        .fillColor(0x110000FF));
-
-                showMyLocation(currentCoordinates);
-            }
-        } catch (NumberFormatException e) {
-            Toast.makeText(this.getActivity(), "Invalid location", Toast.LENGTH_LONG).show();
-            Log.d(TAG, "setUpMap: invalid lat lon parameters");
-        }
+//        // add location marker
+//        try {
+//            LatLon latLon = application.getLatLon();
+//            if(latLon!=null) {
+//                LatLng currentCoordinates = new LatLng(Double.parseDouble(latLon.getLat()), Double.parseDouble(latLon.getLon()));
+//                marker = map.addMarker(new MarkerOptions().position(currentCoordinates).title("My location").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
+//                map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 10));
+//
+//                // ... get a map.
+//                // Add a circle in Sydney
+//                circle = map.addCircle(new CircleOptions()
+//                        .center(currentCoordinates)
+//                        .radius(14000)
+//                        .strokeColor(0xFF0000FF)
+//                        .strokeWidth(0.5f)
+//                        .fillColor(0x110000FF));
+//
+//                showMyLocation(currentCoordinates);
+//            }
+//        } catch (NumberFormatException e) {
+//            Toast.makeText(this.getActivity(), "Invalid location", Toast.LENGTH_LONG).show();
+//            Log.d(TAG, "setUpMap: invalid lat lon parameters");
+//        }
     }
 
     /**
@@ -174,20 +173,20 @@ public class SensorMapFragment extends Fragment implements View.OnClickListener,
      * distance between my location and friend location
      */
     private void showMyLocation(LatLng currentCoordinates) {
-        if(!application.getCurrentSensor().isMySensor()) {
-            // friends sensor
-            // display my location and set zoom level
-            /*Location myLocation = map.getMyLocation();
-            Location friendLocation = new Location("Friend");
-            friendLocation.setLatitude(currentCoordinates.latitude);
-            friendLocation.setLongitude(currentCoordinates.longitude);
-            float distance = myLocation.distanceTo(friendLocation);
-            Log.d(TAG, "Distance: " + distance);*/
-            Log.d(TAG, "Distance: " + "---------------");
-        } else {
-            // set default zoom level
-            // map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
-        }
+//        if(!application.getCurrentSensor().isMySensor()) {
+//            // friends sensor
+//            // display my location and set zoom level
+//            /*Location myLocation = map.getMyLocation();
+//            Location friendLocation = new Location("Friend");
+//            friendLocation.setLatitude(currentCoordinates.latitude);
+//            friendLocation.setLongitude(currentCoordinates.longitude);
+//            float distance = myLocation.distanceTo(friendLocation);
+//            Log.d(TAG, "Distance: " + distance);*/
+//            Log.d(TAG, "Distance: " + "---------------");
+//        } else {
+//            // set default zoom level
+//            // map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentCoordinates, 15));
+//        }
     }
 
     /**
@@ -255,26 +254,4 @@ public class SensorMapFragment extends Fragment implements View.OnClickListener,
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean handleMessage(Message message) {
-        Log.d(TAG, "HandleMessage: message from server");
-        if(message.obj instanceof LatLon) {
-            // we handle LatLon messages only, from here
-            // get address from location
-            Log.d(TAG, "HandleMessage: message is a LatLon object so display it on map");
-            LatLon latLon = (LatLon) message.obj;
-
-            // display location
-            ActivityUtils.cancelProgressDialog();
-            application.setLatLon(latLon);
-            moveToLocation(latLon);
-        } else {
-            Log.e(TAG, "HandleMessage: message not a LatLon object");
-        }
-
-        return false;
-    }
 }

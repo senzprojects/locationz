@@ -150,7 +150,7 @@ public class FriendListActivity extends Activity implements SearchView.OnQueryTe
         // pass selected user and sensor to share activity
         Intent intent = new Intent(this, ShareActivity.class);
         intent.putExtra("com.score.senz.pojos.User", user);
-        intent.putExtra("com.score.senz.pojos.Sensor", application.getCurrentSensor());
+        //intent.putExtra("com.score.senz.pojos.Sensor", application.getCurrentSensor());
         this.startActivity(intent);
         this.overridePendingTransition(R.anim.right_in, R.anim.stay_in);
     }
