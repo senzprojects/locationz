@@ -21,7 +21,7 @@ public class SenzUtils {
      */
     public static void addMySensorsToDb(Context context, User user) {
         Sensor sensor = new Sensor("0", "Location", "LocationValue", true, user, null);
-        new SenzorsDbSource(context).addSensor(sensor);
+        //new SenzorsDbSource(context).addSensor(sensor);
     }
 
 }

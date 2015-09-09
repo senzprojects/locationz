@@ -88,16 +88,6 @@
         </activity>
 
         <activity
-                android:name=".ui.ShareActivity"
-                android:screenOrientation="portrait"
-                android:configChanges="orientation"
-                android:theme="@style/Theme.Yello"
-                android:windowSoftInputMode="stateHidden"
-                android:launchMode="singleTask"
-                android:parentActivityName=".ui.SensorDetailsActivity">
-        </activity>
-
-        <activity
                 android:name=".ui.FriendListActivity"
                 android:screenOrientation="portrait"
                 android:configChanges="orientation"
@@ -146,7 +136,6 @@
                 android:windowSoftInputMode="stateHidden">
         </activity>
 
-        <service android:enabled="true" android:name=".services.WebSocketService" />
         <service android:enabled="true" android:name=".services.GpsReadingService" />
         <service android:enabled="true" android:name=".services.LocationService" />
         <service android:enabled="true" android:name=".services.SenzService" />

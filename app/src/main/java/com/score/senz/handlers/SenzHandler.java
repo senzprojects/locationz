@@ -4,9 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.score.senz.enums.SenzTypeEnum;
+import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.pojos.Senz;
-import com.score.senz.services.LocationService;
 import com.score.senz.utils.SenzParser;
 
 import java.security.InvalidKeyException;
@@ -56,19 +55,19 @@ public class SenzHandler {
     }
 
     private void handleShareSenz(Context context, Senz senz) {
-            //Intent serviceIntent = new Intent(context, LocationService.class);
-            //context.startService(serviceIntent);
+        // create senz
+        new SenzorsDbSource(context).createSenz(senz);
     }
 
     private void handleGetSenz(Context context, Senz senz) {
-        //
+        // TODO Start Location service here, rest of the operation handles by Location Service
     }
 
     private void handleDataSenz(Context context, Senz senz) {
         Intent intent = new Intent("DATA");
 
         // we are broadcasting DATA sensors
-        if (senz.getAttributes().get("msg").equalsIgnoreCase("UserCreated")) {
+        if (senz.getAttributes().get("#msg").equalsIgnoreCase("UserCreated")) {
             intent.putExtra("extra", true);
         } else {
             intent.putExtra("extra", false);

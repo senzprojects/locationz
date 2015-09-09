@@ -18,26 +18,21 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     private static SenzorsDbHelper senzorsDbHelper;
 
     // If you change the database schema, you must increment the database version
-    private static final int DATABASE_VERSION = 12;
-    private static final String DATABASE_NAME = "Senzors.db";
+    private static final int DATABASE_VERSION = 14;
+    private static final String DATABASE_NAME = "Senz.db";
 
     // data types, keywords and queries
     private static final String TEXT_TYPE = " TEXT";
-    private static final String SMALLINT_TYPE = " SMALLINT";
-    private static final String SQL_CREATE_SENSOR =
-            "CREATE TABLE " + SenzorsDbContract.Sensor.TABLE_NAME + " (" +
-                    SenzorsDbContract.Sensor._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
-                    SenzorsDbContract.Sensor.COLUMN_NAME_NAME + TEXT_TYPE + "," +
-                    SenzorsDbContract.Sensor.COLUMN_NAME_VALUE + TEXT_TYPE + "," +
-                    SenzorsDbContract.Sensor.COLUMN_NAME_IS_MINE + SMALLINT_TYPE + "," +
-                    SenzorsDbContract.Sensor.COLUMN_NAME_USER + " INTEGER NOT NULL" + "," +
-                    "FOREIGN KEY" + "(" + SenzorsDbContract.Sensor.COLUMN_NAME_USER + ") " +
-                    "REFERENCES "+ SenzorsDbContract.User.TABLE_NAME + "(" + SenzorsDbContract.User._ID + ")" +
-                    "UNIQUE" + "(" + SenzorsDbContract.Sensor.COLUMN_NAME_NAME + ","  + SenzorsDbContract.Sensor.COLUMN_NAME_USER + ")" +
+    private static final String SQL_CREATE_SENZ =
+            "CREATE TABLE " + SenzorsDbContract.Senz.TABLE_NAME + " (" +
+                    SenzorsDbContract.Senz._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
+                    SenzorsDbContract.Senz.COLUMN_NAME_NAME + TEXT_TYPE + " NOT NULL" + "," +
+                    SenzorsDbContract.Senz.COLUMN_NAME_VALUE + TEXT_TYPE + "," +
+                    SenzorsDbContract.Senz.COLUMN_NAME_USER + TEXT_TYPE + " NOT NULL" +
             " )";
     private static final String SQL_CREATE_USER =
             "CREATE TABLE " + SenzorsDbContract.User.TABLE_NAME + " (" +
-                    SenzorsDbContract.Sensor._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
+                    SenzorsDbContract.User._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                     SenzorsDbContract.User.COLUMN_NAME_PHONE + TEXT_TYPE + "UNIQUE NOT NULL" +
             " )";
     private static final String SQL_CREATE_SHARED_USER =
@@ -48,49 +43,15 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
                     "FOREIGN KEY" + "(" + SenzorsDbContract.SharedUser.COLUMN_NAME_USER + ") " +
                     "REFERENCES "+ SenzorsDbContract.User.TABLE_NAME + "(" + SenzorsDbContract.User._ID + ")" +
                     "FOREIGN KEY" + "(" + SenzorsDbContract.SharedUser.COLUMN_NAME_SENSOR + ") " +
-                    "REFERENCES "+ SenzorsDbContract.Sensor.TABLE_NAME + "(" + SenzorsDbContract.Sensor._ID + ")" +
+                    "REFERENCES "+ SenzorsDbContract.Senz.TABLE_NAME + "(" + SenzorsDbContract.Senz._ID + ")" +
             " )";
 
-    private static final String SQL_DELETE_SENSOR =
-            "DROP TABLE IF EXISTS " + SenzorsDbContract.Sensor.TABLE_NAME;
+    private static final String SQL_DELETE_SENZ =
+            "DROP TABLE IF EXISTS " + SenzorsDbContract.Senz.TABLE_NAME;
     private static final String SQL_DELETE_USER =
             "DROP TABLE IF EXISTS " + SenzorsDbContract.User.TABLE_NAME;
     private static final String SQL_DELETE_SHARED_USER =
             "DROP TABLE IF EXISTS " + SenzorsDbContract.SharedUser.TABLE_NAME;
-
-    // trigger that use to define foreign key constraint of "user" in "sensor" table
-    // we need to define foreign key constraint because of sqlite older versions not default supporting foreign key constraints
-    private static final String SQL_CREATE_TRIGGER_SENSOR_FOREIGN_KEY =
-            "CREATE TRIGGER " + SenzorsDbContract.Sensor.TRIGGER_FOREIGN_KEY_INSERT + " " +
-            "BEFORE INSERT ON " + SenzorsDbContract.Sensor.TABLE_NAME + " " +
-                    "FOR EACH ROW BEGIN " +
-                            "SELECT CASE WHEN((" +
-                                    "SELECT " + SenzorsDbContract.User._ID + " " +
-                                    "FROM " + SenzorsDbContract.User.TABLE_NAME + " " +
-                                    "WHERE " + SenzorsDbContract.User._ID + "=" + "NEW." + SenzorsDbContract.Sensor.COLUMN_NAME_USER + ") " +
-                            "IS NULL) " +
-                            "THEN RAISE(ABORT, 'Foreign key violation') END; " +
-                            "END;";
-
-    private static final String SQL_DELETE_TRIGGER_SENSOR_FOREIGN_KEY =
-            "DROP TRIGGER IF EXISTS " + SenzorsDbContract.Sensor.TRIGGER_FOREIGN_KEY_INSERT;
-
-    // trigger that use to define unique constraints in "sensor" table
-    // 'user' and 'sensor_name' should ne unique together
-    private static final String SQL_CREATE_TRIGGER_SENSOR_UNIQUE_KEY =
-            "CREATE TRIGGER " + SenzorsDbContract.Sensor.TRIGGER_UNIQUE_KEY_INSERT + " " +
-            "BEFORE INSERT ON " + SenzorsDbContract.Sensor.TABLE_NAME + " " +
-                    "FOR EACH ROW BEGIN " +
-                            "SELECT CASE WHEN((" +
-                                    "SELECT " + SenzorsDbContract.User._ID + " " +
-                                    "FROM " + SenzorsDbContract.User.TABLE_NAME + " " +
-                                    "WHERE " + SenzorsDbContract.User._ID + "=" + "NEW." + SenzorsDbContract.Sensor.COLUMN_NAME_USER + ") " +
-                            "IS NOT NULL) " +
-                            "THEN RAISE(ABORT, 'Unique key violation') END; " +
-                            "END;";
-
-    private static final String SQL_DELETE_TRIGGER_SENSOR_UNIQUE_KEY =
-            "DROP TRIGGER IF EXISTS " + SenzorsDbContract.Sensor.TRIGGER_UNIQUE_KEY_INSERT;
 
     /**
      * Init context
@@ -118,9 +79,9 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
      */
     public void onCreate(SQLiteDatabase db) {
         Log.d(TAG, "OnCreate: creating db helper, db version - " + DATABASE_VERSION);
-        db.execSQL(SQL_CREATE_SENSOR);
-        db.execSQL(SQL_CREATE_USER);
-        db.execSQL(SQL_CREATE_SHARED_USER);
+        db.execSQL(SQL_CREATE_SENZ);
+        //db.execSQL(SQL_CREATE_USER);
+        //db.execSQL(SQL_CREATE_SHARED_USER);
         //db.execSQL(SQL_CREATE_TRIGGER_SENSOR_FOREIGN_KEY);
     }
 
@@ -142,9 +103,9 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
         Log.d(TAG, "OnUpgrade: updating db helper, db version - " + DATABASE_VERSION);
-        db.execSQL(SQL_DELETE_SHARED_USER);
-        db.execSQL(SQL_DELETE_SENSOR);
-        db.execSQL(SQL_DELETE_USER);
+        //db.execSQL(SQL_DELETE_SHARED_USER);
+        db.execSQL(SQL_DELETE_SENZ);
+        //db.execSQL(SQL_DELETE_USER);
         //db.execSQL(SQL_DELETE_TRIGGER_SENSOR_FOREIGN_KEY);
         onCreate(db);
     }

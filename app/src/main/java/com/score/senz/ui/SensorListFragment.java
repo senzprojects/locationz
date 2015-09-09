@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.score.senz.R;
 import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.pojos.Sensor;
+import com.score.senz.pojos.Senz;
 
 import java.util.ArrayList;
 
@@ -29,7 +30,7 @@ public class SensorListFragment extends Fragment {
 
     // list view components
     private ListView sensorListView;
-    private ArrayList<Sensor> sensorList;
+    private ArrayList<Senz> senzList;
     private SensorListAdapter adapter;
 
     // empty view to display when no sensors available
@@ -95,8 +96,8 @@ public class SensorListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(TAG, "onItemClick: click on sensor list item");
-                if (position > 0 && position <= sensorList.size()) {
-                    Sensor sensor = sensorList.get(position - 1);
+                if (position > 0 && position <= senzList.size()) {
+                    Senz senz = senzList.get(position - 1);
                     // TODO GET Senz to server
                 }
             }
@@ -121,15 +122,15 @@ public class SensorListFragment extends Fragment {
      */
     private void displaySensorList() {
         // get sensors from db
-        sensorList = (ArrayList<Sensor>) new SenzorsDbSource(this.getActivity()).getSensors(false);
+        senzList = (ArrayList<Senz>) new SenzorsDbSource(this.getActivity()).getSenzes();
 
         // construct list adapter
-        if (sensorList.size() > 0) {
-            adapter = new SensorListAdapter(SensorListFragment.this.getActivity(), sensorList);
+        if (senzList.size() > 0) {
+            adapter = new SensorListAdapter(SensorListFragment.this.getActivity(), senzList);
             adapter.notifyDataSetChanged();
             sensorListView.setAdapter(adapter);
         } else {
-            adapter = new SensorListAdapter(SensorListFragment.this.getActivity(), sensorList);
+            adapter = new SensorListAdapter(SensorListFragment.this.getActivity(), senzList);
             sensorListView.setAdapter(adapter);
             sensorListView.setEmptyView(emptyView);
         }

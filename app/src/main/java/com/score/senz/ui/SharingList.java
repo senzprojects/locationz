@@ -153,26 +153,26 @@ public class SharingList extends Fragment {
         Log.d(TAG, "UnShare: un-sharing query " + query);
 
         // validate share attribute first
-        if(!user.getPhoneNo().equalsIgnoreCase("")) {
-            if(NetworkUtil.isAvailableNetwork(this.getActivity())) {
-                // construct query and send to server via web socket
-                if(application.getWebSocketConnection().isConnected()) {
-                    Log.w(TAG, "UnShare: sending query to server");
-                    ActivityUtils.showProgressDialog(this.getActivity(), "Un-sharing sensor...");
-                    application.getWebSocketConnection().sendTextMessage(query);
-                } else {
-                    Log.w(TAG, "UnShare: not connected to web socket");
-                    Toast.makeText(this.getActivity(), "You are disconnected from senZors service", Toast.LENGTH_LONG).show();
-                }
-
-                ActivityUtils.hideSoftKeyboard(this.getActivity());
-            } else {
-                Log.w(TAG, "UnShare: no network connection");
-                Toast.makeText(this.getActivity(), "Cannot connect to server, Please check your network connection", Toast.LENGTH_LONG).show();
-            }
-        } else {
-            Log.e(TAG, "UnShare: empty username");
-            Toast.makeText(this.getActivity(), "Make sure non empty username", Toast.LENGTH_LONG).show();
-        }
+//        if(!user.getPhoneNo().equalsIgnoreCase("")) {
+//            if(NetworkUtil.isAvailableNetwork(this.getActivity())) {
+//                // construct query and send to server via web socket
+//                if(application.getWebSocketConnection().isConnected()) {
+//                    Log.w(TAG, "UnShare: sending query to server");
+//                    ActivityUtils.showProgressDialog(this.getActivity(), "Un-sharing sensor...");
+//                    application.getWebSocketConnection().sendTextMessage(query);
+//                } else {
+//                    Log.w(TAG, "UnShare: not connected to web socket");
+//                    Toast.makeText(this.getActivity(), "You are disconnected from senZors service", Toast.LENGTH_LONG).show();
+//                }
+//
+//                ActivityUtils.hideSoftKeyboard(this.getActivity());
+//            } else {
+//                Log.w(TAG, "UnShare: no network connection");
+//                Toast.makeText(this.getActivity(), "Cannot connect to server, Please check your network connection", Toast.LENGTH_LONG).show();
+//            }
+//        } else {
+//            Log.e(TAG, "UnShare: empty username");
+//            Toast.makeText(this.getActivity(), "Make sure non empty username", Toast.LENGTH_LONG).show();
+//        }
     }
 }

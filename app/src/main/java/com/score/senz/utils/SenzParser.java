@@ -15,10 +15,6 @@ public class SenzParser {
         Senz senz = new Senz();
         senz.setAttributes(new HashMap<String, String>());
 
-        // part except the signature of the senz message is the payload
-        String senzPayload = senzMessage.substring(0, senzMessage.lastIndexOf(" "));
-        senz.setPayload(senzPayload);
-
         // parse senz
         String[] tokens = senzMessage.split(" ");
         for (int i = 0; i < tokens.length; i++) {
@@ -33,10 +29,10 @@ public class SenzParser {
                 // @0775432012
                 senz.setReceiver(token.substring(1));
             } else if (token.startsWith("^")) {
-                // ^senz, ^0775432015
+                // ^mysensors, ^0775432015
                 senz.setSender(token.substring(1));
             } else if (token.startsWith("#")) {
-                if (token.equals("#time") || token.equals("pubkey")) {
+                if (token.equals("#time") || token.equals("#pubkey")) {
                     // #time 2453234, #pubkey ac23edf432fdg
                     senz.getAttributes().put(token, tokens[i + 1]);
                     i++;
@@ -53,11 +49,12 @@ public class SenzParser {
             }
         }
 
-        System.out.println(senz.getSender());
-        System.out.println(senz.getReceiver());
-        System.out.println(senz.getSenzType());
-        System.out.println(senz.getSignature());
-        System.out.println(senz.getAttributes().entrySet());
+//        System.out.println(senz.getSender());
+//        System.out.println(senz.getReceiver());
+//        System.out.println(senz.getSenzType());
+//        System.out.println(senz.getSignature());
+//        System.out.println(senz.getAttributes().entrySet());
+        //System.out.println("------------");
 
         return senz;
     }
@@ -107,8 +104,8 @@ public class SenzParser {
                 "^0775432015" + " " +
                 "signatureeee";
 
-        parse(senzMessage1);
-        parse(senzMessage2);
+        //parse(senzMessage1);
+        //parse(senzMessage2);
 
 //        Senz senz = new Senz();
 //        senz.setSender("03452");
@@ -120,6 +117,14 @@ public class SenzParser {
 //        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
 //        senz.setAttributes(senzAttributes);
 
+        String senzMessage3 = "DATA " +
+                "#msg UserCreated " +
+                "#pubkey sd23453451234sfsdfd==  " +
+                "#time 1441806897.71 " +
+                "^mysensors " +
+                "v50I88VzgvBvubCjGitTMO9";
+
+        parse(senzMessage3);
 
         Senz senz = new Senz();
         senz.setSender("222");

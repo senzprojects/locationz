@@ -22,17 +22,17 @@ public class LaunchActivity extends Activity {
         SenzApplication application = (SenzApplication) this.getApplication();
 
         // determine where to go
-        if(application.getWebSocketConnection().isConnected()) {
-            //Intent intent = new Intent(this, HomeActivity.class);
-            Intent intent = new Intent(this, SplashActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            finish();
-            startActivity(intent);
-        } else {
-            Intent intent = new Intent(this, SplashActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            finish();
-            startActivity(intent);
-        }
+//        if(application.getWebSocketConnection().isConnected()) {
+//            //Intent intent = new Intent(this, HomeActivity.class);
+//            Intent intent = new Intent(this, SplashActivity.class);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            finish();
+//            startActivity(intent);
+//        } else {
+//            Intent intent = new Intent(this, SplashActivity.class);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            finish();
+//            startActivity(intent);
+//        }
     }
 }

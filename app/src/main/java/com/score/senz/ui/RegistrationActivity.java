@@ -84,7 +84,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         setContentView(R.layout.registration_layout);
 
         initUi();
-        LocalBroadcastManager.getInstance(this).registerReceiver(senzMessageReciver, new IntentFilter("DATA"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
     }
 
     /**
@@ -107,7 +107,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             isServiceBound = true;
         }
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(senzMessageReciver, new IntentFilter("DATA"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
     }
 
     /**
@@ -123,7 +123,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             isServiceBound = false;
         }
 
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(senzMessageReciver);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(senzMessageReceiver);
     }
 
     /**
@@ -237,7 +237,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         }
     }
 
-    private BroadcastReceiver senzMessageReciver = new BroadcastReceiver() {
+    private BroadcastReceiver senzMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Got message from Senz service");
@@ -246,7 +246,10 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     };
 
     /**
-     * @param intent
+     * Handle brodcase message receives
+     * Need to handle registration success failure here
+     *
+     * @param intent intent
      */
     private void handleMessage(Intent intent) {
         String action = intent.getAction();
@@ -254,14 +257,25 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         if (action.equals("DATA")) {
             boolean senzMessage = intent.getExtras().getBoolean("extra");
             if (senzMessage) {
-                Toast.makeText(this, "success", Toast.LENGTH_LONG).show();
-                // navigate home
-            } else {
-                Toast.makeText(this, "fail", Toast.LENGTH_LONG).show();
-                // ask user to retry
+                Toast.makeText(this, "Successfully registered", Toast.LENGTH_LONG).show();
 
+                // navigate home
+                navigateToHome();
+            } else {
+                Toast.makeText(this, "Fail to register", Toast.LENGTH_LONG).show();
+                // ask user to retry
             }
         }
+    }
+
+    /**
+     * Switch to home activity
+     * This method will be call after successful login
+     */
+    private void navigateToHome() {
+        Intent intent = new Intent(RegistrationActivity.this, HomeActivity.class);
+        RegistrationActivity.this.startActivity(intent);
+        RegistrationActivity.this.finish();
     }
 
     /**

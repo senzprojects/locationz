@@ -10,8 +10,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.score.senz.pojos.Sensor;
+
 import com.score.senz.R;
+import com.score.senz.pojos.Sensor;
+import com.score.senz.pojos.Senz;
 
 import java.util.ArrayList;
 
@@ -23,7 +25,7 @@ import java.util.ArrayList;
 public class SensorListAdapter extends BaseAdapter {
 
     private Context context;
-    private ArrayList<Sensor> sensorList;
+    private ArrayList<Senz> senzList;
 
     // set custom font
     Typeface typefaceThin;
@@ -32,38 +34,41 @@ public class SensorListAdapter extends BaseAdapter {
     /**
      * Initialize context variables
      *
-     * @param context activity context
-     * @param sensorList sharing user list
+     * @param context  activity context
+     * @param senzList sharing user list
      */
-    public SensorListAdapter(Context context, ArrayList<Sensor> sensorList) {
+    public SensorListAdapter(Context context, ArrayList<Senz> senzList) {
         typefaceThin = Typeface.createFromAsset(context.getAssets(), "fonts/vegur_2.otf");
         typefaceBlack = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Black.ttf");
 
         this.context = context;
-        this.sensorList = sensorList;
+        this.senzList = senzList;
     }
 
     /**
      * Get size of sensor list
+     *
      * @return userList size
      */
     @Override
     public int getCount() {
-        return sensorList.size();
+        return senzList.size();
     }
 
     /**
      * Get specific item from sensor list
+     *
      * @param i item index
      * @return list item
      */
     @Override
     public Object getItem(int i) {
-        return sensorList.get(i);
+        return senzList.get(i);
     }
 
     /**
      * Get sensor list item id
+     *
      * @param i item index
      * @return current item id
      */
@@ -74,8 +79,9 @@ public class SensorListAdapter extends BaseAdapter {
 
     /**
      * Create list row view
-     * @param i index
-     * @param view current list item view
+     *
+     * @param i         index
+     * @param view      current list item view
      * @param viewGroup parent
      * @return view
      */
@@ -85,7 +91,7 @@ public class SensorListAdapter extends BaseAdapter {
         // to findViewById() on each row.
         final ViewHolder holder;
 
-        final Sensor sensor = (Sensor) getItem(i);
+        final Senz senz = (Senz) getItem(i);
 
         if (view == null) {
             //inflate sensor list row layout
@@ -110,12 +116,7 @@ public class SensorListAdapter extends BaseAdapter {
             holder = (ViewHolder) view.getTag();
         }
 
-        // handle my/friend sensors
-        if(sensor.isMySensor()) {
-            setUpMySensor(sensor, view, holder);
-        } else {
-            setUpFriendSensor(sensor, view, holder);
-        }
+        setUpSenzRow(senz, view, holder);
 
         holder.share.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,14 +131,13 @@ public class SensorListAdapter extends BaseAdapter {
         return view;
     }
 
-    private void setUpMySensor(Sensor sensor, View view, ViewHolder viewHolder) {
+    private void setUpSenzRow(Senz senz, View view, ViewHolder viewHolder) {
         // enable share and change color of view
         view.setBackgroundResource(R.drawable.my_sensor_background);
         viewHolder.share.setVisibility(View.GONE);
         viewHolder.sensorName.setBackgroundResource(R.drawable.circle_shape_red);
         viewHolder.sensorUser.setTextColor(Color.parseColor("#d96459"));
-        String userText = (sensor.getUser().getUsername().equals("") ? sensor.getUser().getPhoneNo() : sensor.getUser().getUsername());
-        viewHolder.sensorUser.setText("@" + userText);
+        viewHolder.sensorUser.setText("@" + senz.getSender());
         viewHolder.sensorValue.setText(R.string.tap_here);
     }
 

@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import com.score.senz.pojos.Sensor;
+import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.utils.PhoneBookUtils;
 
@@ -98,21 +99,20 @@ public class SenzorsDbSource {
     }
 
     /**
-     * Add sensor to the database
-     * @param sensor sensor object
+     * Add senz to the database
+     * @param senz senz object
      */
-    public void addSensor(Sensor sensor) {
-        Log.d(TAG, "AddSensor: adding sensor - " + sensor.getSensorName());
+    public void createSenz(Senz senz) {
+        Log.d(TAG, "AddSensor: adding senz from - " + senz.getSender());
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         // content values to inset
         ContentValues values = new ContentValues();
-        values.put(SenzorsDbContract.Sensor.COLUMN_NAME_NAME, sensor.getSensorName());
-        values.put(SenzorsDbContract.Sensor.COLUMN_NAME_IS_MINE, sensor.isMySensor()? 1 : 0);
-        values.put(SenzorsDbContract.Sensor.COLUMN_NAME_USER, sensor.getUser().getId());
+        values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "Location");
+        values.put(SenzorsDbContract.Senz.COLUMN_NAME_USER, senz.getSender());
 
         // Insert the new row, if fails throw an error
-        db.insertOrThrow(SenzorsDbContract.Sensor.TABLE_NAME, SenzorsDbContract.Sensor.COLUMN_NAME_VALUE, values);
+        db.insertOrThrow(SenzorsDbContract.Senz.TABLE_NAME, SenzorsDbContract.Senz.COLUMN_NAME_VALUE, values);
         db.close();
     }
 
@@ -126,68 +126,46 @@ public class SenzorsDbSource {
         Log.d(TAG, "deleteSensor: deleting sensor - " + sensor.getUser().getPhoneNo());
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
-        // delete sensor matching sensor of given user
-        db.delete(SenzorsDbContract.Sensor.TABLE_NAME,
-                SenzorsDbContract.Sensor.COLUMN_NAME_USER + "=?" + " AND " +
-                SenzorsDbContract.Sensor.COLUMN_NAME_NAME + "=?",
-                new String[]{sensor.getUser().getId(), sensor.getSensorName()});
-        db.close();
+//        // delete sensor matching sensor of given user
+//        db.delete(SenzorsDbContract.Sensor.TABLE_NAME,
+//                SenzorsDbContract.Sensor.COLUMN_NAME_USER + "=?" + " AND " +
+//                SenzorsDbContract.Sensor.COLUMN_NAME_NAME + "=?",
+//                new String[]{sensor.getUser().getId(), sensor.getSensorName()});
+//        db.close();
     }
 
     /**
      * Get all sensors, two types of sensors here
      *  1. my sensors
      *  2. friends sensors
-     * @param mySensors sensor type
      * @return sensor list
      */
-    public List<Sensor> getSensors(boolean mySensors) {
+    public List<Senz> getSenzes() {
         Log.d(TAG, "GetSensors: getting all sensor");
-        List<Sensor> sensorList = new ArrayList<Sensor>();
+        List<Senz> sensorList = new ArrayList<Senz>();
 
         // get matching data via JOIN query
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT * " +
-                "FROM sensor JOIN user " +
-                "ON sensor.user = user._id " +
-                "WHERE sensor.is_mine=?";
-        Cursor cursor = db.rawQuery(query, new String[]{mySensors ? "1" : "0"});
+//        String query = "SELECT * " +
+//                "FROM sensor JOIN user " +
+//                "ON sensor.user = user._id " +
+//                "WHERE sensor.is_mine=?";
+        //String query = "SELECT * from s"
+        //Cursor cursor = db.rawQuery(query, new String[]{mySensors ? "1" : "0"});
+        Cursor cursor = db.query(SenzorsDbContract.Senz.TABLE_NAME, null, null, null, null, null, null);
 
         // sensor/user attributes
-        String sensorId;
-        String sensorName;
-        String sensorValue;
-        boolean isMySensor;
-        String userId;
-        String phoneNo;
-        User user;
-        Sensor sensor;
+        String user;
+        Senz senz;
 
         // extract attributes
         while (cursor.moveToNext()) {
             // get sensor attributes
-            sensorId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Sensor._ID));
-            sensorName = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Sensor.COLUMN_NAME_NAME));
-            sensorValue = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Sensor.COLUMN_NAME_VALUE));
-            isMySensor = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Sensor.COLUMN_NAME_IS_MINE)) == 1;
+            user = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Senz.COLUMN_NAME_USER));
+            senz = new Senz();
+            senz.setSender(user);
 
-            // get user attributes
-            userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
-            phoneNo = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_PHONE));
-
-            // save to list
-            user = new User(userId, phoneNo, "password");
-            if (isMySensor)
-                user.setUsername("Me");
-            else
-                user.setUsername(PhoneBookUtils.getContactName(context, phoneNo));
-            ArrayList<User> sharedUsers = getSharedUsers(sensorId, db);
-            sensor = new Sensor(sensorId, sensorName, sensorValue, isMySensor, user, sharedUsers);
-            sensorList.add(sensor);
-
-            Log.d(TAG, "GetSensors: sensor name - " + sensor.getSensorName());
-            Log.d(TAG, "GetSensors: is my sensor - " + sensor.isMySensor());
-            Log.d(TAG, "GetSensors: user - " + user.getPhoneNo());
+            sensorList.add(senz);
         }
 
         // clean

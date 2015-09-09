@@ -197,16 +197,16 @@ public class QueryHandler {
      */
     private static void handleGetQuery(SenzApplication application, Query query) {
         // get location by starting location service
-        if(application.getWebSocketConnection().isConnected()) {
-            // current location request is from web socket service
-            // start location service
-            //application.setRequestQuery(query);
-            Intent serviceIntent = new Intent(application.getApplicationContext(), GpsReadingService.class);
-            Bundle bundle = new Bundle();
-            bundle.putBoolean("isMyLocation", false);
-            serviceIntent.putExtras(bundle);
-            application.getApplicationContext().startService(serviceIntent);
-        }
+//        if(application.getWebSocketConnection().isConnected()) {
+//            // current location request is from web socket service
+//            // start location service
+//            //application.setRequestQuery(query);
+//            Intent serviceIntent = new Intent(application.getApplicationContext(), GpsReadingService.class);
+//            Bundle bundle = new Bundle();
+//            bundle.putBoolean("isMyLocation", false);
+//            serviceIntent.putExtras(bundle);
+//            application.getApplicationContext().startService(serviceIntent);
+//        }
     }
 
     /**
