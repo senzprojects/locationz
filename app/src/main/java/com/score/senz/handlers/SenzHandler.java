@@ -3,6 +3,7 @@ package com.score.senz.handlers;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.pojos.Senz;
@@ -61,16 +62,19 @@ public class SenzHandler {
 
     private void handleGetSenz(Context context, Senz senz) {
         // TODO Start Location service here, rest of the operation handles by Location Service
+        Log.d("Tag", senz.getSender() + " : " + senz.getSenzType().toString());
     }
 
     private void handleDataSenz(Context context, Senz senz) {
         Intent intent = new Intent("DATA");
 
         // we are broadcasting DATA sensors
-        if (senz.getAttributes().get("#msg").equalsIgnoreCase("UserCreated")) {
-            intent.putExtra("extra", true);
-        } else {
-            intent.putExtra("extra", false);
+        if (senz.getAttributes().containsKey("#msg")) {
+            if (senz.getAttributes().get("#msg").equalsIgnoreCase("UserCreated")) {
+                intent.putExtra("extra", true);
+            } else {
+                intent.putExtra("extra", false);
+            }
         }
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);

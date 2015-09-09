@@ -1,7 +1,15 @@
 package com.score.senz.ui;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,11 +21,26 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.score.senz.R;
+import com.score.senz.db.SenzorsDbContract;
 import com.score.senz.db.SenzorsDbSource;
+import com.score.senz.enums.SenzTypeEnum;
+import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Sensor;
 import com.score.senz.pojos.Senz;
+import com.score.senz.pojos.User;
+import com.score.senz.services.SenzService;
+import com.score.senz.utils.PreferenceUtils;
+import com.score.senz.utils.RSAUtils;
+import com.score.senz.utils.SenzParser;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Display sensor list/ Fragment
@@ -38,6 +61,22 @@ public class SensorListFragment extends Fragment {
 
     // use custom font here
     private Typeface typeface;
+
+    boolean isServiceBound = false;
+
+    // use to send senz messages to SenzService
+    Messenger senzServiceMessenger;
+
+    // connection for SenzService
+    private ServiceConnection senzServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            senzServiceMessenger = new Messenger(service);
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            senzServiceMessenger = null;
+        }
+    };
 
     /**
      * {@inheritDoc}
@@ -65,6 +104,20 @@ public class SensorListFragment extends Fragment {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // bind to senz service
+        if (!isServiceBound) {
+            this.getActivity().bindService(new Intent(this.getActivity(), SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
+            isServiceBound = true;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void onResume() {
         super.onResume();
 
@@ -77,6 +130,20 @@ public class SensorListFragment extends Fragment {
      */
     public void onPause() {
         super.onPause();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // Unbind from the service
+        if (isServiceBound) {
+            getActivity().unbindService(senzServiceConnection);
+            isServiceBound = false;
+        }
     }
 
     /**
@@ -99,6 +166,7 @@ public class SensorListFragment extends Fragment {
                 if (position > 0 && position <= senzList.size()) {
                     Senz senz = senzList.get(position - 1);
                     // TODO GET Senz to server
+                    getSenz(senz.getSender());
                 }
             }
         });
@@ -149,6 +217,57 @@ public class SensorListFragment extends Fragment {
         yourTextView.setTypeface(typeface);
 
         getActivity().getActionBar().setTitle(title);
+    }
+
+    private void getSenz(String phone) {
+        try {
+            // create key pair
+            PrivateKey privateKey = RSAUtils.getPrivateKey(this.getActivity());
+
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            senzAttributes.put("lat", "lat");
+            senzAttributes.put("lot", "lon");
+
+            User user = PreferenceUtils.getUser(this.getActivity());
+
+            // new senz
+            Senz senz = new Senz();
+            senz.setSenzType(SenzTypeEnum.GET);
+            senz.setReceiver(phone);
+            senz.setSender(user.getPhoneNo());
+            senz.setAttributes(senzAttributes);
+
+            // get digital signature of the senz
+            String senzPayload = SenzParser.getSenzPayload(senz);
+            String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+            String senzMessage = SenzParser.getSenzMessage(senzPayload, senzSignature);
+
+            System.out.println("-------------");
+            System.out.println(senzPayload);
+            System.out.println(senzMessage);
+            System.out.println("-------------");
+
+            // send senz to server
+            Message msg = new Message();
+            msg.obj = senzMessage;
+            try {
+                senzServiceMessenger.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        } catch (NoUserException e) {
+            e.printStackTrace();
+        }
     }
 
 }
