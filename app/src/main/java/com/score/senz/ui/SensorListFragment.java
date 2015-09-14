@@ -1,8 +1,10 @@
 package com.score.senz.ui;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +22,7 @@ import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.score.senz.R;
 import com.score.senz.db.SenzorsDbContract;
@@ -113,6 +117,8 @@ public class SensorListFragment extends Fragment {
             this.getActivity().bindService(new Intent(this.getActivity(), SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
             isServiceBound = true;
         }
+
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
     }
 
     /**
@@ -144,6 +150,8 @@ public class SensorListFragment extends Fragment {
             getActivity().unbindService(senzServiceConnection);
             isServiceBound = false;
         }
+
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(senzMessageReceiver);
     }
 
     /**
@@ -228,7 +236,7 @@ public class SensorListFragment extends Fragment {
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
             senzAttributes.put("lat", "lat");
-            senzAttributes.put("lot", "lon");
+            senzAttributes.put("lon", "lon");
 
             User user = PreferenceUtils.getUser(this.getActivity());
 
@@ -267,6 +275,28 @@ public class SensorListFragment extends Fragment {
             e.printStackTrace();
         } catch (NoUserException e) {
             e.printStackTrace();
+        }
+    }
+
+    private BroadcastReceiver senzMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got message from Senz service");
+            handleMessage(intent);
+        }
+    };
+
+    /**
+     * Handle brodcase message receives
+     * Need to handle registration success failure here
+     *
+     * @param intent intent
+     */
+    private void handleMessage(Intent intent) {
+        String action = intent.getAction();
+
+        if (action.equals("DATA")) {
+            Toast.makeText(getActivity(), "Location " + intent.getExtras().getString("extra"), Toast.LENGTH_LONG).show();
         }
     }
 

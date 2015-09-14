@@ -2,17 +2,23 @@ package com.score.senz.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.*;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.score.senz.R;
 import com.score.senz.application.SenzApplication;
 import com.score.senz.pojos.LatLon;
@@ -100,11 +106,11 @@ public class SensorMapFragment extends Fragment implements View.OnClickListener,
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
      * installed) and the map has not already been instantiated.. This will ensure that we only ever
      * call {@link #setUpMap()} once when {@link #map} is not null.
-     * <p>
+     * <p/>
      * If it isn't installed {@link com.google.android.gms.maps.SupportMapFragment} (and
      * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
      * install/update the Google Play services APK on their device.
-     * <p>
+     * <p/>
      * A user can return to this FragmentActivity after following the prompt and correctly
      * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
      * have been completely destroyed during this process (it is likely that it would only be
@@ -117,8 +123,6 @@ public class SensorMapFragment extends Fragment implements View.OnClickListener,
             // Try to obtain the map from the SupportMapFragment
             // disable zoom controller
             Log.d(TAG, "SetUpMapIfNeeded: map is empty, so set up it");
-            //map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
-            //map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
             map = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
             map.getUiSettings().setZoomControlsEnabled(false);
             map.getUiSettings().setMyLocationButtonEnabled(true);
@@ -132,15 +136,15 @@ public class SensorMapFragment extends Fragment implements View.OnClickListener,
     /**
      * This is where we can add markers or lines, add listeners or move the camera. In this case, we
      * just add a marker to available location
-     * <p>
+     * <p/>
      * This should only be called once and when we are sure that {@link #map} is not null.
      */
     private void setUpMap() {
         Log.d(TAG, "SetUpMap: set up map on first time");
 
         // remove existing markers
-        if(marker != null) marker.remove();
-        if(circle != null) circle.remove();
+        if (marker != null) marker.remove();
+        if (circle != null) circle.remove();
 
 //        // add location marker
 //        try {
@@ -191,14 +195,15 @@ public class SensorMapFragment extends Fragment implements View.OnClickListener,
 
     /**
      * Move map to given location
+     *
      * @param latLon lat/lon object
      */
     private void moveToLocation(LatLon latLon) {
         Log.d(TAG, "MoveToLocation: move map to given location");
 
         // remove existing markers
-        if(marker != null) marker.remove();
-        if(circle != null) circle.remove();
+        if (marker != null) marker.remove();
+        if (circle != null) circle.remove();
 
         // add location marker
         try {
@@ -222,7 +227,7 @@ public class SensorMapFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onClick(View v) {
-        if(v==mapLocation) {
+        if (v == mapLocation) {
             // get location or send request to server for get friends location
             // currently display my location
             // start location service to get my location
@@ -235,7 +240,7 @@ public class SensorMapFragment extends Fragment implements View.OnClickListener,
             bundle.putBoolean("isMyLocation", true);
             serviceIntent.putExtras(bundle);
             this.getActivity().startService(serviceIntent);
-        } else if(v==mapActivity) {
+        } else if (v == mapActivity) {
             Log.d(TAG, "OnClick: click on activity, get user activity");
             // TODO get user activity
         }

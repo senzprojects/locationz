@@ -16,6 +16,21 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.score.senz.enums.SenzTypeEnum;
+import com.score.senz.exceptions.NoUserException;
+import com.score.senz.pojos.Senz;
+import com.score.senz.pojos.User;
+import com.score.senz.utils.PreferenceUtils;
+import com.score.senz.utils.RSAUtils;
+import com.score.senz.utils.SenzParser;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.HashMap;
+
 /**
  * Service to get current location
  * We are listening to location updates via LocationListener here
@@ -29,6 +44,8 @@ public class LocationService extends Service {
     private LocationListener locationListener;
     private LocationManager locationManager;
 
+    String receiverPhone;
+
     // keeps weather service already bound or not
     boolean isServiceBound = false;
 
@@ -39,7 +56,6 @@ public class LocationService extends Service {
     private ServiceConnection senzServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             senzServiceMessenger = new Messenger(service);
-
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -72,6 +88,8 @@ public class LocationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+
+        this.receiverPhone = intent.getExtras().getString("PHONE");
 
         // bind with senz service
         if (!isServiceBound) {
@@ -118,15 +136,7 @@ public class LocationService extends Service {
             Log.d(TAG, String.valueOf(location.getLatitude()));
             Log.d(TAG, String.valueOf(location.getLongitude()));
 
-            // send location to requesting user via senzservice
-            // send senz to server
-            Message msg = new Message();
-            msg.obj = "#lat" + location.getLatitude() + " #lon" + location.getLongitude();
-            try {
-                senzServiceMessenger.send(msg);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+            sendLocation(location);
 
             // unbind the service
             if (isServiceBound) {
@@ -151,6 +161,52 @@ public class LocationService extends Service {
         @Override
         public void onProviderDisabled(String provider) {
 
+        }
+    }
+
+    private void sendLocation(Location location) {
+        try {
+            // create key pair
+            PrivateKey privateKey = RSAUtils.getPrivateKey(this);
+
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            senzAttributes.put("lat", Double.toString(location.getLatitude()));
+            senzAttributes.put("lon", Double.toString(location.getLongitude()));
+
+            User user = PreferenceUtils.getUser(this);
+
+            // new senz
+            Senz senz = new Senz();
+            senz.setSenzType(SenzTypeEnum.DATA);
+            senz.setReceiver(receiverPhone);
+            senz.setSender(user.getPhoneNo());
+            senz.setAttributes(senzAttributes);
+
+            // get digital signature of the senz
+            String senzPayload = SenzParser.getSenzPayload(senz);
+            String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+            String senzMessage = SenzParser.getSenzMessage(senzPayload, senzSignature);
+
+            // send senz to server
+            Message msg = new Message();
+            msg.obj = senzMessage;
+            try {
+                senzServiceMessenger.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        } catch (NoUserException e) {
+            e.printStackTrace();
         }
     }
 }
