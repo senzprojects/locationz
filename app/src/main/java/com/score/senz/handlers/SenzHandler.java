@@ -5,8 +5,8 @@ import android.content.Intent;
 import android.location.Location;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.listeners.LocationServiceListener;
 import com.score.senz.pojos.Senz;
@@ -73,7 +73,7 @@ public class SenzHandler implements LocationServiceListener {
 
         Intent serviceIntent = new Intent(context, LocationService.class);
         serviceIntent.putExtra("PHONE", senz.getSender());
-        
+
         context.startService(serviceIntent);
     }
 
@@ -89,7 +89,12 @@ public class SenzHandler implements LocationServiceListener {
             }
         } else if (senz.getAttributes().containsKey("#lat")) {
             Log.d("TAG", "location response");
-            intent.putExtra("extra", senz.getAttributes().get("#lat"));
+
+            // create lat LatLan object and broadcast it
+            double lat = Double.parseDouble(senz.getAttributes().get("#lat"));
+            double lan = Double.parseDouble(senz.getAttributes().get("#lon"));
+            LatLng latLng = new LatLng(lat, lan);
+            intent.putExtra("extra", latLng);
         }
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);

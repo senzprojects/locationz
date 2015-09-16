@@ -24,12 +24,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.score.senz.R;
-import com.score.senz.db.SenzorsDbContract;
 import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
-import com.score.senz.pojos.Sensor;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.services.SenzService;
@@ -39,7 +38,6 @@ import com.score.senz.utils.SenzParser;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
@@ -296,7 +294,10 @@ public class SensorListFragment extends Fragment {
         String action = intent.getAction();
 
         if (action.equals("DATA")) {
-            Toast.makeText(getActivity(), "Location " + intent.getExtras().getString("extra"), Toast.LENGTH_LONG).show();
+            LatLng latLng = intent.getExtras().getParcelable("extra");
+            Toast.makeText(getActivity(), "Location " + latLng.latitude + " " + latLng.longitude, Toast.LENGTH_LONG).show();
+
+            // TODO start map activity
         }
     }
 
