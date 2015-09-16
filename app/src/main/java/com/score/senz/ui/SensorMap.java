@@ -1,11 +1,11 @@
 package com.score.senz.ui;
 
+import android.app.ActionBar;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -26,7 +26,7 @@ import com.score.senz.R;
  * Time: 3:06 PM
  * To change this template use File | Settings | File Templates.
  */
-public class SensorMap extends Fragment {
+public class SensorMap extends FragmentActivity {
 
     private static final String TAG = SensorMap.class.getName();
 
@@ -36,37 +36,14 @@ public class SensorMap extends Fragment {
     private Marker marker;
     private Circle circle;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, "OnCreateView: creating view");
-        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.main, container, false);
-
-        return root;
-    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        Log.d(TAG, "OnActivityCreated: activity created");
-        initLocationCoordinates();
-        setUpMapIfNeeded();
-    }
-
-    /**
-     * Initialize LatLng object from here
-     */
-    private void initLocationCoordinates() {
-        Bundle bundle = this.getArguments();
-        if (bundle != null) {
-            this.locationCoordinates = bundle.getParcelable("extra");
-        }
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.senz_map_layout);
     }
 
     /**
@@ -76,18 +53,44 @@ public class SensorMap extends Fragment {
     public void onResume() {
         super.onResume();
 
-        Log.d(TAG, "OnResume: setting up map, set handler callback MapActivity");
+        setUpActionBar();
+        initLocationCoordinates();
         setUpMapIfNeeded();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void onPause() {
-        super.onPause();
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        this.overridePendingTransition(R.anim.stay_in, R.anim.right_out);
+    }
 
-        // un-register handler from here
-        Log.d(TAG, "OnPause: reset handler callback MapActivity");
+    /**
+     * Set action bar title and font
+     */
+    private void setUpActionBar() {
+        ActionBar actionBar = getActionBar();
+        int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
+        TextView actionBarTitle = (TextView) (this.findViewById(titleId));
+
+        Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
+        actionBarTitle.setTextColor(getResources().getColor(R.color.white));
+        actionBarTitle.setTypeface(typefaceThin);
+
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle("#Location");
+    }
+
+    /**
+     * Initialize LatLng object from here
+     */
+    private void initLocationCoordinates() {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            this.locationCoordinates = bundle.getParcelable("extra");
+        }
     }
 
     /**
@@ -111,7 +114,9 @@ public class SensorMap extends Fragment {
             // Try to obtain the map from the SupportMapFragment
             // disable zoom controller
             Log.d(TAG, "SetUpMapIfNeeded: map is empty, so set up it");
-            map = ((SupportMapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+            map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+                    .getMap();
+
             map.getUiSettings().setZoomControlsEnabled(false);
             map.getUiSettings().setMyLocationButtonEnabled(true);
             // Check if we were successful in obtaining the map.
@@ -145,7 +150,7 @@ public class SensorMap extends Fragment {
                     .strokeWidth(0.5f)
                     .fillColor(0x110000FF));
         } catch (NumberFormatException e) {
-            Toast.makeText(this.getActivity(), "Invalid location", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Invalid location", Toast.LENGTH_LONG).show();
             Log.d(TAG, "MoveToLocation: invalid lat lon parameters");
         }
     }

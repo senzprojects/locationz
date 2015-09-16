@@ -155,7 +155,7 @@ public class QueryParser {
         return message;
     }
 
-    /*public static void main(String[] args) {
+    /*public static void senz_map_layout(String[] args) {
         try {
             String query = "@user1 DATA #lat 2.3434 #lon 34.45454";
             String query1 = "@user1 DATA #msg LOGINOK";

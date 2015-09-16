@@ -172,7 +172,8 @@ public class SensorDetailsActivity extends FragmentActivity {
         public Fragment getItem(int i) {
             switch (i) {
                 case 0:
-                    return new SensorMapFragment();
+                    //return new SensorMap();
+                    break;
                 case 1:
                     return new SharingList();
             }

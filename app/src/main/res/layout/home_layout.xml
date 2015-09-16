@@ -4,7 +4,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
-    <!-- The main content view -->
+    <!-- The senz_map_layout content view -->
     <!-- Replace with fragment -->
     <FrameLayout
         android:id="@+id/main"

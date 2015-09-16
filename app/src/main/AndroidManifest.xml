@@ -136,6 +136,15 @@
                 android:windowSoftInputMode="stateHidden">
         </activity>
 
+        <activity
+            android:name=".ui.SensorMap"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.Yello"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
+
         <service android:enabled="true" android:name=".services.GpsReadingService" />
         <service android:enabled="true" android:name=".services.LocationService" />
         <service android:enabled="true" android:name=".services.SenzService" />

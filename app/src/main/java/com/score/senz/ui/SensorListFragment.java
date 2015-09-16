@@ -32,6 +32,7 @@ import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.services.SenzService;
+import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;
@@ -171,7 +172,8 @@ public class SensorListFragment extends Fragment {
                 Log.d(TAG, "onItemClick: click on sensor list item");
                 if (position > 0 && position <= senzList.size()) {
                     Senz senz = senzList.get(position - 1);
-                    // TODO GET Senz to server
+
+                    ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
                     getSenz(senz.getSender());
                 }
             }
@@ -294,10 +296,14 @@ public class SensorListFragment extends Fragment {
         String action = intent.getAction();
 
         if (action.equals("DATA")) {
+            ActivityUtils.cancelProgressDialog();
             LatLng latLng = intent.getExtras().getParcelable("extra");
-            Toast.makeText(getActivity(), "Location " + latLng.latitude + " " + latLng.longitude, Toast.LENGTH_LONG).show();
 
-            // TODO start map activity
+            // start map activity
+            Intent mapIntent = new Intent(getActivity(), SensorMap.class);
+            mapIntent.putExtra("extra", latLng);
+            getActivity().startActivity(mapIntent);
+            getActivity().overridePendingTransition(R.anim.right_in, R.anim.stay_in);
         }
     }
 

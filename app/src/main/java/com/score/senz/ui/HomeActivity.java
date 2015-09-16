@@ -109,7 +109,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         Typeface face = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
         signOutTextView.setTypeface(face, Typeface.NORMAL);
 
-        // set a custom shadow that overlays the main content when the drawer opens
+        // set a custom shadow that overlays the senz_map_layout content when the drawer opens
         // set up drawer listener
         //drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         homeActionBarDrawerToggle = new HomeActionBarDrawerToggle(this, drawerLayout);
