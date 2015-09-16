@@ -26,9 +26,9 @@ import com.score.senz.R;
  * Time: 3:06 PM
  * To change this template use File | Settings | File Templates.
  */
-public class SensorMapFragment extends Fragment {
+public class SensorMap extends Fragment {
 
-    private static final String TAG = SensorMapFragment.class.getName();
+    private static final String TAG = SensorMap.class.getName();
 
     private LatLng locationCoordinates;
 
