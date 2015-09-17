@@ -69,7 +69,7 @@ public class SenzService extends Service {
         initUdpListener();
 
         // If we get killed, after returning from here, restart
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     /**
@@ -85,7 +85,12 @@ public class SenzService extends Service {
      */
     @Override
     public void onDestroy() {
-        stopForeground(true);
+        Log.d(TAG, "Destroyed");
+
+        // restart service again
+        // its done via broadcast receiver
+        Intent intent = new Intent("com.score.senz.senzservice");
+        sendBroadcast(intent);
     }
 
     /**

@@ -22,7 +22,6 @@ import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.score.senz.R;
@@ -126,7 +125,7 @@ public class SensorListFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        setUpActionBarTitle("#Friend #Senz");
+        setUpActionBarTitle("#Senz");
         displaySensorList();
     }
 
@@ -251,11 +250,6 @@ public class SensorListFragment extends Fragment {
             String senzPayload = SenzParser.getSenzPayload(senz);
             String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
             String senzMessage = SenzParser.getSenzMessage(senzPayload, senzSignature);
-
-            System.out.println("-------------");
-            System.out.println(senzPayload);
-            System.out.println(senzMessage);
-            System.out.println("-------------");
 
             // send senz to server
             Message msg = new Message();

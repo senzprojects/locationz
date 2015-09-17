@@ -1,50 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.score.senz"
     android:versionCode="9"
     android:versionName="1.9">
 
     <uses-sdk
         android:minSdkVersion="14"
-        android:targetSdkVersion="19"/>
+        android:targetSdkVersion="19" />
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
     <!-- External storage for caching. -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <!-- My Location -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <!-- Use to get the phone no -->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <!-- Use to read contact list -->
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <!-- Maps API needs OpenGL ES 2.0. -->
     <uses-feature
         android:glEsVersion="0x00020000"
-        android:required="true"/>
+        android:required="true" />
 
     <application
-        android:label="@string/app_name"
+        android:name=".application.SenzApplication"
         android:icon="@drawable/senz_logo"
-        android:name=".application.SenzApplication">
+        android:label="@string/app_name">
 
         <!-- production key -->
         <!--<meta-data-->
-            <!--android:name="com.google.android.maps.v2.API_KEY"-->
-            <!--android:value="AIzaSyDQBL4MsO4B5qpA3VvX3HtRCQG2I09p7t0"/>-->
+        <!--android:name="com.google.android.maps.v2.API_KEY"-->
+        <!--android:value="AIzaSyDQBL4MsO4B5qpA3VvX3HtRCQG2I09p7t0"/>-->
 
         <!-- debug key -->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyAzW1LOJz7zGeKTohFwzmRPDtb1yqt0bC8"/>
+            android:value="AIzaSyAzW1LOJz7zGeKTohFwzmRPDtb1yqt0bC8" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -52,102 +51,107 @@
 
         <activity
             android:name=".ui.LoginActivity"
-            android:screenOrientation="portrait"
             android:configChanges="orientation"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.NoActionBar"
+            android:windowSoftInputMode="stateHidden"></activity>
+
+        <activity
+            android:name=".ui.LaunchActivity"
+            android:configChanges="orientation"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:windowSoftInputMode="stateHidden"></activity>
+
+        <activity
+            android:name=".ui.HomeActivity"
+            android:configChanges="orientation"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Yello"
+            android:windowSoftInputMode="stateHidden"></activity>
+
+        <activity
+            android:name=".ui.SensorDetailsActivity"
+            android:configChanges="orientation"
+            android:launchMode="singleTask"
+            android:parentActivityName=".ui.HomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Yello"
+            android:windowSoftInputMode="stateHidden"></activity>
+
+        <activity
+            android:name=".ui.FriendListActivity"
+            android:configChanges="orientation"
+            android:launchMode="singleTask"
+            android:parentActivityName=".ui.SensorDetailsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Yello"
+            android:windowSoftInputMode="stateHidden">
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"></meta-data>
+        </activity>
+
+        <activity
+            android:name=".ui.SplashActivity"
+            android:configChanges="orientation"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.NoActionBar"
             android:windowSoftInputMode="stateHidden">
-        </activity>
-
-        <activity
-                android:name=".ui.LaunchActivity"
-                android:screenOrientation="portrait"
-                android:configChanges="orientation"
-                android:launchMode="singleTask"
-                android:theme="@android:style/Theme.NoDisplay"
-                android:windowSoftInputMode="stateHidden">
-        </activity>
-
-        <activity
-                android:name=".ui.HomeActivity"
-                android:screenOrientation="portrait"
-                android:configChanges="orientation"
-                android:launchMode="singleTask"
-                android:theme="@style/Theme.Yello"
-                android:windowSoftInputMode="stateHidden">
-        </activity>
-
-        <activity
-                android:name=".ui.SensorDetailsActivity"
-                android:screenOrientation="portrait"
-                android:configChanges="orientation"
-                android:launchMode="singleTask"
-                android:theme="@style/Theme.Yello"
-                android:parentActivityName=".ui.HomeActivity"
-                android:windowSoftInputMode="stateHidden">
-        </activity>
-
-        <activity
-                android:name=".ui.FriendListActivity"
-                android:screenOrientation="portrait"
-                android:configChanges="orientation"
-                android:theme="@style/Theme.Yello"
-                android:windowSoftInputMode="stateHidden"
-                android:launchMode="singleTask"
-                android:parentActivityName=".ui.SensorDetailsActivity">
-                <meta-data
-                    android:name="android.app.searchable"
-                    android:resource="@xml/searchable">
-                </meta-data>
-        </activity>
-
-        <activity
-                android:name=".ui.SplashActivity"
-                android:screenOrientation="portrait"
-                android:configChanges="orientation"
-                android:launchMode="singleTask"
-                android:theme="@android:style/Theme.Holo.NoActionBar"
-                android:windowSoftInputMode="stateHidden">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <activity
-                android:name=".ui.CountryListActivity"
-                android:screenOrientation="portrait"
-                android:configChanges="orientation"
-                android:theme="@style/Theme.Yello"
-                android:windowSoftInputMode="stateHidden"
-                android:launchMode="singleTask">
+            android:name=".ui.CountryListActivity"
+            android:configChanges="orientation"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Yello"
+            android:windowSoftInputMode="stateHidden">
             <meta-data
-                    android:name="android.app.searchable"
-                    android:resource="@xml/searchable">
-            </meta-data>
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"></meta-data>
         </activity>
 
         <activity
-                android:name=".ui.RegistrationActivity"
-                android:screenOrientation="portrait"
-                android:configChanges="orientation"
-                android:launchMode="singleTask"
-                android:theme="@android:style/Theme.Holo.NoActionBar"
-                android:windowSoftInputMode="stateHidden">
-        </activity>
+            android:name=".ui.RegistrationActivity"
+            android:configChanges="orientation"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.NoActionBar"
+            android:windowSoftInputMode="stateHidden"></activity>
 
         <activity
             android:name=".ui.SensorMap"
-            android:screenOrientation="portrait"
             android:configChanges="orientation"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Yello"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
+            android:windowSoftInputMode="stateHidden"></activity>
 
-        <service android:enabled="true" android:name=".services.GpsReadingService" />
-        <service android:enabled="true" android:name=".services.LocationService" />
-        <service android:enabled="true" android:name=".services.SenzService" />
+        <service
+            android:name=".services.GpsReadingService"
+            android:enabled="true" />
+        <service
+            android:name=".services.LocationService"
+            android:enabled="true" />
+        <service
+            android:name=".services.SenzService"
+            android:enabled="true" />
+
+        <receiver android:name=".receivers.SenzServiceCall">
+            <intent-filter>
+                <action android:name="com.score.senz.senzservice" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
     </application>
 
