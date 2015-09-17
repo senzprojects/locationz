@@ -1,6 +1,8 @@
 package com.score.senz.ui;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -53,6 +55,10 @@ public class FriendList extends android.support.v4.app.Fragment implements Searc
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        setActionBar("#Friends");
+        initFriendListView();
+        readContacts();
     }
 
     /**
@@ -60,9 +66,6 @@ public class FriendList extends android.support.v4.app.Fragment implements Searc
      */
     public void onResume() {
         super.onResume();
-
-        setActionBar("#Share");
-        readContacts();
     }
 
     /**
@@ -70,48 +73,16 @@ public class FriendList extends android.support.v4.app.Fragment implements Searc
      */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        //inflater.inflate(R.menu.search_menu, menu);
-
-//        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-//        searchMenuItem = menu.findItem(R.id.search);
-//        searchView = (SearchView) searchMenuItem.getActionView();
-//
-//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-//        searchView.setSubmitButtonEnabled(true);
-//        searchView.setOnQueryTextListener(this);
-
-        MenuItem item = menu.add("Search");
-        item.setIcon(android.R.drawable.ic_menu_search);
-        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM
-                | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
-        searchView = new MySearchView(getActivity());
+        searchMenuItem = menu.add("Search");
+        searchMenuItem.setIcon(android.R.drawable.ic_menu_search);
+        searchMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+        searchView = new FriendSearchView(getActivity());
         searchView.setOnQueryTextListener(this);
         searchView.setOnCloseListener(this);
         searchView.setIconifiedByDefault(true);
-        item.setActionView(searchView);
+        searchMenuItem.setActionView(searchView);
     }
 
-    @Override
-    public boolean onClose() {
-        if (!TextUtils.isEmpty(searchView.getQuery())) {
-            searchView.setQuery(null, true);
-        }
-        return true;
-    }
-
-    public static class MySearchView extends SearchView {
-        public MySearchView(Context context) {
-            super(context);
-        }
-
-        // The normal SearchView doesn't clear its search text when
-        // collapsed, so we will do this for it.
-        @Override
-        public void onActionViewCollapsed() {
-            setQuery("", false);
-            super.onActionViewCollapsed();
-        }
-    }
 
     /**
      * Set action bar title according to currently selected sensor type
@@ -140,18 +111,16 @@ public class FriendList extends android.support.v4.app.Fragment implements Searc
     }
 
     /**
-     * Initialize friend list
+     * Initialize friend list view
      */
-    private void initFriendList() {
+    private void initFriendListView() {
         friendListView = (ListView) getActivity().findViewById(R.id.list_view);
-        friendListAdapter = new FriendListAdapter(this, friendList);
 
         // add header and footer for list
         View headerView = View.inflate(getActivity(), R.layout.list_header, null);
         View footerView = View.inflate(getActivity(), R.layout.list_header, null);
         friendListView.addHeaderView(headerView);
         friendListView.addFooterView(footerView);
-        friendListView.setAdapter(friendListAdapter);
         friendListView.setTextFilterEnabled(false);
 
         // set up click listener
@@ -177,12 +146,12 @@ public class FriendList extends android.support.v4.app.Fragment implements Searc
             searchView.setQuery("", false);
         }
 
-        // pass selected user and sensor to share activity
-        //Intent intent = new Intent(this, ShareActivity.class);
-        //intent.putExtra("com.score.senz.pojos.User", user);
-        //intent.putExtra("com.score.senz.pojos.Sensor", application.getCurrentSensor());
-        //this.startActivity(intent);
-        //this.overridePendingTransition(R.anim.right_in, R.anim.stay_in);
+        // launch share activity
+//        Intent intent = new Intent(getActivity(), ShareActivity.class);
+//        intent.putExtra("extra", user.getPhoneNo());
+//        getActivity().startActivity(intent);
+//        getActivity().overridePendingTransition(R.anim.bottom_in, R.anim.stay_in);
+        showShareConfirmDialog(user);
     }
 
     /**
@@ -204,6 +173,17 @@ public class FriendList extends android.support.v4.app.Fragment implements Searc
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean onClose() {
+        if (!TextUtils.isEmpty(searchView.getQuery())) {
+            searchView.setQuery(null, true);
+        }
+        return true;
+    }
+
+    /**
      * Trigger contact reader task finish
      *
      * @param contactList user list
@@ -212,7 +192,49 @@ public class FriendList extends android.support.v4.app.Fragment implements Searc
     public void onPostReadContacts(ArrayList<User> contactList) {
         ActivityUtils.cancelProgressDialog();
 
-        this.friendList = contactList;
-        initFriendList();
+        friendList = contactList;
+        friendListAdapter = new FriendListAdapter(this, friendList);
+        friendListView.setAdapter(friendListAdapter);
     }
+
+    /**
+     * Search view to search friend list
+     */
+    public static class FriendSearchView extends SearchView {
+        public FriendSearchView(Context context) {
+            super(context);
+        }
+
+        // The normal SearchView doesn't clear its search text when
+        // collapsed, so we will do this for it.
+        @Override
+        public void onActionViewCollapsed() {
+            setQuery("", false);
+            super.onActionViewCollapsed();
+        }
+    }
+
+    private void showShareConfirmDialog(User user) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+
+        alertDialogBuilder
+                .setMessage("Are you sure you want to share senz with '" + user.getUsername() + "'")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // share senz to server
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // if this button is clicked, just close
+                        // the dialog box and do nothing
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
 }

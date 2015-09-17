@@ -1,6 +1,7 @@
 package com.score.senz.ui;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -12,12 +13,8 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -43,12 +40,14 @@ import java.util.HashMap;
  *
  * @author erangaeb@gmail.com (eranga herath)
  */
-public class ShareActivity extends android.support.v4.app.Fragment {
+public class ShareActivity extends Activity {
 
     private static final String TAG = ShareActivity.class.getName();
 
     private TextView phoneNoLabel;
     private EditText phoneNoEditText;
+
+    private String phoneNo;
 
     // use to send senz messages to SenzService
     Messenger senzServiceMessenger;
@@ -70,27 +69,10 @@ public class ShareActivity extends android.support.v4.app.Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ViewGroup root = (ViewGroup) inflater.inflate(R.layout.share_layout, container, false);
-
-        return root;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+        setContentView(R.layout.share_layout);
 
         initUi();
+        initSharingData();
     }
 
     /**
@@ -99,7 +81,7 @@ public class ShareActivity extends android.support.v4.app.Fragment {
     public void onResume() {
         super.onResume();
 
-        getActivity().bindService(new Intent(getActivity(), SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
+        bindService(new Intent(this, SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     /**
@@ -113,15 +95,15 @@ public class ShareActivity extends android.support.v4.app.Fragment {
      * Initialize UI components
      */
     private void initUi() {
-        Typeface typefaceThin = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
+        Typeface typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
 
-        phoneNoLabel = (TextView) getActivity().findViewById(R.id.share_layout_phone_no_label);
-        phoneNoEditText = (EditText) getActivity().findViewById(R.id.share_layout_phone_no);
+        phoneNoLabel = (TextView) findViewById(R.id.share_layout_phone_no_label);
+        phoneNoEditText = (EditText) findViewById(R.id.share_layout_phone_no);
 
         // Set up action bar.
         // Specify that the Home button should show an "Up" caret, indicating that touching the
         // button will take the user one step up in the application's hierarchy.
-        final ActionBar actionBar = getActivity().getActionBar();
+        final ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle("#Share");
 
@@ -129,7 +111,7 @@ public class ShareActivity extends android.support.v4.app.Fragment {
         //  1. action bar title
         //  2. other ui texts
         int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
-        TextView actionBarTitle = (TextView) (getActivity().findViewById(titleId));
+        TextView actionBarTitle = (TextView) (findViewById(titleId));
         actionBarTitle.setTextColor(getResources().getColor(R.color.white));
         actionBarTitle.setTypeface(typefaceThin);
         phoneNoLabel.setTypeface(typefaceThin);
@@ -137,13 +119,24 @@ public class ShareActivity extends android.support.v4.app.Fragment {
     }
 
     /**
+     * Initialize sharing data from here
+     */
+    private void initSharingData() {
+        Bundle bundle = getIntent().getExtras();
+        phoneNo = bundle.getString("extra");
+
+        phoneNoEditText.setText(phoneNo);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.share_menu, menu);
-    }
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.share_menu, menu);
 
+        return super.onCreateOptionsMenu(menu);
+    }
 
     /**
      * {@inheritDoc}
@@ -169,7 +162,7 @@ public class ShareActivity extends android.support.v4.app.Fragment {
 
         try {
             // create key pair
-            PrivateKey privateKey = RSAUtils.getPrivateKey(getActivity());
+            PrivateKey privateKey = RSAUtils.getPrivateKey(this);
 
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
@@ -181,18 +174,13 @@ public class ShareActivity extends android.support.v4.app.Fragment {
             Senz senz = new Senz();
             senz.setSenzType(SenzTypeEnum.SHARE);
             senz.setReceiver(phoneNoEditText.getText().toString().trim());
-            senz.setSender(PreferenceUtils.getUser(getActivity()).getPhoneNo());
+            senz.setSender(PreferenceUtils.getUser(this).getPhoneNo());
             senz.setAttributes(senzAttributes);
 
             // get digital signature of the senz
             String senzPayload = SenzParser.getSenzPayload(senz);
             String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
             String senzMessage = SenzParser.getSenzMessage(senzPayload, senzSignature);
-
-            System.out.println("-------------");
-            System.out.println(senzPayload);
-            System.out.println(senzMessage);
-            System.out.println("-------------");
 
             // send senz to server
             Message msg = new Message();
