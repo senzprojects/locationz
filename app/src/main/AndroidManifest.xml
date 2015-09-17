@@ -83,7 +83,7 @@
             android:windowSoftInputMode="stateHidden"></activity>
 
         <activity
-            android:name=".ui.FriendListActivity"
+            android:name=".ui.FriendList"
             android:configChanges="orientation"
             android:launchMode="singleTask"
             android:parentActivityName=".ui.SensorDetailsActivity"

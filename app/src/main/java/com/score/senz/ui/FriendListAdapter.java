@@ -5,7 +5,11 @@ import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.TextView;
+
 import com.score.senz.R;
 import com.score.senz.pojos.User;
 
@@ -18,7 +22,7 @@ import java.util.ArrayList;
  */
 public class FriendListAdapter extends BaseAdapter implements Filterable {
 
-    private FriendListActivity activity;
+    private FriendList activity;
     private FriendFilter friendFilter;
     private Typeface typeface;
     private ArrayList<User> friendList;
@@ -26,20 +30,22 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
 
     /**
      * Initialize context variables
-     * @param activity friend list activity
+     *
+     * @param activity   friend list activity
      * @param friendList friend list
      */
-    public FriendListAdapter(FriendListActivity activity, ArrayList<User> friendList) {
+    public FriendListAdapter(FriendList activity, ArrayList<User> friendList) {
         this.activity = activity;
         this.friendList = friendList;
         this.filteredList = friendList;
-        typeface = Typeface.createFromAsset(activity.getAssets(), "fonts/vegur_2.otf");
+        typeface = Typeface.createFromAsset(activity.getActivity().getAssets(), "fonts/vegur_2.otf");
 
         getFilter();
     }
 
     /**
      * Get size of user list
+     *
      * @return userList size
      */
     @Override
@@ -49,6 +55,7 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
 
     /**
      * Get specific item from user list
+     *
      * @param i item index
      * @return list item
      */
@@ -59,6 +66,7 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
 
     /**
      * Get user list item id
+     *
      * @param i item index
      * @return current item id
      */
@@ -69,9 +77,10 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
 
     /**
      * Create list row view
+     *
      * @param position index
-     * @param view current list item view
-     * @param parent parent
+     * @param view     current list item view
+     * @param parent   parent
      * @return view
      */
     @Override
@@ -82,7 +91,7 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
         final User user = (User) getItem(position);
 
         if (view == null) {
-            LayoutInflater layoutInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater layoutInflater = (LayoutInflater) activity.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = layoutInflater.inflate(R.layout.friend_list_row_layout, parent, false);
             holder = new ViewHolder();
             holder.iconText = (TextView) view.findViewById(R.id.icon_text);
@@ -110,6 +119,7 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
 
     /**
      * Get custom filter
+     *
      * @return filter
      */
     @Override
@@ -139,7 +149,7 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults filterResults = new FilterResults();
-            if (constraint!=null && constraint.length()>0) {
+            if (constraint != null && constraint.length() > 0) {
                 ArrayList<User> tempList = new ArrayList<User>();
 
                 // search content in friend list
@@ -161,8 +171,9 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
 
         /**
          * Notify about filtered list to ui
+         *
          * @param constraint text
-         * @param results filtered result
+         * @param results    filtered result
          */
         @SuppressWarnings("unchecked")
         @Override

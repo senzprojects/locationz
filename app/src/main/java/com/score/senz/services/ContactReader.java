@@ -3,7 +3,7 @@ package com.score.senz.services;
 import android.os.AsyncTask;
 import com.score.senz.listeners.ContactReaderListener;
 import com.score.senz.pojos.User;
-import com.score.senz.ui.FriendListActivity;
+import com.score.senz.ui.FriendList;
 import com.score.senz.utils.PhoneBookUtils;
 
 import java.util.ArrayList;
@@ -15,11 +15,11 @@ import java.util.ArrayList;
  */
 public class ContactReader extends AsyncTask<String, String, String > {
 
-    FriendListActivity activity;
+    FriendList activity;
     ContactReaderListener listener;
     ArrayList<User> contactList;
 
-    public ContactReader(FriendListActivity activity) {
+    public ContactReader(FriendList activity) {
         this.activity = activity;
         this.listener = activity;
     }
@@ -29,7 +29,7 @@ public class ContactReader extends AsyncTask<String, String, String > {
      */
     @Override
     protected String doInBackground(String... params) {
-        contactList = PhoneBookUtils.readContacts(activity);
+        contactList = PhoneBookUtils.readContacts(activity.getActivity());
 
         return "READ";
     }

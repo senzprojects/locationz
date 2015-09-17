@@ -232,7 +232,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     }
 
     private void loadShare() {
-        ShareActivity shareFragment = new ShareActivity();
+        FriendList shareFragment = new FriendList();
 
         // fragment transitions
         // Replace whatever is in the fragment_container view with this fragment,
