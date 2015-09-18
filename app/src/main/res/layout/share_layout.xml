@@ -58,7 +58,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
                     android:layout_marginLeft="20dp"
-                    android:text="Phone no"
+                    android:text="Phone no/Username"
                     android:textColor="#4a4a4a"
                     android:textSize="18sp"></TextView>
 
@@ -69,9 +69,6 @@
                     android:layout_marginLeft="20dp"
                     android:layout_marginRight="20dp"
                     android:background="@drawable/edit_text_shape"
-                    android:editable="false"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
                     android:inputType="text"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"

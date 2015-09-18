@@ -187,7 +187,7 @@ public class SensorListFragment extends Fragment {
         emptyView = (ViewStub) getActivity().findViewById(R.id.sensor_list_layout_empty_view);
         View inflatedEmptyView = emptyView.inflate();
         TextView emptyText = (TextView) inflatedEmptyView.findViewById(R.id.empty_text);
-        emptyText.setText("No Friends.SenZors available");
+        emptyText.setText("No SenZ available");
         emptyText.setTypeface(typeface);
     }
 

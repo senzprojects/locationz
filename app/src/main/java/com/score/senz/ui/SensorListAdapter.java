@@ -135,8 +135,8 @@ public class SensorListAdapter extends BaseAdapter {
         // enable share and change color of view
         view.setBackgroundResource(R.drawable.my_sensor_background);
         viewHolder.share.setVisibility(View.GONE);
-        viewHolder.sensorName.setBackgroundResource(R.drawable.circle_shape_red);
-        viewHolder.sensorUser.setTextColor(Color.parseColor("#d96459"));
+        viewHolder.sensorName.setBackgroundResource(R.drawable.circle_shape_green);
+        viewHolder.sensorUser.setTextColor(Color.parseColor("#11b29c"));
         viewHolder.sensorUser.setText("@" + senz.getSender());
         viewHolder.sensorValue.setText(R.string.tap_here);
     }

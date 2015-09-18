@@ -34,6 +34,7 @@ import com.score.senz.pojos.User;
 import com.score.senz.services.ContactReader;
 import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
+import com.score.senz.utils.PhoneBookUtils;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;
@@ -95,7 +96,7 @@ public class FriendList extends android.support.v4.app.Fragment implements Searc
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setActionBar("#Friends");
+        setActionBar("#Friend");
         initFriendListView();
         readContacts();
     }
@@ -206,11 +207,7 @@ public class FriendList extends android.support.v4.app.Fragment implements Searc
             searchView.setQuery("", false);
         }
 
-        // launch share activity
-//        Intent intent = new Intent(getActivity(), ShareActivity.class);
-//        intent.putExtra("extra", user.getPhoneNo());
-//        getActivity().startActivity(intent);
-//        getActivity().overridePendingTransition(R.anim.bottom_in, R.anim.stay_in);
+        PhoneBookUtils.getContactName(getActivity(), user.getPhoneNo());
         showShareConfirmDialog(user);
     }
 

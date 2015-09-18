@@ -124,7 +124,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         // need to determine selected item according to the currently selected sensor type
         drawerItemList = new ArrayList();
         drawerItemList.add(new DrawerItem("#Senz", R.drawable.my_sensz_normal, R.drawable.my_sensz_selected, true));
-        drawerItemList.add(new DrawerItem("#Friends", R.drawable.friends_normal, R.drawable.friends_selected, false));
+        drawerItemList.add(new DrawerItem("#Friend", R.drawable.friends_normal, R.drawable.friends_selected, false));
         drawerItemList.add(new DrawerItem("#Share", R.drawable.friends_normal, R.drawable.friends_selected, false));
 
         drawerAdapter = new DrawerAdapter(HomeActivity.this, drawerItemList);
@@ -211,9 +211,10 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
                 loadSensors();
             } else if (position == 1) {
                 drawerItemList.get(1).setSelected(true);
-                loadShare();
+                loadFriends();
             } else if (position == 2) {
                 drawerItemList.get(2).setSelected(true);
+                loadShare();
             }
 
             drawerAdapter.notifyDataSetChanged();
@@ -234,8 +235,19 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         transaction.commit();
     }
 
-    private void loadShare() {
+    private void loadFriends() {
         FriendList shareFragment = new FriendList();
+
+        // fragment transitions
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack so the user can navigate back
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.main, shareFragment);
+        transaction.commit();
+    }
+
+    private void loadShare() {
+        ShareActivity shareFragment = new ShareActivity();
 
         // fragment transitions
         // Replace whatever is in the fragment_container view with this fragment,

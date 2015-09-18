@@ -83,14 +83,6 @@
             android:windowSoftInputMode="stateHidden"></activity>
 
         <activity
-            android:name=".ui.ShareActivity"
-            android:configChanges="orientation"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Yello"
-            android:windowSoftInputMode="stateHidden"></activity>
-
-        <activity
             android:name=".ui.SplashActivity"
             android:configChanges="orientation"
             android:launchMode="singleTask"

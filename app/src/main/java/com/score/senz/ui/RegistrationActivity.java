@@ -154,11 +154,10 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      * Initialize user object
      */
     private void initRegisteringUser() {
-        String countryCode = countryCodeText.getText().toString().trim();
         String phoneNo = editTextPhoneNo.getText().toString().trim();
-        //String internationalPhoneNo = countryCode + phoneNo.substring(phoneNo.length() - 9);
+        String internationalPhoneNo = PhoneBookUtils.getFormattedPhoneNo(this, phoneNo);
 
-        registeringUser = new User("0", phoneNo, "");
+        registeringUser = new User("0", internationalPhoneNo, "");
         registeringUser.setUsername("Me");
     }
 
@@ -210,11 +209,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             String senzPayload = SenzParser.getSenzPayload(senz);
             String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
             String senzMessage = SenzParser.getSenzMessage(senzPayload, senzSignature);
-
-            System.out.println("-------------");
-            System.out.println(senzPayload);
-            System.out.println(senzMessage);
-            System.out.println("-------------");
 
             // send senz to server
             Message msg = new Message();

@@ -45,6 +45,8 @@ public class PhoneBookUtils {
             cursor.close();
         }
 
+        System.out.println(contactName);
+
         return contactName;
     }
 
