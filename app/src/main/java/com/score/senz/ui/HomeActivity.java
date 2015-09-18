@@ -124,6 +124,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         // need to determine selected item according to the currently selected sensor type
         drawerItemList = new ArrayList();
         drawerItemList.add(new DrawerItem("#Senz", R.drawable.my_sensz_normal, R.drawable.my_sensz_selected, true));
+        drawerItemList.add(new DrawerItem("#Friends", R.drawable.friends_normal, R.drawable.friends_selected, false));
         drawerItemList.add(new DrawerItem("#Share", R.drawable.friends_normal, R.drawable.friends_selected, false));
 
         drawerAdapter = new DrawerAdapter(HomeActivity.this, drawerItemList);
@@ -211,6 +212,8 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
             } else if (position == 1) {
                 drawerItemList.get(1).setSelected(true);
                 loadShare();
+            } else if (position == 2) {
+                drawerItemList.get(2).setSelected(true);
             }
 
             drawerAdapter.notifyDataSetChanged();

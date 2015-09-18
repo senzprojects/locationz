@@ -1,11 +1,19 @@
 package com.score.senz.ui;
 
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,12 +26,25 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.score.senz.R;
+import com.score.senz.enums.SenzTypeEnum;
+import com.score.senz.exceptions.NoUserException;
 import com.score.senz.listeners.ContactReaderListener;
+import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.services.ContactReader;
+import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
+import com.score.senz.utils.PreferenceUtils;
+import com.score.senz.utils.RSAUtils;
+import com.score.senz.utils.SenzParser;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Display Contact list when sharing sensor
@@ -32,11 +53,29 @@ import java.util.ArrayList;
  */
 public class FriendList extends android.support.v4.app.Fragment implements SearchView.OnQueryTextListener, SearchView.OnCloseListener, ContactReaderListener {
 
+    private static final String TAG = SensorListFragment.class.getName();
+
     private ListView friendListView;
     private SearchView searchView;
     private MenuItem searchMenuItem;
     private FriendListAdapter friendListAdapter;
     private ArrayList<User> friendList = new ArrayList<>();
+
+    boolean isServiceBound = false;
+
+    // use to send senz messages to SenzService
+    Messenger senzServiceMessenger;
+
+    // connection for SenzService
+    private ServiceConnection senzServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            senzServiceMessenger = new Messenger(service);
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            senzServiceMessenger = null;
+        }
+    };
 
     /**
      * {@inheritDoc}
@@ -64,8 +103,29 @@ public class FriendList extends android.support.v4.app.Fragment implements Searc
     /**
      * {@inheritDoc}
      */
-    public void onResume() {
-        super.onResume();
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // bind to senz service
+        if (!isServiceBound) {
+            this.getActivity().bindService(new Intent(this.getActivity(), SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
+            isServiceBound = true;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // Unbind from the service
+        if (isServiceBound) {
+            getActivity().unbindService(senzServiceConnection);
+            isServiceBound = false;
+        }
     }
 
     /**
@@ -214,7 +274,7 @@ public class FriendList extends android.support.v4.app.Fragment implements Searc
         }
     }
 
-    private void showShareConfirmDialog(User user) {
+    private void showShareConfirmDialog(final User user) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
 
         alertDialogBuilder
@@ -223,6 +283,7 @@ public class FriendList extends android.support.v4.app.Fragment implements Searc
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // share senz to server
+                        share(user);
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -235,6 +296,57 @@ public class FriendList extends android.support.v4.app.Fragment implements Searc
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
+    }
+
+    /**
+     * Share current sensor
+     * Need to send share query to server via web socket
+     */
+    private void share(User user) {
+        String query = "SHARE" + " " + "#lat #lon" + " " + "@" + user.getPhoneNo().trim();
+        Log.d(TAG, "Share: sharing query " + query);
+
+        try {
+            // create key pair
+            PrivateKey privateKey = RSAUtils.getPrivateKey(getActivity());
+
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("lat", "lat");
+            senzAttributes.put("lon", "lon");
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+
+            // new senz
+            Senz senz = new Senz();
+            senz.setSenzType(SenzTypeEnum.SHARE);
+            senz.setReceiver(user.getPhoneNo().trim());
+            senz.setSender(PreferenceUtils.getUser(getActivity()).getPhoneNo());
+            senz.setAttributes(senzAttributes);
+
+            // get digital signature of the senz
+            String senzPayload = SenzParser.getSenzPayload(senz);
+            String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+            String senzMessage = SenzParser.getSenzMessage(senzPayload, senzSignature);
+
+            // send senz to server
+            Message msg = new Message();
+            msg.obj = senzMessage;
+            try {
+                senzServiceMessenger.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            e.printStackTrace();
+        } catch (NoUserException e) {
+            e.printStackTrace();
+        }
     }
 
 }

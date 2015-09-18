@@ -49,6 +49,7 @@ public class ActivityUtils {
      */
     public static void showProgressDialog(Context context, String message) {
         progressDialog = ProgressDialog.show(context, null, message, true);
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setCancelable(true);
 
         progressDialog.show();
