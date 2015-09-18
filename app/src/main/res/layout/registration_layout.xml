@@ -25,15 +25,17 @@
                     android:layout_marginLeft="40dp">
 
                 <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/registration_header_text"
-                        android:textColor="#ffffff"
-                        android:textSize="42sp"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginLeft="0dp"
-                        android:layout_marginBottom="52dp"
-                        android:text="#SignUp">
+                    android:id="@+id/registration_header_text"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:text="#"
+                    android:visibility="gone"
+                    android:gravity="center"
+                    android:layout_centerHorizontal="true"
+                    android:textSize="58sp"
+                    android:layout_marginBottom="80dp"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/circle_shape_gray">
                 </TextView>
 
                 <RelativeLayout
