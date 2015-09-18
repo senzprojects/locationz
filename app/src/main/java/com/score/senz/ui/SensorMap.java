@@ -117,7 +117,7 @@ public class SensorMap extends FragmentActivity {
             map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
 
-            map.getUiSettings().setZoomControlsEnabled(false);
+            map.getUiSettings().setZoomControlsEnabled(true);
             map.getUiSettings().setMyLocationButtonEnabled(true);
             // Check if we were successful in obtaining the map.
             if (map != null) {
@@ -138,7 +138,7 @@ public class SensorMap extends FragmentActivity {
 
         // add location marker
         try {
-            marker = map.addMarker(new MarkerOptions().position(this.locationCoordinates).title("My new location").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
+            marker = map.addMarker(new MarkerOptions().position(this.locationCoordinates).title("Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(this.locationCoordinates, 10));
 
             // ... get a map
