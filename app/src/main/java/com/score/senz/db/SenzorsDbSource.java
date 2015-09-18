@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
 import com.score.senz.pojos.Sensor;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
@@ -25,6 +26,7 @@ public class SenzorsDbSource {
 
     /**
      * Init db helper
+     *
      * @param context application context
      */
     public SenzorsDbSource(Context context) {
@@ -34,6 +36,7 @@ public class SenzorsDbSource {
 
     /**
      * Insert user to database
+     *
      * @param user user
      */
     public void createUser(User user) {
@@ -51,6 +54,7 @@ public class SenzorsDbSource {
 
     /**
      * Get user if exists in the database, other wise create user and return
+     *
      * @param phoneNo phone no
      * @return user
      */
@@ -60,13 +64,13 @@ public class SenzorsDbSource {
         // get matching user if exists
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
         Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, // table
-                null, SenzorsDbContract.User.COLUMN_NAME_PHONE+ "=?", // constraint
+                null, SenzorsDbContract.User.COLUMN_NAME_PHONE + "=?", // constraint
                 new String[]{phoneNo}, // prams
                 null, // order by
                 null, // group by
                 null); // join
 
-        if(cursor.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             // have matching user
             // so get user data
             // we return id as password since we no storing users password in database
@@ -100,6 +104,7 @@ public class SenzorsDbSource {
 
     /**
      * Add senz to the database
+     *
      * @param senz senz object
      */
     public void createSenz(Senz senz) {
@@ -119,6 +124,7 @@ public class SenzorsDbSource {
     /**
      * Delete sensor from database,
      * In here we actually delete all the matching sensors of given user
+     *
      * @param sensor sensor
      */
     public void deleteSensorOfUser(Sensor sensor) {
@@ -136,8 +142,9 @@ public class SenzorsDbSource {
 
     /**
      * Get all sensors, two types of sensors here
-     *  1. my sensors
-     *  2. friends sensors
+     * 1. my sensors
+     * 2. friends sensors
+     *
      * @return sensor list
      */
     public List<Senz> getSenzes() {
@@ -155,15 +162,19 @@ public class SenzorsDbSource {
         Cursor cursor = db.query(SenzorsDbContract.Senz.TABLE_NAME, null, null, null, null, null, null);
 
         // sensor/user attributes
+        String phone;
         String user;
         Senz senz;
 
         // extract attributes
         while (cursor.moveToNext()) {
             // get sensor attributes
-            user = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Senz.COLUMN_NAME_USER));
+            phone = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Senz.COLUMN_NAME_USER));
+            user = PhoneBookUtils.getContactName(context, phone);
+
             senz = new Senz();
-            senz.setSender(user);
+            senz.setSender(phone);
+            senz.setSenderName(user);
 
             sensorList.add(senz);
         }
@@ -178,8 +189,9 @@ public class SenzorsDbSource {
 
     /**
      * Get shared users of given sensor
+     *
      * @param sensorId sensor id
-     * @param db database
+     * @param db       database
      * @return user list
      */
     private ArrayList<User> getSharedUsers(String sensorId, SQLiteDatabase db) {
@@ -219,8 +231,9 @@ public class SenzorsDbSource {
 
     /**
      * Add shared user to db when share sensor with user
+     *
      * @param sensor sensor
-     * @param user user
+     * @param user   user
      */
     public void addSharedUser(Sensor sensor, User user) {
         Log.d(TAG, "AddSharedUser: add data - " + sensor.getSensorName() + " " + user.getPhoneNo());
@@ -240,6 +253,7 @@ public class SenzorsDbSource {
      * Delete shared users from database,
      * Sensor sharing details keeps on SharedUser table, so delete that
      * sharing entries from here
+     *
      * @param user user
      */
     public void deleteSharedUser(User user) {

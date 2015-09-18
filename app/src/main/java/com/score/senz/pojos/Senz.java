@@ -11,6 +11,7 @@ public class Senz {
     private String signature;
     private SenzTypeEnum senzType;
     private String sender;
+    private String senderName;
     private String receiver;
     private HashMap<String, String> attributes;
 
@@ -54,4 +55,11 @@ public class Senz {
         this.attributes = attributes;
     }
 
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
+    }
 }

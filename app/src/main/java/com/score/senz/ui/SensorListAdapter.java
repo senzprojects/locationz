@@ -12,7 +12,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.score.senz.R;
-import com.score.senz.pojos.Sensor;
 import com.score.senz.pojos.Senz;
 
 import java.util.ArrayList;
@@ -137,17 +136,7 @@ public class SensorListAdapter extends BaseAdapter {
         viewHolder.share.setVisibility(View.GONE);
         viewHolder.sensorName.setBackgroundResource(R.drawable.circle_shape_green);
         viewHolder.sensorUser.setTextColor(Color.parseColor("#11b29c"));
-        viewHolder.sensorUser.setText("@" + senz.getSender());
-        viewHolder.sensorValue.setText(R.string.tap_here);
-    }
-
-    private void setUpFriendSensor(Sensor sensor, View view, ViewHolder viewHolder) {
-        // disable share and change color of view
-        view.setBackgroundResource(R.drawable.my_sensor_background);
-        viewHolder.share.setVisibility(View.GONE);
-        viewHolder.sensorName.setBackgroundResource(R.drawable.circle_shape_green);
-        viewHolder.sensorUser.setTextColor(Color.parseColor("#11b29c"));
-        viewHolder.sensorUser.setText("@" + sensor.getUser().getUsername());
+        viewHolder.sensorUser.setText("@" + senz.getSenderName());
         viewHolder.sensorValue.setText(R.string.tap_here);
     }
 

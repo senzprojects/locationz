@@ -207,7 +207,6 @@ public class FriendList extends android.support.v4.app.Fragment implements Searc
             searchView.setQuery("", false);
         }
 
-        PhoneBookUtils.getContactName(getActivity(), user.getPhoneNo());
         showShareConfirmDialog(user);
     }
 
