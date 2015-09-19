@@ -140,7 +140,7 @@ public class SensorDetailsActivity extends FragmentActivity {
 
                 return true;
             case R.id.action_share:
-                Intent intent = new Intent(this, FriendList.class);
+                Intent intent = new Intent(this, FriendListFragment.class);
                 intent.putExtra("com.score.senz.pojos.Sensor", thisSensor);
                 this.startActivity(intent);
                 this.overridePendingTransition(R.anim.bottom_in, R.anim.stay_in);

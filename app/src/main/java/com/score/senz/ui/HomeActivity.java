@@ -236,7 +236,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     }
 
     private void loadFriends() {
-        FriendList shareFragment = new FriendList();
+        FriendListFragment shareFragment = new FriendListFragment();
 
         // fragment transitions
         // Replace whatever is in the fragment_container view with this fragment,
@@ -247,7 +247,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     }
 
     private void loadShare() {
-        ShareActivity shareFragment = new ShareActivity();
+        ShareFragment shareFragment = new ShareFragment();
 
         // fragment transitions
         // Replace whatever is in the fragment_container view with this fragment,

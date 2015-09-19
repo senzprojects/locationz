@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
+
 import com.score.senz.R;
 import com.score.senz.application.SenzApplication;
 import com.score.senz.pojos.Country;
@@ -84,8 +85,8 @@ public class CountryListActivity extends Activity implements SearchView.OnQueryT
 
     /**
      * Set action bar
-     *      1. properties
-     *      2. title with custom font
+     * 1. properties
+     * 2. title with custom font
      */
     private void setActionBar() {
         getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -118,8 +119,8 @@ public class CountryListActivity extends Activity implements SearchView.OnQueryT
         countryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(position>0 && position <= countryList.size()) {
-                    handelListItemClick((Country)countryListAdapter.getItem(position - 1));
+                if (position > 0 && position <= countryList.size()) {
+                    handelListItemClick((Country) countryListAdapter.getItem(position - 1));
                 }
             }
         });
@@ -127,6 +128,7 @@ public class CountryListActivity extends Activity implements SearchView.OnQueryT
 
     /**
      * Navigate to register activity form here
+     *
      * @param country country
      */
     private void handelListItemClick(Country country) {
@@ -137,7 +139,7 @@ public class CountryListActivity extends Activity implements SearchView.OnQueryT
         }
 
         // pass selected user and sensor to share activity
-        Intent intent = new Intent(this, ShareActivity.class);
+        Intent intent = new Intent(this, ShareFragment.class);
         //intent.putExtra("com.score.senz.pojos.User", user);
         //intent.putExtra("com.score.senz.pojos.Sensor", application.getCurrentSensor());
         this.startActivity(intent);

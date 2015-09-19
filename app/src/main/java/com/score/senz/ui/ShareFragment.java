@@ -43,9 +43,9 @@ import java.util.HashMap;
  *
  * @author erangaeb@gmail.com (eranga herath)
  */
-public class ShareActivity extends android.support.v4.app.Fragment {
+public class ShareFragment extends android.support.v4.app.Fragment {
 
-    private static final String TAG = ShareActivity.class.getName();
+    private static final String TAG = ShareFragment.class.getName();
 
     private TextView phoneNoLabel;
     private EditText phoneNoEditText;

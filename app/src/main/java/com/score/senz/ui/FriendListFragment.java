@@ -52,7 +52,7 @@ import java.util.HashMap;
  *
  * @author eranga herath(erangeb@gmail.com)
  */
-public class FriendList extends android.support.v4.app.Fragment implements SearchView.OnQueryTextListener, SearchView.OnCloseListener, ContactReaderListener {
+public class FriendListFragment extends android.support.v4.app.Fragment implements SearchView.OnQueryTextListener, SearchView.OnCloseListener, ContactReaderListener {
 
     private static final String TAG = SensorListFragment.class.getName();
 

@@ -121,7 +121,7 @@ public class SensorListAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 // start share activity
-                Intent intent = new Intent(context, ShareActivity.class);
+                Intent intent = new Intent(context, ShareFragment.class);
                 context.startActivity(intent);
                 ((HomeActivity) context).overridePendingTransition(R.anim.bottom_in, R.anim.stay_in);
             }

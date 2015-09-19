@@ -22,7 +22,7 @@ import java.util.ArrayList;
  */
 public class FriendListAdapter extends BaseAdapter implements Filterable {
 
-    private FriendList activity;
+    private FriendListFragment activity;
     private FriendFilter friendFilter;
     private Typeface typeface;
     private ArrayList<User> friendList;
@@ -34,7 +34,7 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
      * @param activity   friend list activity
      * @param friendList friend list
      */
-    public FriendListAdapter(FriendList activity, ArrayList<User> friendList) {
+    public FriendListAdapter(FriendListFragment activity, ArrayList<User> friendList) {
         this.activity = activity;
         this.friendList = friendList;
         this.filteredList = friendList;
