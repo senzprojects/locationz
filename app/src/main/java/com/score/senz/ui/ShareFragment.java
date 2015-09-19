@@ -20,12 +20,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.score.senz.R;
 import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.services.SenzService;
+import com.score.senz.utils.ActivityUtils;
+import com.score.senz.utils.PhoneBookUtils;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;
@@ -194,6 +197,7 @@ public class ShareFragment extends android.support.v4.app.Fragment {
             msg.obj = senzMessage;
             try {
                 senzServiceMessenger.send(msg);
+                onPostShare();
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -208,6 +212,15 @@ public class ShareFragment extends android.support.v4.app.Fragment {
         } catch (NoUserException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Clear input fields and reset activity components
+     */
+    private void onPostShare() {
+        phoneNoEditText.setText("");
+        ActivityUtils.hideSoftKeyboard(getActivity());
+        Toast.makeText(getActivity(), "Successfully shared SenZ", Toast.LENGTH_LONG).show();
     }
 
 }

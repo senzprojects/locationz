@@ -24,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.score.senz.R;
 import com.score.senz.enums.SenzTypeEnum;
@@ -329,6 +330,7 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
             msg.obj = senzMessage;
             try {
                 senzServiceMessenger.send(msg);
+                onPostShare();
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -343,6 +345,15 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
         } catch (NoUserException e) {
             e.printStackTrace();
         }
+    }
+
+
+    /**
+     * Clear input fields and reset activity components
+     */
+    private void onPostShare() {
+        ActivityUtils.hideSoftKeyboard(getActivity());
+        Toast.makeText(getActivity(), "Successfully shared SenZ", Toast.LENGTH_LONG).show();
     }
 
 }

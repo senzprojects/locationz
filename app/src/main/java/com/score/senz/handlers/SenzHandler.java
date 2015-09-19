@@ -7,10 +7,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.score.senz.R;
 import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.listeners.LocationServiceListener;
 import com.score.senz.pojos.Senz;
 import com.score.senz.services.LocationService;
+import com.score.senz.utils.NotificationUtils;
 import com.score.senz.utils.SenzParser;
 
 import java.security.InvalidKeyException;
@@ -65,6 +67,9 @@ public class SenzHandler implements LocationServiceListener {
     private void handleShareSenz(Context context, Senz senz) {
         // create senz
         new SenzorsDbSource(context).createSenz(senz);
+
+        // display notification
+        NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "SenZ received from @" + senz.getSender());
     }
 
     private void handleGetSenz(Context context, Senz senz) {

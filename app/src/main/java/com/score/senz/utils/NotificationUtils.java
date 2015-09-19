@@ -6,8 +6,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
-import com.score.senz.ui.HomeActivity;
+
 import com.score.senz.R;
+import com.score.senz.ui.HomeActivity;
 
 /**
  * Utility class for create and update notifications
@@ -23,6 +24,7 @@ public class NotificationUtils {
     /**
      * Get notification to create/ update
      * We need to create or update notification in different scenarios
+     *
      * @param context context
      * @return notification
      */
@@ -42,6 +44,21 @@ public class NotificationUtils {
                 .setContentIntent(pendingIntent);
 
         return builder.build();
+    }
+
+    /**
+     * Display notification from here
+     *
+     * @param context context
+     * @param title   notification title
+     * @param message message to be display
+     */
+    public static void showNotification(Context context, String title, String message) {
+        // display notification
+        Notification notification = NotificationUtils.getNotification(context, R.drawable.logo_green, title, message);
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
     }
 
     /**

@@ -36,7 +36,6 @@ public class SensorMap extends FragmentActivity {
     private Marker marker;
     private Circle circle;
 
-
     /**
      * {@inheritDoc}
      */
