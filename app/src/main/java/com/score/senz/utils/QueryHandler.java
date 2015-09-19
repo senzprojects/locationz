@@ -262,9 +262,9 @@ public class QueryHandler {
     private static void sendMessage(SenzApplication application, Object obj) {
         Message message = Message.obtain();
         message.obj = obj;
-        if (application.getHandler()!=null) {
-            application.getHandler().sendMessage(message);
-        }
+//        if (application.getHandler()!=null) {
+//            application.getHandler().sendMessage(message);
+//        }
     }
 
 }

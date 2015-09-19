@@ -48,6 +48,41 @@ public class PhoneBookUtils {
         return contactName;
     }
 
+    public static Uri getImage(Context context, String phoneNumber) {
+        ContentResolver contentResolver = context.getContentResolver();
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+        Cursor cursor = contentResolver.query(uri, new String[]{Phone.PHOTO_URI}, null, null, null);
+        if (cursor == null) {
+            return null;
+        }
+        try {
+            if (cursor.moveToFirst()) {
+                String image_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
+                return Uri.parse(image_uri);
+            }
+        } finally {
+            cursor.close();
+        }
+        return null;
+
+//        Cursor cursor = contentResolver.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME, ContactsContract.Contacts.Photo.PHOTO}, null, null, null);
+//        if (cursor == null) {
+//            return null;
+//        }
+//        try {
+//            if (cursor.moveToFirst()) {
+//                byte[] data = cursor.getBlob(cursor.getColumnIndex(ContactsContract.Contacts.Photo.PHOTO));
+//                if (data != null) {
+//                    return BitmapFactory.decodeStream(new ByteArrayInputStream(data));
+//                }
+//            }
+//        } finally {
+//            cursor.close();
+//        }
+//
+//        return null;
+    }
+
     /**
      * Read all contacts from contact database, we read
      * 1. name

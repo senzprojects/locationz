@@ -1,18 +1,22 @@
 package com.score.senz.ui;
 
 import android.content.Context;
-import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Path;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.RelativeLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.score.senz.R;
 import com.score.senz.pojos.Senz;
+import com.score.senz.utils.PhoneBookUtils;
 
 import java.util.ArrayList;
 
@@ -101,13 +105,11 @@ public class SensorListAdapter extends BaseAdapter {
             holder = new ViewHolder();
             holder.sensorName = (TextView) view.findViewById(R.id.sensor_name_text);
             holder.sensorUser = (TextView) view.findViewById(R.id.sensor_list_row_layout_sensor_user);
-            holder.sensorValue = (TextView) view.findViewById(R.id.sensor_list_row_layout_sensor_value);
-            holder.share = (RelativeLayout) view.findViewById(R.id.sensor_list_row_layout_share);
+            holder.contactImage = (ImageView) view.findViewById(R.id.contact_image);
 
             // set custom font
             holder.sensorName.setTypeface(typefaceThin);
             holder.sensorUser.setTypeface(typefaceBlack);
-            holder.sensorValue.setTypeface(typefaceThin);
 
             view.setTag(holder);
         } else {
@@ -117,27 +119,17 @@ public class SensorListAdapter extends BaseAdapter {
 
         setUpSenzRow(senz, view, holder);
 
-        holder.share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // start share activity
-                Intent intent = new Intent(context, ShareFragment.class);
-                context.startActivity(intent);
-                ((HomeActivity) context).overridePendingTransition(R.anim.bottom_in, R.anim.stay_in);
-            }
-        });
-
         return view;
     }
 
     private void setUpSenzRow(Senz senz, View view, ViewHolder viewHolder) {
         // enable share and change color of view
         view.setBackgroundResource(R.drawable.my_sensor_background);
-        viewHolder.share.setVisibility(View.GONE);
         viewHolder.sensorName.setBackgroundResource(R.drawable.circle_shape_green);
-        viewHolder.sensorUser.setTextColor(Color.parseColor("#11b29c"));
+        //viewHolder.sensorUser.setTextColor(Color.parseColor("#11b29c"));
         viewHolder.sensorUser.setText("@" + senz.getSenderName());
-        viewHolder.sensorValue.setText(R.string.tap_here);
+        //viewHolder.contactImage.setImageBitmap(getRoundedShape(PhoneBookUtils.getImage(context, "+94777206677")));
+        viewHolder.contactImage.setImageURI(PhoneBookUtils.getImage(context, "+94715991422"));
     }
 
     /**
@@ -146,8 +138,30 @@ public class SensorListAdapter extends BaseAdapter {
     static class ViewHolder {
         TextView sensorName;
         TextView sensorUser;
-        TextView sensorValue;
-        RelativeLayout share;
+        ImageView contactImage;
+    }
+
+    public Bitmap getRoundedShape(Bitmap scaleBitmapImage) {
+        int targetWidth = 50;
+        int targetHeight = 50;
+        Bitmap targetBitmap = Bitmap.createBitmap(targetWidth,
+                targetHeight,Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(targetBitmap);
+        Path path = new Path();
+        path.addCircle(((float) targetWidth - 1) / 2,
+                ((float) targetHeight - 1) / 2,
+                (Math.min(((float) targetWidth),
+                        ((float) targetHeight)) / 2),
+                Path.Direction.CCW);
+
+        canvas.clipPath(path);
+        Bitmap sourceBitmap = scaleBitmapImage;
+        canvas.drawBitmap(sourceBitmap,
+                new Rect(0, 0, sourceBitmap.getWidth(),
+                        sourceBitmap.getHeight()),
+                new Rect(0, 0, targetWidth, targetHeight), null);
+        return targetBitmap;
     }
 
 }

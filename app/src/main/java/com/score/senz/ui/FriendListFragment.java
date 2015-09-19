@@ -35,7 +35,6 @@ import com.score.senz.pojos.User;
 import com.score.senz.services.ContactReader;
 import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
-import com.score.senz.utils.PhoneBookUtils;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;

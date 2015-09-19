@@ -281,7 +281,7 @@ public class SensorListFragment extends Fragment {
     };
 
     /**
-     * Handle brodcase message receives
+     * Handle broadcast message receives
      * Need to handle registration success failure here
      *
      * @param intent intent

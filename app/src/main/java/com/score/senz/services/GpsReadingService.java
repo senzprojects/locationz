@@ -208,11 +208,11 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
         // send message to available handler
         Message message = Message.obtain();
         message.obj = latLon;
-        if (application.getHandler()!=null) {
-            Log.d(TAG, "HandleLocationRequestFromSensorList: send message to available handler");
-            application.getHandler().sendMessage(message);
-        } else {
-            Log.e(TAG, "HandleLocationRequestFromSensorList: no available handler");
-        }
+//        if (application.getHandler()!=null) {
+//            Log.d(TAG, "HandleLocationRequestFromSensorList: send message to available handler");
+//            application.getHandler().sendMessage(message);
+//        } else {
+//            Log.e(TAG, "HandleLocationRequestFromSensorList: no available handler");
+//        }
     }
 }
