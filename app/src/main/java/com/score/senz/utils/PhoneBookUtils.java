@@ -62,16 +62,12 @@ public class PhoneBookUtils {
         ContentResolver contentResolver = context.getContentResolver();
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
         Cursor cursor = contentResolver.query(uri, new String[]{Phone.PHOTO_URI}, null, null, null);
-        if (cursor == null) {
-            return null;
-        }
+        if (cursor == null) return null;
 
         try {
             if (cursor.moveToFirst()) {
                 String image_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(contentResolver, Uri.parse(image_uri));
-
-                return bitmap;
+                if (image_uri != null) return MediaStore.Images.Media.getBitmap(contentResolver, Uri.parse(image_uri));
             }
         } catch (IOException e) {
             e.printStackTrace();
