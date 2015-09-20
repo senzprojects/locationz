@@ -14,6 +14,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.senz.R;
 import com.score.senz.pojos.Senz;
 import com.score.senz.utils.PhoneBookUtils;
@@ -103,13 +104,13 @@ public class SensorListAdapter extends BaseAdapter {
 
             //create view holder to store reference to child views
             holder = new ViewHolder();
-            holder.sensorName = (TextView) view.findViewById(R.id.sensor_name_text);
-            holder.sensorUser = (TextView) view.findViewById(R.id.sensor_list_row_layout_sensor_user);
-            holder.contactImage = (ImageView) view.findViewById(R.id.contact_image);
+            holder.user = (TextView) view.findViewById(R.id.sensor_list_row_layout_sensor_user);
+            holder.lastSeen = (TextView) view.findViewById(R.id.sensor_list_row_layout_sensor_value);
+            holder.image = (CircularImageView) view.findViewById(R.id.contact_image);
 
             // set custom font
-            holder.sensorName.setTypeface(typefaceThin);
-            holder.sensorUser.setTypeface(typefaceBlack);
+            holder.user.setTypeface(typefaceThin, Typeface.BOLD);
+            holder.lastSeen.setTypeface(typefaceThin, Typeface.BOLD);
 
             view.setTag(holder);
         } else {
@@ -125,20 +126,22 @@ public class SensorListAdapter extends BaseAdapter {
     private void setUpSenzRow(Senz senz, View view, ViewHolder viewHolder) {
         // enable share and change color of view
         view.setBackgroundResource(R.drawable.my_sensor_background);
-        viewHolder.sensorName.setBackgroundResource(R.drawable.circle_shape_green);
+        //viewHolder.sensorName.setBackgroundResource(R.drawable.circle_shape_green);
         //viewHolder.sensorUser.setTextColor(Color.parseColor("#11b29c"));
-        viewHolder.sensorUser.setText("@" + senz.getSenderName());
-        //viewHolder.contactImage.setImageBitmap(getRoundedShape(PhoneBookUtils.getImage(context, "+94777206677")));
-        viewHolder.contactImage.setImageURI(PhoneBookUtils.getImage(context, "+94715991422"));
+        viewHolder.user.setText("@" + senz.getSenderName());
+        viewHolder.lastSeen.setText("Last seen from Kaluthara");
+        //viewHolder.contactImage.setImageBitmap(getRoundedShape(PhoneBookUtils.getImage(context, "+94715991422")));
+        viewHolder.image.setImageBitmap(PhoneBookUtils.getImage(context, "+94715991422"));
+        //viewHolder.contactImage.setImageURI(PhoneBookUtils.getImage(context, "+94715991422"));
     }
 
     /**
      * Keep reference to children view to avoid unnecessary calls
      */
     static class ViewHolder {
-        TextView sensorName;
-        TextView sensorUser;
-        ImageView contactImage;
+        TextView user;
+        TextView lastSeen;
+        CircularImageView image;
     }
 
     public Bitmap getRoundedShape(Bitmap scaleBitmapImage) {

@@ -1,62 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:padding="15dp"
     android:layout_height="wrap_content"
     android:background="@drawable/my_sensor_background"
     android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="110dp">
+        android:layout_height="95dp">
 
-        <TextView
-            android:id="@+id/sensor_name_text"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:background="@drawable/circle_shape_green"
-            android:gravity="center"
-            android:text="#"
-            android:textColor="#FFFFFF"
-            android:textSize="40sp"></TextView>
-
-        <ImageView
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_alignParentRight="true"
-            android:id="@+id/contact_image"/>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_toRightOf="@+id/sensor_name_text"
-            android:layout_centerVertical="true"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/sensor_list_row_layout_sensor_user"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="'@'eranga"
-                android:textColor="#4a4a4a"
-                android:textSize="25sp"
-                android:textStyle="normal"></TextView>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="Last seen in Colombo 07"
-                android:textColor="#11b29c"
-                android:textSize="20sp">
-            </TextView>
-
-        </LinearLayout>
+        <com.github.siyamed.shapeimageview.CircularImageView
+            android:id="@+id/contact_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            app:siBorderColor="#ffc027"
+            app:siBorderWidth="4dp"></com.github.siyamed.shapeimageview.CircularImageView>
 
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/sensor_list_row_layout_sensor_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="8dp"
+        android:text="eranga"
+        android:textColor="#4a4a4a"
+        android:textSize="25sp"
+        android:textStyle="bold"></TextView>
+
+    <TextView
+        android:id="@+id/sensor_list_row_layout_sensor_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="@string/sample_address"
+        android:textColor="#ffc027"
+        android:textSize="16sp"></TextView>
 </LinearLayout>

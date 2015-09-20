@@ -3,9 +3,11 @@ package com.score.senz.utils;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.MediaStore;
 import android.telephony.TelephonyManager;
 
 import com.google.i18n.phonenumbers.NumberParseException;
@@ -13,6 +15,8 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.score.senz.R;
 import com.score.senz.pojos.User;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -48,7 +52,7 @@ public class PhoneBookUtils {
         return contactName;
     }
 
-    public static Uri getImage(Context context, String phoneNumber) {
+    public static Bitmap getImage(Context context, String phoneNumber) {
         ContentResolver contentResolver = context.getContentResolver();
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
         Cursor cursor = contentResolver.query(uri, new String[]{Phone.PHOTO_URI}, null, null, null);
@@ -58,8 +62,14 @@ public class PhoneBookUtils {
         try {
             if (cursor.moveToFirst()) {
                 String image_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
-                return Uri.parse(image_uri);
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(contentResolver, Uri.parse(image_uri));
+
+                return bitmap;
             }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             cursor.close();
         }
