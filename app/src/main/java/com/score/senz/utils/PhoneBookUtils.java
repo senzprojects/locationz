@@ -15,7 +15,6 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.score.senz.R;
 import com.score.senz.pojos.User;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -52,13 +51,21 @@ public class PhoneBookUtils {
         return contactName;
     }
 
-    public static Bitmap getImage(Context context, String phoneNumber) {
+    /**
+     * Get image of the matching contact
+     *
+     * @param context
+     * @param phoneNumber
+     * @return
+     */
+    public static Bitmap getContactImage(Context context, String phoneNumber) {
         ContentResolver contentResolver = context.getContentResolver();
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
         Cursor cursor = contentResolver.query(uri, new String[]{Phone.PHOTO_URI}, null, null, null);
         if (cursor == null) {
             return null;
         }
+
         try {
             if (cursor.moveToFirst()) {
                 String image_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
@@ -66,31 +73,13 @@ public class PhoneBookUtils {
 
                 return bitmap;
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             cursor.close();
         }
-        return null;
 
-//        Cursor cursor = contentResolver.query(uri, new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME, ContactsContract.Contacts.Photo.PHOTO}, null, null, null);
-//        if (cursor == null) {
-//            return null;
-//        }
-//        try {
-//            if (cursor.moveToFirst()) {
-//                byte[] data = cursor.getBlob(cursor.getColumnIndex(ContactsContract.Contacts.Photo.PHOTO));
-//                if (data != null) {
-//                    return BitmapFactory.decodeStream(new ByteArrayInputStream(data));
-//                }
-//            }
-//        } finally {
-//            cursor.close();
-//        }
-//
-//        return null;
+        return null;
     }
 
     /**
@@ -124,44 +113,6 @@ public class PhoneBookUtils {
             user.setUsername(name.toLowerCase());
             contactList.add(user);
         }
-
-//        Uri CONTENT_URI = ContactsContract.Contacts.CONTENT_URI;
-//        String _ID = ContactsContract.Contacts._ID;
-//        String DISPLAY_NAME = ContactsContract.Contacts.DISPLAY_NAME;
-//        String HAS_PHONE_NUMBER = ContactsContract.Contacts.HAS_PHONE_NUMBER;
-//
-//        Uri PHONE_CONTENT_URI = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-//        String PHONE_CONTACT_ID = ContactsContract.CommonDataKinds.Phone.CONTACT_ID;
-//        String NUMBER = ContactsContract.CommonDataKinds.Phone.NUMBER;
-//
-//        ContentResolver contentResolver = context.getContentResolver();
-//        Cursor cursor = contentResolver.query(CONTENT_URI, null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC");
-//
-//        // Loop for every contact in the phone
-//        if (cursor.getCount() > 0) {
-//            while (cursor.moveToNext()) {
-//                int hasPhoneNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(HAS_PHONE_NUMBER)));
-//                if (hasPhoneNumber > 0) {
-//                    // read name nad contact_id
-//                    String contact_id = cursor.getString(cursor.getColumnIndex(_ID));
-//                    String name = cursor.getString(cursor.getColumnIndex(DISPLAY_NAME));
-//
-//                    // query and loop for every phone number of the contact
-//                    String phoneNumber = "";
-//                    Cursor phoneCursor = contentResolver.query(PHONE_CONTENT_URI, null, PHONE_CONTACT_ID + " = ?", new String[]{contact_id}, null);
-//                    while (phoneCursor.moveToNext()) {
-//                        phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(NUMBER));
-//                    }
-//                    phoneCursor.close();
-//
-//                    if (name != null && phoneNumber != null) {
-//                        User user = new User(contact_id, getFormattedPhoneNo(context, phoneNumber), "password");
-//                        user.setUsername(name.toLowerCase());
-//                        contactList.add(user);
-//                    }
-//                }
-//            }
-//        }
 
         managedCursor.close();
 

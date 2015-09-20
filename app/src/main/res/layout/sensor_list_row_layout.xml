@@ -18,7 +18,8 @@
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
             app:siBorderColor="#ffc027"
-            app:siBorderWidth="4dp"></com.github.siyamed.shapeimageview.CircularImageView>
+            app:siBorderWidth="1dp">
+        </com.github.siyamed.shapeimageview.CircularImageView>
 
     </RelativeLayout>
 

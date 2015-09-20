@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.score.senz.pojos.Sensor;
@@ -153,17 +154,12 @@ public class SenzorsDbSource {
 
         // get matching data via JOIN query
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-//        String query = "SELECT * " +
-//                "FROM sensor JOIN user " +
-//                "ON sensor.user = user._id " +
-//                "WHERE sensor.is_mine=?";
-        //String query = "SELECT * from s"
-        //Cursor cursor = db.rawQuery(query, new String[]{mySensors ? "1" : "0"});
         Cursor cursor = db.query(SenzorsDbContract.Senz.TABLE_NAME, null, null, null, null, null, null);
 
         // sensor/user attributes
         String phone;
         String user;
+        Bitmap userImage;
         Senz senz;
 
         // extract attributes
@@ -171,10 +167,12 @@ public class SenzorsDbSource {
             // get sensor attributes
             phone = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Senz.COLUMN_NAME_USER));
             user = PhoneBookUtils.getContactName(context, phone);
+            userImage = PhoneBookUtils.getContactImage(context, phone);
 
             senz = new Senz();
             senz.setSender(phone);
             senz.setSenderName(user);
+            senz.setSenderImage(userImage);
 
             sensorList.add(senz);
         }

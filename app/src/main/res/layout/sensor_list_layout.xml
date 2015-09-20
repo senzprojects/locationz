@@ -16,7 +16,7 @@
             android:listSelector="@android:color/transparent"
             android:cacheColorHint="@android:color/transparent"
             android:divider="@android:color/transparent"
-            android:dividerHeight="5.0sp"
+            android:dividerHeight="12dp"
             android:scrollbarStyle="outsideInset">
     </ListView>
 

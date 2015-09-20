@@ -159,8 +159,8 @@ public class SensorListFragment extends Fragment {
         sensorListView = (ListView) getActivity().findViewById(R.id.sensor_list_layout_sensor_list);
 
         // add header and footer for list
-        View headerView = View.inflate(this.getActivity(), R.layout.list_header, null);
-        View footerView = View.inflate(this.getActivity(), R.layout.list_header, null);
+        View headerView = View.inflate(this.getActivity(), R.layout.list_footer, null);
+        View footerView = View.inflate(this.getActivity(), R.layout.list_footer, null);
         sensorListView.addHeaderView(headerView);
         sensorListView.addFooterView(footerView);
 

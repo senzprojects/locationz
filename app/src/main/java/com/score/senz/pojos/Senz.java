@@ -1,5 +1,7 @@
 package com.score.senz.pojos;
 
+import android.graphics.Bitmap;
+
 import com.score.senz.enums.SenzTypeEnum;
 
 import java.util.HashMap;
@@ -12,6 +14,7 @@ public class Senz {
     private SenzTypeEnum senzType;
     private String sender;
     private String senderName;
+    private Bitmap senderImage;
     private String receiver;
     private HashMap<String, String> attributes;
 
@@ -61,5 +64,13 @@ public class Senz {
 
     public void setSenderName(String senderName) {
         this.senderName = senderName;
+    }
+
+    public Bitmap getSenderImage() {
+        return senderImage;
+    }
+
+    public void setSenderImage(Bitmap senderImage) {
+        this.senderImage = senderImage;
     }
 }

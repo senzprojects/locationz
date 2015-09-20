@@ -2,22 +2,17 @@ package com.score.senz.ui;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Path;
-import android.graphics.Rect;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.senz.R;
 import com.score.senz.pojos.Senz;
-import com.score.senz.utils.PhoneBookUtils;
 
 import java.util.ArrayList;
 
@@ -126,13 +121,15 @@ public class SensorListAdapter extends BaseAdapter {
     private void setUpSenzRow(Senz senz, View view, ViewHolder viewHolder) {
         // enable share and change color of view
         view.setBackgroundResource(R.drawable.my_sensor_background);
-        //viewHolder.sensorName.setBackgroundResource(R.drawable.circle_shape_green);
-        //viewHolder.sensorUser.setTextColor(Color.parseColor("#11b29c"));
         viewHolder.user.setText("@" + senz.getSenderName());
         viewHolder.lastSeen.setText("Last seen from Kaluthara");
-        //viewHolder.contactImage.setImageBitmap(getRoundedShape(PhoneBookUtils.getImage(context, "+94715991422")));
-        viewHolder.image.setImageBitmap(PhoneBookUtils.getImage(context, "+94715991422"));
-        //viewHolder.contactImage.setImageURI(PhoneBookUtils.getImage(context, "+94715991422"));
+
+        if (senz.getSenderImage() != null) {
+            viewHolder.image.setImageBitmap(senz.getSenderImage());
+        } else {
+            Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_user_icon);
+            viewHolder.image.setImageBitmap(largeIcon);
+        }
     }
 
     /**
@@ -142,29 +139,6 @@ public class SensorListAdapter extends BaseAdapter {
         TextView user;
         TextView lastSeen;
         CircularImageView image;
-    }
-
-    public Bitmap getRoundedShape(Bitmap scaleBitmapImage) {
-        int targetWidth = 50;
-        int targetHeight = 50;
-        Bitmap targetBitmap = Bitmap.createBitmap(targetWidth,
-                targetHeight,Bitmap.Config.ARGB_8888);
-
-        Canvas canvas = new Canvas(targetBitmap);
-        Path path = new Path();
-        path.addCircle(((float) targetWidth - 1) / 2,
-                ((float) targetHeight - 1) / 2,
-                (Math.min(((float) targetWidth),
-                        ((float) targetHeight)) / 2),
-                Path.Direction.CCW);
-
-        canvas.clipPath(path);
-        Bitmap sourceBitmap = scaleBitmapImage;
-        canvas.drawBitmap(sourceBitmap,
-                new Rect(0, 0, sourceBitmap.getWidth(),
-                        sourceBitmap.getHeight()),
-                new Rect(0, 0, targetWidth, targetHeight), null);
-        return targetBitmap;
     }
 
 }
