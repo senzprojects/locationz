@@ -37,11 +37,10 @@ import java.util.HashMap;
  *
  * @author eranga herath(erangaeb@gmail.com)
  */
-public class LocationService extends Service {
+public class LocationService extends Service implements LocationListener {
 
     private static final String TAG = LocationService.class.getName();
 
-    private LocationListener locationListener;
     private LocationManager locationManager;
 
     String receiverPhone;
@@ -77,9 +76,8 @@ public class LocationService extends Service {
     @Override
     public void onCreate() {
         // start to listen location updates from here
-        locationListener = new SenzLocationListener();
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(getBestLocationProvider(), 0, 0, locationListener);
+        locationManager.requestLocationUpdates(getBestLocationProvider(), 0, 0, this);
     }
 
     /**
@@ -107,11 +105,12 @@ public class LocationService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        locationManager.removeUpdates(locationListener);
+        locationManager.removeUpdates(this);
     }
 
     /**
      * Get best available location provider via Criteria
+     *
      * @return location provider
      */
     private String getBestLocationProvider() {
@@ -125,43 +124,36 @@ public class LocationService extends Service {
         return locationManager.getBestProvider(criteria, true);
     }
 
-    /**
-     * Location listener to get accurate location
-     * We only need one location update, so when receives one update we stop the service
-     */
-    private class SenzLocationListener implements LocationListener {
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d(TAG, String.valueOf(location.getLatitude()));
+        Log.d(TAG, String.valueOf(location.getLongitude()));
 
-        @Override
-        public void onLocationChanged(Location location) {
-            Log.d(TAG, String.valueOf(location.getLatitude()));
-            Log.d(TAG, String.valueOf(location.getLongitude()));
+        sendLocation(location);
 
-            sendLocation(location);
-
-            // unbind the service
-            if (isServiceBound) {
-                unbindService(senzServiceConnection);
-                isServiceBound = false;
-            }
-
-            // stop the service when receive a location update
-            stopSelf();
+        // unbind the service
+        if (isServiceBound) {
+            unbindService(senzServiceConnection);
+            isServiceBound = false;
         }
 
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
+        // stop the service when receive a location update
+        stopSelf();
+    }
 
-        }
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
 
-        @Override
-        public void onProviderEnabled(String provider) {
+    }
 
-        }
+    @Override
+    public void onProviderEnabled(String provider) {
 
-        @Override
-        public void onProviderDisabled(String provider) {
+    }
 
-        }
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 
     private void sendLocation(Location location) {
@@ -197,15 +189,7 @@ public class LocationService extends Service {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (NoUserException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException | NoUserException e) {
             e.printStackTrace();
         }
     }

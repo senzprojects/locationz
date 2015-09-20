@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -15,6 +16,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.score.senz.R;
@@ -43,6 +45,10 @@ public class SensorMap extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.senz_map_layout);
+
+        setUpActionBar();
+        initLocationCoordinates();
+        setUpMapIfNeeded();
     }
 
     /**
@@ -52,9 +58,6 @@ public class SensorMap extends FragmentActivity {
     public void onResume() {
         super.onResume();
 
-        setUpActionBar();
-        initLocationCoordinates();
-        setUpMapIfNeeded();
     }
 
     /**
@@ -131,6 +134,8 @@ public class SensorMap extends FragmentActivity {
     private void moveToLocation() {
         Log.d(TAG, "MoveToLocation: move map to given location");
 
+        LatLng latLng = new LatLng(7.842891, 80.809937);
+
         // remove existing markers
         if (marker != null) marker.remove();
         if (circle != null) circle.remove();
@@ -138,7 +143,8 @@ public class SensorMap extends FragmentActivity {
         // add location marker
         try {
             marker = map.addMarker(new MarkerOptions().position(this.locationCoordinates).title("Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(this.locationCoordinates, 10));
+            marker = map.addMarker(new MarkerOptions().position(latLng).title("Me").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
+            // map.animateCamera(CameraUpdateFactory.newLatLngZoom(this.locationCoordinates, 10));
 
             // ... get a map
             // Add a circle
@@ -148,6 +154,27 @@ public class SensorMap extends FragmentActivity {
                     .strokeColor(0xFF0000FF)
                     .strokeWidth(0.5f)
                     .fillColor(0x110000FF));
+
+            circle = map.addCircle(new CircleOptions()
+                    .center(latLng)
+                    .radius(14000)
+                    .strokeColor(0xFF0000FF)
+                    .strokeWidth(0.5f)
+                    .fillColor(0x110000FF));
+
+            // set zoom level
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            builder.include(latLng);
+            builder.include(this.locationCoordinates);
+            LatLngBounds bounds = builder.build();
+
+            // begin new code:
+            int width = getResources().getDisplayMetrics().widthPixels;
+            int height = getResources().getDisplayMetrics().heightPixels;
+            int padding = (int) (width * 0.20);
+
+            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+            map.moveCamera(cu);
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Invalid location", Toast.LENGTH_LONG).show();
             Log.d(TAG, "MoveToLocation: invalid lat lon parameters");

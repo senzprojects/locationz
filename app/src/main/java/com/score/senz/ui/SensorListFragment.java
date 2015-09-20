@@ -56,7 +56,6 @@ public class SensorListFragment extends Fragment {
     // list view components
     private ListView sensorListView;
     private ArrayList<Senz> senzList;
-    private SensorListAdapter adapter;
 
     // empty view to display when no sensors available
     private ViewStub emptyView;
@@ -200,6 +199,7 @@ public class SensorListFragment extends Fragment {
         senzList = (ArrayList<Senz>) new SenzorsDbSource(this.getActivity()).getSenzes();
 
         // construct list adapter
+        SensorListAdapter adapter;
         if (senzList.size() > 0) {
             adapter = new SensorListAdapter(SensorListFragment.this.getActivity(), senzList);
             adapter.notifyDataSetChanged();
@@ -259,15 +259,7 @@ public class SensorListFragment extends Fragment {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (NoUserException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidKeySpecException | SignatureException | NoUserException e) {
             e.printStackTrace();
         }
     }
