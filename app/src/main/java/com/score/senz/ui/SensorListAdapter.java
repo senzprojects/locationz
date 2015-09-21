@@ -113,16 +113,19 @@ public class SensorListAdapter extends BaseAdapter {
             holder = (ViewHolder) view.getTag();
         }
 
-        setUpSenzRow(senz, view, holder);
+        setUpSenzRow(i, senz, view, holder);
 
         return view;
     }
 
-    private void setUpSenzRow(Senz senz, View view, ViewHolder viewHolder) {
+    private void setUpSenzRow(int i, Senz senz, View view, ViewHolder viewHolder) {
         // enable share and change color of view
         view.setBackgroundResource(R.drawable.my_sensor_background);
         viewHolder.user.setText("@" + senz.getSenderName());
-        viewHolder.lastSeen.setText("Last seen from Kaluthara");
+        if (i == 0)
+            viewHolder.lastSeen.setText("Last seen from Kaluthara");
+        else
+            viewHolder.lastSeen.setText("Last seen from Colombo");
 
         if (senz.getSenderImage() != null) {
             viewHolder.image.setImageBitmap(senz.getSenderImage());
