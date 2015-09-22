@@ -1,7 +1,16 @@
 package com.score.senz.ui;
 
 import android.app.ActionBar;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -16,12 +25,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.score.senz.R;
+import com.score.senz.utils.ActivityUtils;
+import com.score.senz.utils.PhoneBookUtils;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,13 +40,16 @@ import com.score.senz.R;
  * Time: 3:06 PM
  * To change this template use File | Settings | File Templates.
  */
-public class SensorMap extends FragmentActivity {
+public class SensorMap extends FragmentActivity implements LocationListener {
 
     private static final String TAG = SensorMap.class.getName();
 
     RelativeLayout myLocation;
 
-    private LatLng locationCoordinates;
+    private LocationManager locationManager;
+
+    private LatLng friendLatLan;
+    private LatLng myLatLan;
 
     private GoogleMap map;
     private Marker marker;
@@ -53,9 +66,13 @@ public class SensorMap extends FragmentActivity {
         myLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                move();
+                //displayMyLocation(new LatLng(7.842891, 80.809937));
+                ActivityUtils.showProgressDialog(SensorMap.this, "Please wait...");
+                locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                locationManager.requestLocationUpdates(LocationUtils.getBestLocationProvider(locationManager), 0, 0, SensorMap.this);
             }
         });
+
 
         setUpActionBar();
         initLocationCoordinates();
@@ -68,7 +85,13 @@ public class SensorMap extends FragmentActivity {
     @Override
     public void onResume() {
         super.onResume();
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        locationManager.removeUpdates(this);
     }
 
     /**
@@ -102,7 +125,7 @@ public class SensorMap extends FragmentActivity {
     private void initLocationCoordinates() {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            this.locationCoordinates = bundle.getParcelable("extra");
+            this.friendLatLan = bundle.getParcelable("extra");
         }
     }
 
@@ -130,8 +153,6 @@ public class SensorMap extends FragmentActivity {
             map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
 
-            //map.getUiSettings().setZoomControlsEnabled(true);
-            //map.getUiSettings().setMyLocationButtonEnabled(true);
             // Check if we were successful in obtaining the map.
             if (map != null) {
                 moveToLocation();
@@ -151,47 +172,91 @@ public class SensorMap extends FragmentActivity {
 
         // add location marker
         try {
-            marker = map.addMarker(new MarkerOptions().position(this.locationCoordinates).title("Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(this.locationCoordinates, 10));
+            marker = map.addMarker(new MarkerOptions().position(this.friendLatLan).title("Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(this.friendLatLan, 10));
 
             // ... get a map
             // Add a circle
-            circle = map.addCircle(new CircleOptions()
-                    .center(this.locationCoordinates)
-                    .radius(14000)
-                    .strokeColor(0xFF0000FF)
-                    .strokeWidth(0.5f)
-                    .fillColor(0x110000FF));
+//            circle = map.addCircle(new CircleOptions()
+//                    .center(this.friendLatLan)
+//                    .radius(14000)
+//                    .strokeColor(0xFF0000FF)
+//                    .strokeWidth(0.5f)
+//                    .fillColor(0x110000FF));
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Invalid location", Toast.LENGTH_LONG).show();
             Log.d(TAG, "MoveToLocation: invalid lat lon parameters");
         }
     }
 
-    private void move() {
-        LatLng latLng = new LatLng(7.842891, 80.809937);
-        marker = map.addMarker(new MarkerOptions().position(latLng).title("Me").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
+    /**
+     * Add marker to my location and set up zoom level
+     *
+     * @param latLng
+     */
+    private void displayMyLocation(LatLng latLng) {
 
-        circle = map.addCircle(new CircleOptions()
-                .center(latLng)
-                .radius(14000)
-                .strokeColor(0xFF0000FF)
-                .strokeWidth(0.5f)
-                .fillColor(0x110000FF));
+        Bitmap roundBitmap = Bitmap.createScaledBitmap(getCroppedBitmap(PhoneBookUtils.getContactImage(this, "+1525")), 80, 80, false);
+        marker = map.addMarker(new MarkerOptions().position(latLng).title("Me").icon(BitmapDescriptorFactory.fromBitmap(roundBitmap)));
+
+//        circle = map.addCircle(new CircleOptions()
+//                .center(latLng)
+//                .radius(14000)
+//                .strokeColor(0xFF0000FF)
+//                .strokeWidth(0.5f)
+//                .fillColor(0x110000FF));
 
         // set zoom level
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         builder.include(latLng);
-        builder.include(this.locationCoordinates);
+        builder.include(this.friendLatLan);
         LatLngBounds bounds = builder.build();
-
-        // begin new code:
-        //int width = getResources().getDisplayMetrics().widthPixels;
-        //int height = getResources().getDisplayMetrics().heightPixels;
-        //int padding = (int) (width * 0.20);
 
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 200);
         map.animateCamera(cu);
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+        ActivityUtils.cancelProgressDialog();
+        locationManager.removeUpdates(this);
+        displayMyLocation(new LatLng(location.getLatitude(), location.getLongitude()));
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    public Bitmap getCroppedBitmap(Bitmap bitmap) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+        canvas.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2,
+                bitmap.getWidth() / 2, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+        //Bitmap _bmp = Bitmap.createScaledBitmap(output, 60, 60, false);
+        //return _bmp;
+        return output;
+    }
 }

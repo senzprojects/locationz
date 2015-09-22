@@ -122,10 +122,7 @@ public class SensorListAdapter extends BaseAdapter {
         // enable share and change color of view
         view.setBackgroundResource(R.drawable.my_sensor_background);
         viewHolder.user.setText("@" + senz.getSenderName());
-        if (i == 0)
-            viewHolder.lastSeen.setText("Last seen from Kaluthara");
-        else
-            viewHolder.lastSeen.setText("Last seen from Colombo");
+        viewHolder.lastSeen.setText("Last seen from Kaluthara");
 
         if (senz.getSenderImage() != null) {
             viewHolder.image.setImageBitmap(senz.getSenderImage());

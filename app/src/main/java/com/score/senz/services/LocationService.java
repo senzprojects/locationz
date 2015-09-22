@@ -5,7 +5,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -20,6 +19,7 @@ import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
+import com.score.senz.ui.LocationUtils;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;
@@ -77,7 +77,7 @@ public class LocationService extends Service implements LocationListener {
     public void onCreate() {
         // start to listen location updates from here
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(getBestLocationProvider(), 0, 0, this);
+        locationManager.requestLocationUpdates(LocationUtils.getBestLocationProvider(locationManager), 0, 0, this);
     }
 
     /**
@@ -108,27 +108,13 @@ public class LocationService extends Service implements LocationListener {
         locationManager.removeUpdates(this);
     }
 
-    /**
-     * Get best available location provider via Criteria
-     *
-     * @return location provider
-     */
-    private String getBestLocationProvider() {
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setCostAllowed(true);
-        criteria.setPowerRequirement(Criteria.POWER_MEDIUM);
-
-        return locationManager.getBestProvider(criteria, true);
-    }
 
     @Override
     public void onLocationChanged(Location location) {
         Log.d(TAG, String.valueOf(location.getLatitude()));
         Log.d(TAG, String.valueOf(location.getLongitude()));
 
+        locationManager.removeUpdates(this);
         sendLocation(location);
 
         // unbind the service
