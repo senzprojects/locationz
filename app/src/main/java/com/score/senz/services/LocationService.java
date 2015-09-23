@@ -19,7 +19,6 @@ import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
-import com.score.senz.ui.LocationUtils;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;
@@ -77,7 +76,23 @@ public class LocationService extends Service implements LocationListener {
     public void onCreate() {
         // start to listen location updates from here
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationUtils.getBestLocationProvider(locationManager), 0, 0, this);
+
+        // getting GPS and Network status
+        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+
+        if (!isGPSEnabled && !isNetworkEnabled) {
+            Log.d(TAG, "No location provider enable");
+        } else {
+            if (isGPSEnabled) {
+                Log.d(TAG, "Getting location via GPS");
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+            }
+            if (isNetworkEnabled) {
+                Log.d(TAG, "Getting location via Network");
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+            }
+        }
     }
 
     /**

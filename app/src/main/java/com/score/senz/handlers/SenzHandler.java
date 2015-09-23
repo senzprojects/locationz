@@ -11,6 +11,7 @@ import com.score.senz.R;
 import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.listeners.LocationServiceListener;
 import com.score.senz.pojos.Senz;
+import com.score.senz.services.LocationAddressReceiver;
 import com.score.senz.services.LocationService;
 import com.score.senz.utils.NotificationUtils;
 import com.score.senz.utils.SenzParser;
@@ -100,6 +101,9 @@ public class SenzHandler implements LocationServiceListener {
             double lan = Double.parseDouble(senz.getAttributes().get("#lon"));
             LatLng latLng = new LatLng(lat, lan);
             intent.putExtra("extra", latLng);
+
+            // start background worker to get address and save in database
+            new LocationAddressReceiver(context, latLng, senz.getSender());
         }
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
@@ -109,4 +113,5 @@ public class SenzHandler implements LocationServiceListener {
     public void onPostReadLocation(Location location) {
 
     }
+
 }

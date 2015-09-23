@@ -212,7 +212,6 @@ public class SensorMap extends FragmentActivity implements LocationListener {
     public void onLocationChanged(Location location) {
         ActivityUtils.cancelProgressDialog();
         locationManager.removeUpdates(this);
-        new LocationAddressReceiver(this, new LatLng(location.getLatitude(), location.getLongitude()));
         displayMyLocation(new LatLng(location.getLatitude(), location.getLongitude()));
     }
 

@@ -18,40 +18,37 @@ import java.util.Locale;
 public class LocationAddressReceiver extends AsyncTask<String, String, String> {
     Context context;
     LatLng latLng;
+    String sender;
 
-    public LocationAddressReceiver(Context context, LatLng latLng) {
+    public LocationAddressReceiver(Context context, LatLng latLng, String sender) {
         this.context = context;
         this.latLng = latLng;
+        this.sender = sender;
     }
 
     @Override
     protected String doInBackground(String... params) {
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-        String result = null;
+        String city = null;
         try {
             List<Address> addressList = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
             if (addressList != null && addressList.size() > 0) {
-                Address address = addressList.get(0);
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
-                    sb.append(address.getAddressLine(i)).append("\n");
+                if (addressList.size() > 0) {
+                    city = addressList.get(0).getSubLocality();
                 }
-                sb.append(address.getLocality()).append("\n");
-                sb.append(address.getPostalCode()).append("\n");
-                sb.append(address.getCountryName());
-                result = sb.toString();
             }
         } catch (IOException e) {
-            Log.e("Address", "Unable connect to Geocoder", e);
+            Log.d("Address", "Unable connect to Geocoder", e);
         }
 
-        return result;
+        return city;
     }
 
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        Log.d("Address", s);
+
+        // update sender's last know location in database
     }
 
 }
