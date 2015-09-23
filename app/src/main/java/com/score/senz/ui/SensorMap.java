@@ -24,6 +24,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.score.senz.R;
+import com.score.senz.services.LocationAddressReceiver;
 import com.score.senz.utils.ActivityUtils;
 
 /**
@@ -211,6 +212,7 @@ public class SensorMap extends FragmentActivity implements LocationListener {
     public void onLocationChanged(Location location) {
         ActivityUtils.cancelProgressDialog();
         locationManager.removeUpdates(this);
+        new LocationAddressReceiver(this, new LatLng(location.getLatitude(), location.getLongitude()));
         displayMyLocation(new LatLng(location.getLatitude(), location.getLongitude()));
     }
 

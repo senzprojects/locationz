@@ -179,4 +179,5 @@ public class LocationService extends Service implements LocationListener {
             e.printStackTrace();
         }
     }
+
 }
