@@ -1,12 +1,6 @@
 package com.score.senz.ui;
 
 import android.app.ActionBar;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationListener;
@@ -31,7 +25,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.score.senz.R;
 import com.score.senz.utils.ActivityUtils;
-import com.score.senz.utils.PhoneBookUtils;
 
 /**
  * Created with IntelliJ IDEA.
@@ -195,9 +188,7 @@ public class SensorMap extends FragmentActivity implements LocationListener {
      * @param latLng
      */
     private void displayMyLocation(LatLng latLng) {
-
-        Bitmap roundBitmap = Bitmap.createScaledBitmap(getCroppedBitmap(PhoneBookUtils.getContactImage(this, "+1525")), 80, 80, false);
-        marker = map.addMarker(new MarkerOptions().position(latLng).title("Me").icon(BitmapDescriptorFactory.fromBitmap(roundBitmap)));
+        marker = map.addMarker(new MarkerOptions().position(latLng).title("Me").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
 
 //        circle = map.addCircle(new CircleOptions()
 //                .center(latLng)
@@ -238,25 +229,4 @@ public class SensorMap extends FragmentActivity implements LocationListener {
 
     }
 
-    public Bitmap getCroppedBitmap(Bitmap bitmap) {
-        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
-                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-
-        final int color = 0xff424242;
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-
-        paint.setAntiAlias(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(color);
-        // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
-        canvas.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2,
-                bitmap.getWidth() / 2, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(bitmap, rect, rect, paint);
-        //Bitmap _bmp = Bitmap.createScaledBitmap(output, 60, 60, false);
-        //return _bmp;
-        return output;
-    }
 }

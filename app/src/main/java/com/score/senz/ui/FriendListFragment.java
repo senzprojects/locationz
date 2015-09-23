@@ -1,6 +1,7 @@
 package com.score.senz.ui;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,7 +21,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -207,7 +210,8 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
             searchView.setQuery("", false);
         }
 
-        showShareConfirmDialog(user);
+        //showShareConfirmDialog(user);
+        displayDeleteMessageDialog("Are you sure you want to share the senz with ''" + user.getUsername() + "''", user);
     }
 
     /**
@@ -354,5 +358,53 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
         ActivityUtils.hideSoftKeyboard(getActivity());
         Toast.makeText(getActivity(), "Successfully shared SenZ", Toast.LENGTH_LONG).show();
     }
+
+    /**
+     * Display message dialog when user request(click) to delete invoice
+     * @param message message to be display
+     */
+    public void displayDeleteMessageDialog(String message, final User user) {
+        final Dialog dialog = new Dialog(getActivity());
+
+        //set layout for dialog
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.share_confirm_message_dialog);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCancelable(true);
+
+        // set dialog texts
+        TextView messageHeaderTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_header_text);
+        TextView messageTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_text);
+        messageHeaderTextView.setText("#Share");
+        messageTextView.setText(message);
+
+        // set custom font
+        Typeface face = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
+        messageHeaderTextView.setTypeface(face);
+        messageTextView.setTypeface(face);
+
+        //set ok button
+        Button okButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_ok_button);
+        okButton.setTypeface(face);
+        okButton.setTypeface(null, Typeface.BOLD);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dialog.cancel();
+                share(user);
+            }
+        });
+
+        // cancel button
+        Button cancelButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_cancel_button);
+        cancelButton.setTypeface(face);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+
+        dialog.show();
+    }
+
 
 }
