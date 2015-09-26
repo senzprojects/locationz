@@ -2,7 +2,6 @@ package com.score.senz.ui;
 
 import android.app.Activity;
 import android.content.res.Configuration;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
@@ -14,7 +13,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.score.senz.R;
 import com.score.senz.pojos.DrawerItem;
@@ -27,7 +25,7 @@ import java.util.ArrayList;
  *
  * @author erangaeb@gmail.com (eranga herath)
  */
-public class HomeActivity extends FragmentActivity implements View.OnClickListener {
+public class HomeActivity extends FragmentActivity {
 
     private static final String TAG = HomeActivity.class.getName();
 
@@ -35,7 +33,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     private ListView drawerListView;
     private DrawerLayout drawerLayout;
     private RelativeLayout drawerContainer;
-    private RelativeLayout logout;
     private HomeActionBarDrawerToggle homeActionBarDrawerToggle;
 
     // drawer components
@@ -101,13 +98,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerContainer = (RelativeLayout) findViewById(R.id.drawer_container);
-        logout = (RelativeLayout) findViewById(R.id.home_logout);
-        logout.setOnClickListener(this);
-
-        // set custom sign out button
-        TextView signOutTextView = (TextView) findViewById(R.id.sign_out_text);
-        Typeface face = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
-        signOutTextView.setTypeface(face, Typeface.NORMAL);
 
         // set a custom shadow that overlays the senz_map_layout content when the drawer opens
         // set up drawer listener
@@ -153,15 +143,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         homeActionBarDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onClick(View view) {
-        if (view == logout) {
-        }
     }
 
     /**

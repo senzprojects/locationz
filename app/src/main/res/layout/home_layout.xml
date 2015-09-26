@@ -38,6 +38,7 @@
                 android:layout_width="240dp"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
+                android:visibility="gone"
                 android:id="@+id/home_logout"
                 android:layout_height="50dp">
 
