@@ -28,7 +28,6 @@ import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
-import com.score.senz.utils.PhoneBookUtils;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;
@@ -52,6 +51,9 @@ public class ShareFragment extends android.support.v4.app.Fragment {
 
     private TextView phoneNoLabel;
     private EditText phoneNoEditText;
+
+    // keeps weather service already bound or not
+    boolean isServiceBound = false;
 
     // use to send senz messages to SenzService
     Messenger senzServiceMessenger;
@@ -99,17 +101,28 @@ public class ShareFragment extends android.support.v4.app.Fragment {
     /**
      * {@inheritDoc}
      */
-    public void onResume() {
+    public void onStart() {
         super.onResume();
 
-        getActivity().bindService(new Intent(getActivity(), SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
+        // bind with senz service
+        if (!isServiceBound) {
+            getActivity().bindService(new Intent(getActivity(), SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
+            isServiceBound = true;
+        }
     }
 
     /**
      * {@inheritDoc}
      */
-    public void onPause() {
-        super.onPause();
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // Unbind from the service
+        if (isServiceBound) {
+            getActivity().unbindService(senzServiceConnection);
+            isServiceBound = false;
+        }
     }
 
     /**
