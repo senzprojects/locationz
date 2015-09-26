@@ -165,7 +165,7 @@ public class SensorMap extends FragmentActivity implements LocationListener {
 
         // add location marker
         try {
-            marker = map.addMarker(new MarkerOptions().position(this.friendLatLan).title("Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
+            marker = map.addMarker(new MarkerOptions().position(this.friendLatLan).title("Friend").icon(BitmapDescriptorFactory.fromResource(R.drawable.location_friend)));
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(this.friendLatLan, 10));
 
             // ... get a map
@@ -188,7 +188,7 @@ public class SensorMap extends FragmentActivity implements LocationListener {
      * @param latLng
      */
     private void displayMyLocation(LatLng latLng) {
-        marker = map.addMarker(new MarkerOptions().position(latLng).title("Me").icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
+        marker = map.addMarker(new MarkerOptions().position(latLng).title("Me").icon(BitmapDescriptorFactory.fromResource(R.drawable.location_me)));
 
 //        circle = map.addCircle(new CircleOptions()
 //                .center(latLng)
