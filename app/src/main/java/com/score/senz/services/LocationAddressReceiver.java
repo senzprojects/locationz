@@ -37,10 +37,14 @@ public class LocationAddressReceiver extends AsyncTask<String, String, String> {
         try {
             List<Address> addressList = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
             if (addressList != null && addressList.size() > 0) {
-                String locality = addressList.get(0).getLocality();
+                String subAdminArea = addressList.get(0).getSubAdminArea();
+                String adminArea = addressList.get(0).getAdminArea();
                 String country = addressList.get(0).getCountryName();
 
-                if (locality != null) address.append(locality).append(" ");
+                if (subAdminArea != null)
+                    address.append(subAdminArea).append(" ");
+                else if (adminArea != null) address.append(adminArea).append(" ");
+
                 if (country != null) address.append(country);
             }
         } catch (IOException e) {
