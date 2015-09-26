@@ -103,7 +103,7 @@ public class SenzHandler implements LocationServiceListener {
             intent.putExtra("extra", latLng);
 
             // start background worker to get address and save in database
-            new LocationAddressReceiver(context, latLng, senz.getSender());
+            new LocationAddressReceiver(context, latLng, senz.getSender()).execute("PARAM");
         }
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);

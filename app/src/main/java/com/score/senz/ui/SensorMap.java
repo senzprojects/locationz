@@ -24,7 +24,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.score.senz.R;
-import com.score.senz.services.LocationAddressReceiver;
 import com.score.senz.utils.ActivityUtils;
 
 /**
@@ -85,7 +84,7 @@ public class SensorMap extends FragmentActivity implements LocationListener {
     protected void onDestroy() {
         super.onDestroy();
 
-        locationManager.removeUpdates(this);
+        if (locationManager != null) locationManager.removeUpdates(this);
     }
 
     /**

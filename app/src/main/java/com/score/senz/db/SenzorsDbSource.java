@@ -13,6 +13,7 @@ import com.score.senz.pojos.User;
 import com.score.senz.utils.PhoneBookUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -122,6 +123,22 @@ public class SenzorsDbSource {
         db.close();
     }
 
+    public void updateSenz(String phoneNo, String value) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // content values to inset
+        ContentValues values = new ContentValues();
+        values.put(SenzorsDbContract.Senz.COLUMN_NAME_VALUE, value);
+
+        // update
+        db.update(SenzorsDbContract.Senz.TABLE_NAME,
+                values,
+                SenzorsDbContract.Senz.COLUMN_NAME_USER + " = ?",
+                new String[]{String.valueOf(phoneNo)});
+
+        db.close();
+    }
+
     /**
      * Delete sensor from database,
      * In here we actually delete all the matching sensors of given user
@@ -159,20 +176,32 @@ public class SenzorsDbSource {
         // sensor/user attributes
         String phone;
         String user;
+        String senzName;
+        String senzValue;
         Bitmap userImage;
         Senz senz;
 
+
         // extract attributes
         while (cursor.moveToNext()) {
+            HashMap<String, String> senzAttributes = new HashMap<>();
+
             // get sensor attributes
             phone = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Senz.COLUMN_NAME_USER));
             user = PhoneBookUtils.getContactName(context, phone);
+            senzName = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Senz.COLUMN_NAME_NAME));
+            senzValue = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Senz.COLUMN_NAME_VALUE));
             userImage = PhoneBookUtils.getContactImage(context, phone);
 
             senz = new Senz();
             senz.setSender(phone);
             senz.setSenderName(user);
             senz.setSenderImage(userImage);
+            if (senzValue != null && !senzValue.isEmpty()) {
+                senzAttributes.put(senzName, senzValue);
+            }
+
+            senz.setAttributes(senzAttributes);
 
             sensorList.add(senz);
         }

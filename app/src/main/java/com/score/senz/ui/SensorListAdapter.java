@@ -3,6 +3,7 @@ package com.score.senz.ui;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -122,7 +123,14 @@ public class SensorListAdapter extends BaseAdapter {
         // enable share and change color of view
         view.setBackgroundResource(R.drawable.my_sensor_background);
         viewHolder.user.setText("@" + senz.getSenderName());
-        viewHolder.lastSeen.setText("Last seen from Kaluthara");
+
+        if (senz.getAttributes().containsKey("Location")) {
+            viewHolder.lastSeen.setText("Last seen in " + senz.getAttributes().get("Location"));
+            viewHolder.lastSeen.setTextColor(Color.parseColor("#ffc027"));
+        } else {
+            viewHolder.lastSeen.setText("No last seen location available");
+            viewHolder.lastSeen.setTextColor(Color.parseColor("#4a4a4a"));
+        }
 
         if (senz.getSenderImage() != null) {
             viewHolder.image.setImageBitmap(senz.getSenderImage());
