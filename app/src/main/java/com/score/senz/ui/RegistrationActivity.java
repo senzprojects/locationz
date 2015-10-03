@@ -1,6 +1,7 @@
 package com.score.senz.ui;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,6 +17,9 @@ import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -58,6 +62,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     private TextView textViewHeaderText;
     private TextView textViewSignUpText;
     private RelativeLayout signUpButton;
+    private Typeface typeface;
 
     // keeps weather service already bound or not
     boolean isServiceBound = false;
@@ -82,6 +87,8 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.registration_layout);
+
+        typeface = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
 
         initUi();
         LocalBroadcastManager.getInstance(this).registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
@@ -132,7 +139,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      * set custom font for UI fields
      */
     private void initUi() {
-        Typeface typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
 
         editTextPhoneNo = (EditText) findViewById(R.id.registration_phone_no);
         signUpButton = (RelativeLayout) findViewById(R.id.registration_sign_up_button);
@@ -145,9 +151,9 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         if (!countryCode.isEmpty())
             countryCodeText.setText(countryCode);
 
-        textViewHeaderText.setTypeface(typefaceThin, Typeface.BOLD);
-        textViewSignUpText.setTypeface(typefaceThin, Typeface.BOLD);
-        editTextPhoneNo.setTypeface(typefaceThin, Typeface.NORMAL);
+        textViewHeaderText.setTypeface(typeface, Typeface.BOLD);
+        textViewSignUpText.setTypeface(typeface, Typeface.BOLD);
+        editTextPhoneNo.setTypeface(typeface, Typeface.NORMAL);
     }
 
     /**
@@ -178,9 +184,8 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      */
     private void signUp() {
         initRegisteringUser();
-        PreferenceUtils.saveUser(this, registeringUser);
         ActivityUtils.hideSoftKeyboard(this);
-        registerUser();
+        displayDeleteMessageDialog("Are you sure you want to register on senz with phone no " + "'" + registeringUser.getPhoneNo() + "'");
     }
 
     /**
@@ -253,7 +258,9 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             if (senzMessage) {
                 Toast.makeText(this, "Successfully registered", Toast.LENGTH_LONG).show();
 
+                // save user
                 // navigate home
+                PreferenceUtils.saveUser(this, registeringUser);
                 navigateToHome();
             } else {
                 Toast.makeText(this, "Fail to register", Toast.LENGTH_LONG).show();
@@ -270,6 +277,52 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         Intent intent = new Intent(RegistrationActivity.this, HomeActivity.class);
         RegistrationActivity.this.startActivity(intent);
         RegistrationActivity.this.finish();
+    }
+
+    /**
+     * Display message dialog when user request(click) to delete invoice
+     * @param message message to be display
+     */
+    public void displayDeleteMessageDialog(String message) {
+        final Dialog dialog = new Dialog(RegistrationActivity.this);
+
+        //set layout for dialog
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.share_confirm_message_dialog);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCancelable(true);
+
+        // set dialog texts
+        TextView messageHeaderTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_header_text);
+        TextView messageTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_text);
+        messageHeaderTextView.setText("Confirm phone no");
+        messageTextView.setText(message);
+
+        // set custom font
+        messageHeaderTextView.setTypeface(typeface);
+        messageTextView.setTypeface(typeface);
+
+        //set ok button
+        Button okButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_ok_button);
+        okButton.setTypeface(typeface);
+        okButton.setTypeface(null, Typeface.BOLD);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dialog.cancel();
+                registerUser();
+            }
+        });
+
+        // cancel button
+        Button cancelButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_cancel_button);
+        cancelButton.setTypeface(typeface);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+
+        dialog.show();
     }
 
     /**
