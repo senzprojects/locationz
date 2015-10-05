@@ -1,7 +1,12 @@
 package com.score.senz.services;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -51,12 +56,40 @@ public class SenzService extends Service {
     // server address
     private InetAddress address;
 
+    // broadcast receiver to check network status changes
+    private final BroadcastReceiver networkStatusReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = cm.getActiveNetworkInfo();
+
+            Log.d(TAG, "Network status changed");
+
+            //should check null because in air plan mode it will be null
+            if (netInfo != null && netInfo.isConnected()) {
+                // send ping from here
+                initPing();
+            }
+        }
+    };
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void onCreate() {
         senzServiceMessenger = new Messenger(new MessageHandler());
+        registerNetworkStatusReceiver();
+    }
+
+    /**
+     * Register for network connectivity change receiver
+     */
+    private void registerNetworkStatusReceiver() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        registerReceiver(networkStatusReceiver, filter);
     }
 
     /**
@@ -65,7 +98,7 @@ public class SenzService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         initUdpSocket();
-        initPingSender();
+        initPing();
         initUdpListener();
 
         // If we get killed, after returning from here, restart
@@ -87,6 +120,9 @@ public class SenzService extends Service {
     public void onDestroy() {
         Log.d(TAG, "Destroyed");
 
+        // unregister connectivity listener
+        unregisterReceiver(networkStatusReceiver);
+
         // restart service again
         // its done via broadcast receiver
         Intent intent = new Intent("com.score.senz.senzservice");
@@ -107,29 +143,17 @@ public class SenzService extends Service {
     }
 
     /**
-     * Start thread to send periodic ping messages to server, in current implementation
-     * we are sending messages in every minute(60, 000  ms)
-     * <p/>
-     * The purpose of sending ping message is notify NAT table updates to server
+     * Start thread to send initial PING messages to server
      */
-    private void initPingSender() {
+    private void initPing() {
         new Thread(new Runnable() {
             public void run() {
-                while (true) {
-                    try {
-                        // send ping message
-                        sendPing();
-                    } catch (IOException | NoSuchAlgorithmException | NoUserException | SignatureException |
-                            InvalidKeyException | InvalidKeySpecException e) {
-                        e.printStackTrace();
-                    } finally {
-                        // send ping in every 20 seconds
-                        try {
-                            Thread.sleep(20000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                try {
+                    // send ping message
+                    sendPing();
+                } catch (IOException | NoSuchAlgorithmException | NoUserException | SignatureException |
+                        InvalidKeyException | InvalidKeySpecException e) {
+                    e.printStackTrace();
                 }
             }
         }).start();

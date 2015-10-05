@@ -20,8 +20,11 @@ public class SenzParser {
         for (int i = 0; i < tokens.length; i++) {
             String token = tokens[i];
             if (i == 0) {
-                // query type at first (SHARE, GET, DATA)
+                // query type at first (PING, SHARE, GET, DATA)
                 senz.setSenzType(SenzTypeEnum.valueOf(token.toUpperCase()));
+
+                // if query type is PING we breakup from here :)
+                if (senz.getSenzType() == SenzTypeEnum.PING) return senz;
             } else if (i == tokens.length - 1) {
                 // signature at the end
                 senz.setSignature(token);

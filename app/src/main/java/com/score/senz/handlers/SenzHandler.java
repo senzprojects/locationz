@@ -2,14 +2,12 @@ package com.score.senz.handlers;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.score.senz.R;
 import com.score.senz.db.SenzorsDbSource;
-import com.score.senz.listeners.LocationServiceListener;
 import com.score.senz.pojos.Senz;
 import com.score.senz.services.LocationAddressReceiver;
 import com.score.senz.services.LocationService;
@@ -23,7 +21,8 @@ import java.security.SignatureException;
 /**
  * Handle All senz messages from here
  */
-public class SenzHandler implements LocationServiceListener {
+public class SenzHandler {
+    private static final String TAG = SenzHandler.class.getName();
     private static SenzHandler instance;
 
     private SenzHandler() {
@@ -42,13 +41,19 @@ public class SenzHandler implements LocationServiceListener {
             Senz senz = SenzParser.parse(senzMessage);
             verifySenz(context, senz);
             switch (senz.getSenzType()) {
+                case PING:
+                    Log.d(TAG, "PING received");
+                    break;
                 case SHARE:
+                    Log.d(TAG, "SHARE received");
                     handleShareSenz(context, senz);
                     break;
                 case GET:
+                    Log.d(TAG, "GET received");
                     handleGetSenz(context, senz);
                     break;
                 case DATA:
+                    Log.d(TAG, "DATA received");
                     handleDataSenz(context, senz);
                     break;
             }
@@ -107,11 +112,6 @@ public class SenzHandler implements LocationServiceListener {
         }
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-    }
-
-    @Override
-    public void onPostReadLocation(Location location) {
-
     }
 
 }

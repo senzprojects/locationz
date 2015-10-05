@@ -13,9 +13,9 @@ import com.score.senz.services.SenzService;
  * 2. on device boot
  * We have to start SenzService again from here
  */
-public class SenzServiceCall extends BroadcastReceiver {
+public class BootCompleteReceiver extends BroadcastReceiver {
 
-    private static final String TAG = SenzServiceCall.class.getName();
+    private static final String TAG = BootCompleteReceiver.class.getName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
