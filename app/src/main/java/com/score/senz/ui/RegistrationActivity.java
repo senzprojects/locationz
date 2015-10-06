@@ -15,6 +15,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -183,9 +184,10 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      * the user
      */
     private void signUp() {
-        initRegisteringUser();
         ActivityUtils.hideSoftKeyboard(this);
-        displayDeleteMessageDialog("Are you sure you want to register on senz with phone no " + "'" + registeringUser.getPhoneNo() + "'");
+        initRegisteringUser();
+        String confirmationMessage = "<font color=#000000>Are you sure you want to register on senz with phone no </font> <font color=#ffc027>" + "<b>" + registeringUser.getPhoneNo() + "</b>" + "</font>";
+        displayDeleteMessageDialog(confirmationMessage);
     }
 
     /**
@@ -281,6 +283,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
 
     /**
      * Display message dialog when user request(click) to delete invoice
+     *
      * @param message message to be display
      */
     public void displayDeleteMessageDialog(String message) {
@@ -296,7 +299,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         TextView messageHeaderTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_header_text);
         TextView messageTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_text);
         messageHeaderTextView.setText("Confirm phone no");
-        messageTextView.setText(message);
+        messageTextView.setText(Html.fromHtml(message));
 
         // set custom font
         messageHeaderTextView.setTypeface(typeface);

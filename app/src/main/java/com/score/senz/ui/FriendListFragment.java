@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -211,7 +212,8 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
         }
 
         //showShareConfirmDialog(user);
-        displayDeleteMessageDialog("Are you sure you want to share the senz with ''" + user.getUsername() + "''", user);
+        String confirmationMessage = "<font color=#000000>Are you sure you want to share senz with </font> <font color=#ffc027>" + "<b>" + user.getUsername() + "</b>" + "</font>";
+        displayDeleteMessageDialog(confirmationMessage, user);
     }
 
     /**
@@ -376,7 +378,7 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
         TextView messageHeaderTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_header_text);
         TextView messageTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_text);
         messageHeaderTextView.setText("#Share");
-        messageTextView.setText(message);
+        messageTextView.setText(Html.fromHtml(message));
 
         // set custom font
         Typeface face = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");

@@ -67,7 +67,8 @@ public class PhoneBookUtils {
         try {
             if (cursor.moveToFirst()) {
                 String image_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
-                if (image_uri != null) return MediaStore.Images.Media.getBitmap(contentResolver, Uri.parse(image_uri));
+                if (image_uri != null)
+                    return MediaStore.Images.Media.getBitmap(contentResolver, Uri.parse(image_uri));
             }
         } catch (IOException e) {
             e.printStackTrace();

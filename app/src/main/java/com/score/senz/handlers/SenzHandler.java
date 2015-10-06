@@ -12,6 +12,7 @@ import com.score.senz.pojos.Senz;
 import com.score.senz.services.LocationAddressReceiver;
 import com.score.senz.services.LocationService;
 import com.score.senz.utils.NotificationUtils;
+import com.score.senz.utils.PhoneBookUtils;
 import com.score.senz.utils.SenzParser;
 
 import java.security.InvalidKeyException;
@@ -75,7 +76,7 @@ public class SenzHandler {
         new SenzorsDbSource(context).createSenz(senz);
 
         // display notification
-        NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "SenZ received from @" + senz.getSender());
+        NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "SenZ received from @" + PhoneBookUtils.getContactName(context, senz.getSender()));
     }
 
     private void handleGetSenz(Context context, Senz senz) {

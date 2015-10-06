@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -125,7 +126,8 @@ public class SensorListAdapter extends BaseAdapter {
         viewHolder.user.setText("@" + senz.getSenderName());
 
         if (senz.getAttributes().containsKey("Location")) {
-            viewHolder.lastSeen.setText("Last seen in " + senz.getAttributes().get("Location"));
+            String locationText = "<font color=#4a4a4a>Last seen in</font> <font color=#ffc027>" + "<b>" + senz.getAttributes().get("Location") + "</b>" + "</font>";
+            viewHolder.lastSeen.setText(Html.fromHtml(locationText));
             viewHolder.lastSeen.setTextColor(Color.parseColor("#ffc027"));
         } else {
             viewHolder.lastSeen.setText("No last seen location available");
