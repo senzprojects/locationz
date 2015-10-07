@@ -32,6 +32,7 @@ import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
+import com.score.senz.utils.NetworkUtil;
 import com.score.senz.utils.PhoneBookUtils;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
@@ -174,7 +175,11 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     @Override
     public void onClick(View v) {
         if (v == signUpButton) {
-            signUp();
+            if (NetworkUtil.isAvailableNetwork(this)) {
+                signUp();
+            } else {
+                Toast.makeText(this, "No network connection available", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -258,6 +263,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         if (action.equals("DATA")) {
             boolean senzMessage = intent.getExtras().getBoolean("extra");
             if (senzMessage) {
+                ActivityUtils.cancelProgressDialog();
                 Toast.makeText(this, "Successfully registered", Toast.LENGTH_LONG).show();
 
                 // save user
@@ -293,6 +299,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.share_confirm_message_dialog);
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(true);
 
         // set dialog texts
@@ -312,6 +319,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dialog.cancel();
+                ActivityUtils.showProgressDialog(RegistrationActivity.this, "Please wait...");
                 registerUser();
             }
         });

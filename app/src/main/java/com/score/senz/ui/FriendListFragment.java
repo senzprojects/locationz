@@ -1,10 +1,8 @@
 package com.score.senz.ui;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
@@ -39,6 +37,7 @@ import com.score.senz.pojos.User;
 import com.score.senz.services.ContactReader;
 import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
+import com.score.senz.utils.NetworkUtil;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;
@@ -211,9 +210,12 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
             searchView.setQuery("", false);
         }
 
-        //showShareConfirmDialog(user);
-        String confirmationMessage = "<font color=#000000>Are you sure you want to share senz with </font> <font color=#ffc027>" + "<b>" + user.getUsername() + "</b>" + "</font>";
-        displayDeleteMessageDialog(confirmationMessage, user);
+        if (NetworkUtil.isAvailableNetwork(getActivity())) {
+            String confirmationMessage = "<font color=#000000>Are you sure you want to share senz with </font> <font color=#ffc027>" + "<b>" + user.getUsername() + "</b>" + "</font>";
+            displayDeleteMessageDialog(confirmationMessage, user);
+        } else {
+            Toast.makeText(getActivity(), "No network connection available", Toast.LENGTH_LONG).show();
+        }
     }
 
     /**
@@ -276,30 +278,6 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
         }
     }
 
-    private void showShareConfirmDialog(final User user) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-
-        alertDialogBuilder
-                .setMessage("Are you sure you want to share senz with '" + user.getUsername() + "'")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // share senz to server
-                        share(user);
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // if this button is clicked, just close
-                        // the dialog box and do nothing
-                        dialog.cancel();
-                    }
-                });
-
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-    }
-
     /**
      * Share current sensor
      * Need to send share query to server via web socket
@@ -352,7 +330,6 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
         }
     }
 
-
     /**
      * Clear input fields and reset activity components
      */
@@ -363,6 +340,7 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
 
     /**
      * Display message dialog when user request(click) to delete invoice
+     *
      * @param message message to be display
      */
     public void displayDeleteMessageDialog(String message, final User user) {

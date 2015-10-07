@@ -22,6 +22,7 @@ import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.score.senz.R;
@@ -32,6 +33,7 @@ import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
+import com.score.senz.utils.NetworkUtil;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;
@@ -171,8 +173,12 @@ public class SensorListFragment extends Fragment {
                 if (position > 0 && position <= senzList.size()) {
                     Senz senz = senzList.get(position - 1);
 
-                    ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
-                    getSenz(senz.getSender());
+                    if (NetworkUtil.isAvailableNetwork(getActivity())) {
+                        ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
+                        getSenz(senz.getSender());
+                    } else {
+                        Toast.makeText(getActivity(), "No network connection available", Toast.LENGTH_LONG).show();
+                    }
                 }
             }
         });
