@@ -2,6 +2,7 @@ package com.score.senz.handlers;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteConstraintException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -77,10 +78,16 @@ public class SenzHandler {
         SenzorsDbSource dbSource = new SenzorsDbSource(context);
         User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
         senz.setSender(sender);
-        dbSource.createSenz(senz);
 
-        // display notification
-        NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "SenZ received from @" + PhoneBookUtils.getContactName(context, senz.getSender().getUsername()));
+        // if senz already exists in the db, SQLiteConstraintException should throw
+        try {
+            dbSource.createSenz(senz);
+
+            NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "SenZ received from @" + PhoneBookUtils.getContactName(context, senz.getSender().getUsername()));
+        } catch (SQLiteConstraintException e) {
+            Log.e(TAG, e.toString());
+        }
+
     }
 
     private void handleGetSenz(Context context, Senz senz) {

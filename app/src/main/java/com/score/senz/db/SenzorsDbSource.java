@@ -207,7 +207,9 @@ public class SenzorsDbSource {
         while (cursor.moveToNext()) {
             _id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
             _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
-            userList.add(new User(_id, _username));
+
+            // we don't add mysensors user as a friend(its a server :))
+            if (!_username.equalsIgnoreCase("mysensors")) userList.add(new User(_id, _username));
         }
 
         // clean

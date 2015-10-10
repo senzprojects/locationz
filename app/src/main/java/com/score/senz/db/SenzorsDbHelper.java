@@ -18,18 +18,19 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     private static SenzorsDbHelper senzorsDbHelper;
 
     // If you change the database schema, you must increment the database version
-    private static final int DATABASE_VERSION = 15;
+    private static final int DATABASE_VERSION = 17;
     private static final String DATABASE_NAME = "Senz.db";
 
     // data types, keywords and queries
     private static final String TEXT_TYPE = " TEXT";
     private static final String SQL_CREATE_SENZ =
             "CREATE TABLE " + SenzorsDbContract.Senz.TABLE_NAME + " (" +
-                    SenzorsDbContract.Senz._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
-                    SenzorsDbContract.Senz.COLUMN_NAME_NAME + TEXT_TYPE + " NOT NULL" + "," +
-                    SenzorsDbContract.Senz.COLUMN_NAME_VALUE + TEXT_TYPE + "," +
-                    SenzorsDbContract.Senz.COLUMN_NAME_USER + TEXT_TYPE + " NOT NULL" +
-            " )";
+                    SenzorsDbContract.Senz._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + ", " +
+                    SenzorsDbContract.Senz.COLUMN_NAME_NAME + TEXT_TYPE + " NOT NULL" + ", " +
+                    SenzorsDbContract.Senz.COLUMN_NAME_VALUE + TEXT_TYPE + ", " +
+                    SenzorsDbContract.Senz.COLUMN_NAME_USER + TEXT_TYPE + " NOT NULL" + ", " +
+                    "UNIQUE" + "(" + SenzorsDbContract.Senz.COLUMN_NAME_NAME + "," + SenzorsDbContract.Senz.COLUMN_NAME_USER + ")" +
+            ")";
     private static final String SQL_CREATE_USER =
             "CREATE TABLE " + SenzorsDbContract.User.TABLE_NAME + " (" +
                     SenzorsDbContract.User._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
@@ -68,6 +69,9 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
      */
     public void onCreate(SQLiteDatabase db) {
         Log.d(TAG, "OnCreate: creating db helper, db version - " + DATABASE_VERSION);
+        Log.d(TAG, SQL_CREATE_SENZ);
+        Log.d(TAG, SQL_CREATE_USER);
+
         db.execSQL(SQL_CREATE_SENZ);
         db.execSQL(SQL_CREATE_USER);
     }
