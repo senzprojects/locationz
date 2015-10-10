@@ -64,9 +64,9 @@ public class SenzHandler {
     }
 
     private static void verifySenz(Context context, Senz senz) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        // TODO get public key of sender
         senz.getSender();
 
+        // TODO get public key of sender
         // TODO verify signature of the senz
         //RSAUtils.verifyDigitalSignature(senz.getPayload(), senz.getSignature(), null);
     }
@@ -76,7 +76,7 @@ public class SenzHandler {
         new SenzorsDbSource(context).createSenz(senz);
 
         // display notification
-        NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "SenZ received from @" + PhoneBookUtils.getContactName(context, senz.getSender()));
+        NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "SenZ received from @" + PhoneBookUtils.getContactName(context, senz.getSender().getUsername()));
     }
 
     private void handleGetSenz(Context context, Senz senz) {
@@ -84,7 +84,7 @@ public class SenzHandler {
         Log.d("Tag", senz.getSender() + " : " + senz.getSenzType().toString());
 
         Intent serviceIntent = new Intent(context, LocationService.class);
-        serviceIntent.putExtra("PHONE", senz.getSender());
+        serviceIntent.putExtra("USER", senz.getSender());
 
         context.startService(serviceIntent);
     }

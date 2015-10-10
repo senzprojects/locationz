@@ -42,7 +42,7 @@ public class LocationService extends Service implements LocationListener {
 
     private LocationManager locationManager;
 
-    String receiverPhone;
+    private User receiver;
 
     // keeps weather service already bound or not
     boolean isServiceBound = false;
@@ -102,7 +102,7 @@ public class LocationService extends Service implements LocationListener {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        this.receiverPhone = intent.getExtras().getString("PHONE");
+        this.receiver = intent.getExtras().getParcelable("USER§");
 
         // bind with senz service
         if (!isServiceBound) {
@@ -173,8 +173,8 @@ public class LocationService extends Service implements LocationListener {
             // new senz
             Senz senz = new Senz();
             senz.setSenzType(SenzTypeEnum.DATA);
-            senz.setReceiver(receiverPhone);
-            senz.setSender(user.getPhoneNo());
+            senz.setReceiver(receiver);
+            senz.setSender(user);
             senz.setAttributes(senzAttributes);
 
             // get digital signature of the senz

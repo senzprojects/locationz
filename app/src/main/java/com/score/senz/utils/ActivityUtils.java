@@ -76,12 +76,9 @@ public class ActivityUtils {
      * @return valid or not
      */
     public static boolean isValidRegistrationFields(User user) throws InvalidInputFieldsException, InvalidPhoneNoException {
-        if (user.getPhoneNo().isEmpty()) {
+        if (user.getUsername().isEmpty()) {
             throw new InvalidInputFieldsException();
         }
-
-        if (user.getPhoneNo().length() < 9)
-            throw new InvalidPhoneNoException();
 
         return true;
     }
@@ -93,7 +90,7 @@ public class ActivityUtils {
      * @return valid of not
      */
     public static boolean isValidLoginFields(User user) {
-        return !(user.getPhoneNo().isEmpty());
+        return !(user.getUsername().isEmpty());
     }
 
     /**

@@ -7,21 +7,19 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-//import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationRequest;
 import com.score.senz.application.SenzApplication;
 import com.score.senz.pojos.LatLon;
-import com.score.senz.pojos.Query;
-import com.score.senz.utils.QueryParser;
 
-import java.util.HashMap;
+//import com.google.android.gms.location.LocationClient;
 
 public class GpsReadingService extends Service implements GooglePlayServicesClient.ConnectionCallbacks,
-                                                          GooglePlayServicesClient.OnConnectionFailedListener,
-                                                          com.google.android.gms.location.LocationListener {
+        GooglePlayServicesClient.OnConnectionFailedListener,
+        com.google.android.gms.location.LocationListener {
 
     private static final String TAG = GpsReadingService.class.getName();
     private SenzApplication application;
@@ -111,6 +109,7 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
 
     /**
      * Verify that Google Play services is available before making a request.
+     *
      * @return true if Google Play services is available, otherwise false
      */
     private boolean isServicesConnected() {
@@ -148,7 +147,7 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
         // get location and send to appropriate handle
         // the close location updates
         // stop service
-        if(isMyLocation) {
+        if (isMyLocation) {
             // send location result to sensor list via message
             handleLocationRequestFromSensorList(location);
         } else {
@@ -163,8 +162,8 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
              * The current Activity is the listener, so
              * the argument is "this".
              */
-            Log.d(TAG, "OnLocationChanged: removed location updates");
-            //locationClient.removeLocationUpdates(this);
+        Log.d(TAG, "OnLocationChanged: removed location updates");
+        //locationClient.removeLocationUpdates(this);
         //}
 
         /*
@@ -178,6 +177,7 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
     /**
      * Handle location request that comes from server as a query
      * need to send location to server via web socket
+     *
      * @param location current location
      */
     private void handleLocationRequestFromSever(Location location) {
@@ -200,6 +200,7 @@ public class GpsReadingService extends Service implements GooglePlayServicesClie
     /**
      * Location request comes from internal(from sensor list)by clicking my location sensor
      * So need to send update to sensor list
+     *
      * @param location current location
      */
     private void handleLocationRequestFromSensorList(Location location) {

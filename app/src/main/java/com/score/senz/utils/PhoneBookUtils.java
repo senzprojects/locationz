@@ -106,9 +106,9 @@ public class PhoneBookUtils {
             String name = managedCursor.getString(managedCursor.getColumnIndex(DISPLAY_NAME));
             String phoneNo = managedCursor.getString(managedCursor.getColumnIndex(NUMBER));
 
-            User user = new User(contact_id, getFormattedPhoneNo(context, phoneNo), "password");
-            user.setUsername(name.toLowerCase());
-            contactList.add(user);
+            //User user = new User(contact_id, getFormattedPhoneNo(context, phoneNo), "password");
+            //user.setUsername(name.toLowerCase());
+            //contactList.add(user);
         }
 
         managedCursor.close();

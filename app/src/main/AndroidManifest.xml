@@ -51,14 +51,6 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".ui.LoginActivity"
-            android:configChanges="orientation"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.NoActionBar"
-            android:windowSoftInputMode="stateHidden"></activity>
-
-        <activity
             android:name=".ui.LaunchActivity"
             android:configChanges="orientation"
             android:launchMode="singleTask"
@@ -70,15 +62,6 @@
             android:name=".ui.HomeActivity"
             android:configChanges="orientation"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Yello"
-            android:windowSoftInputMode="stateHidden"></activity>
-
-        <activity
-            android:name=".ui.SensorDetailsActivity"
-            android:configChanges="orientation"
-            android:launchMode="singleTask"
-            android:parentActivityName=".ui.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Yello"
             android:windowSoftInputMode="stateHidden"></activity>

@@ -123,7 +123,7 @@ public class SensorListAdapter extends BaseAdapter {
     private void setUpSenzRow(int i, Senz senz, View view, ViewHolder viewHolder) {
         // enable share and change color of view
         view.setBackgroundResource(R.drawable.my_sensor_background);
-        viewHolder.user.setText("@" + senz.getSenderName());
+        viewHolder.user.setText("@" + senz.getSender().getUsername());
 
         if (senz.getAttributes().containsKey("Location")) {
             String locationText = "<font color=#4a4a4a>Last seen in</font> <font color=#ffc027>" + "<b>" + senz.getAttributes().get("Location") + "</b>" + "</font>";
@@ -134,12 +134,15 @@ public class SensorListAdapter extends BaseAdapter {
             viewHolder.lastSeen.setTextColor(Color.parseColor("#4a4a4a"));
         }
 
-        if (senz.getSenderImage() != null) {
-            viewHolder.image.setImageBitmap(senz.getSenderImage());
-        } else {
-            Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_user_icon);
-            viewHolder.image.setImageBitmap(largeIcon);
-        }
+//        if (senz.getSenderImage() != null) {
+//            viewHolder.image.setImageBitmap(senz.getSenderImage());
+//        } else {
+//            Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_user_icon);
+//            viewHolder.image.setImageBitmap(largeIcon);
+//        }
+
+        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_user_icon);
+        viewHolder.image.setImageBitmap(largeIcon);
     }
 
     /**

@@ -58,7 +58,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
                     android:layout_marginLeft="20dp"
-                    android:text="Phone no/Username"
+                    android:text="Username"
                     android:textColor="#4a4a4a"
                     android:textSize="18sp"></TextView>
 

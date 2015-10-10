@@ -33,25 +33,14 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_USER =
             "CREATE TABLE " + SenzorsDbContract.User.TABLE_NAME + " (" +
                     SenzorsDbContract.User._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
-                    SenzorsDbContract.User.COLUMN_NAME_PHONE + TEXT_TYPE + "UNIQUE NOT NULL" +
-            " )";
-    private static final String SQL_CREATE_SHARED_USER =
-            "CREATE TABLE " + SenzorsDbContract.SharedUser.TABLE_NAME + " (" +
-                    SenzorsDbContract.SharedUser._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
-                    SenzorsDbContract.SharedUser.COLUMN_NAME_USER + " INTEGER NOT NULL" + "," +
-                    SenzorsDbContract.SharedUser.COLUMN_NAME_SENSOR + " INTEGER NOT NULL" + "," +
-                    "FOREIGN KEY" + "(" + SenzorsDbContract.SharedUser.COLUMN_NAME_USER + ") " +
-                    "REFERENCES "+ SenzorsDbContract.User.TABLE_NAME + "(" + SenzorsDbContract.User._ID + ")" +
-                    "FOREIGN KEY" + "(" + SenzorsDbContract.SharedUser.COLUMN_NAME_SENSOR + ") " +
-                    "REFERENCES "+ SenzorsDbContract.Senz.TABLE_NAME + "(" + SenzorsDbContract.Senz._ID + ")" +
+                    SenzorsDbContract.User.COLUMN_NAME_USERNAME + TEXT_TYPE + "UNIQUE NOT NULL" + "," +
+                    SenzorsDbContract.User.COLUMN_NAME_NAME + TEXT_TYPE +
             " )";
 
     private static final String SQL_DELETE_SENZ =
             "DROP TABLE IF EXISTS " + SenzorsDbContract.Senz.TABLE_NAME;
     private static final String SQL_DELETE_USER =
             "DROP TABLE IF EXISTS " + SenzorsDbContract.User.TABLE_NAME;
-    private static final String SQL_DELETE_SHARED_USER =
-            "DROP TABLE IF EXISTS " + SenzorsDbContract.SharedUser.TABLE_NAME;
 
     /**
      * Init context
@@ -80,9 +69,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         Log.d(TAG, "OnCreate: creating db helper, db version - " + DATABASE_VERSION);
         db.execSQL(SQL_CREATE_SENZ);
-        //db.execSQL(SQL_CREATE_USER);
-        //db.execSQL(SQL_CREATE_SHARED_USER);
-        //db.execSQL(SQL_CREATE_TRIGGER_SENSOR_FOREIGN_KEY);
+        db.execSQL(SQL_CREATE_USER);
     }
 
     /**
@@ -103,10 +90,9 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
         Log.d(TAG, "OnUpgrade: updating db helper, db version - " + DATABASE_VERSION);
-        //db.execSQL(SQL_DELETE_SHARED_USER);
         db.execSQL(SQL_DELETE_SENZ);
-        //db.execSQL(SQL_DELETE_USER);
-        //db.execSQL(SQL_DELETE_TRIGGER_SENSOR_FOREIGN_KEY);
+        db.execSQL(SQL_DELETE_USER);
+
         onCreate(db);
     }
 

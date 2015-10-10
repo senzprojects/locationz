@@ -11,7 +11,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +25,7 @@ import com.score.senz.R;
 import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Senz;
+import com.score.senz.pojos.User;
 import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.PreferenceUtils;
@@ -49,8 +49,8 @@ public class ShareFragment extends android.support.v4.app.Fragment {
 
     private static final String TAG = ShareFragment.class.getName();
 
-    private TextView phoneNoLabel;
-    private EditText phoneNoEditText;
+    private TextView usernameLabel;
+    private EditText usernameEditText;
 
     // keeps weather service already bound or not
     boolean isServiceBound = false;
@@ -131,8 +131,8 @@ public class ShareFragment extends android.support.v4.app.Fragment {
     private void initUi() {
         Typeface typefaceThin = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
 
-        phoneNoLabel = (TextView) getActivity().findViewById(R.id.share_layout_phone_no_label);
-        phoneNoEditText = (EditText) getActivity().findViewById(R.id.share_layout_phone_no);
+        usernameLabel = (TextView) getActivity().findViewById(R.id.share_layout_phone_no_label);
+        usernameEditText = (EditText) getActivity().findViewById(R.id.share_layout_phone_no);
 
         // Set up action bar.
         // Specify that the Home button should show an "Up" caret, indicating that touching the
@@ -148,8 +148,8 @@ public class ShareFragment extends android.support.v4.app.Fragment {
         TextView actionBarTitle = (TextView) (getActivity().findViewById(titleId));
         actionBarTitle.setTextColor(getResources().getColor(R.color.white));
         actionBarTitle.setTypeface(typefaceThin);
-        phoneNoLabel.setTypeface(typefaceThin);
-        phoneNoEditText.setTypeface(typefaceThin);
+        usernameLabel.setTypeface(typefaceThin);
+        usernameEditText.setTypeface(typefaceThin);
     }
 
     /**
@@ -180,9 +180,6 @@ public class ShareFragment extends android.support.v4.app.Fragment {
      * Need to send share query to server via web socket
      */
     private void share() {
-        String query = "SHARE" + " " + "#lat #lon" + " " + "@" + phoneNoEditText.getText().toString().trim();
-        Log.d(TAG, "Share: sharing query " + query);
-
         try {
             // create key pair
             PrivateKey privateKey = RSAUtils.getPrivateKey(getActivity());
@@ -196,8 +193,8 @@ public class ShareFragment extends android.support.v4.app.Fragment {
             // new senz
             Senz senz = new Senz();
             senz.setSenzType(SenzTypeEnum.SHARE);
-            senz.setReceiver(phoneNoEditText.getText().toString().trim());
-            senz.setSender(PreferenceUtils.getUser(getActivity()).getPhoneNo());
+            senz.setReceiver(new User("", usernameEditText.getText().toString().trim()));
+            senz.setSender(PreferenceUtils.getUser(getActivity()));
             senz.setAttributes(senzAttributes);
 
             // get digital signature of the senz
@@ -231,7 +228,7 @@ public class ShareFragment extends android.support.v4.app.Fragment {
      * Clear input fields and reset activity components
      */
     private void onPostShare() {
-        phoneNoEditText.setText("");
+        usernameEditText.setText("");
         ActivityUtils.hideSoftKeyboard(getActivity());
         Toast.makeText(getActivity(), "Successfully shared SenZ", Toast.LENGTH_LONG).show();
     }

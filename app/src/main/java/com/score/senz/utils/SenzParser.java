@@ -2,6 +2,7 @@ package com.score.senz.utils;
 
 import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.pojos.Senz;
+import com.score.senz.pojos.User;
 
 import java.util.HashMap;
 
@@ -30,10 +31,10 @@ public class SenzParser {
                 senz.setSignature(token);
             } else if (tokens[i].startsWith("@")) {
                 // @0775432012
-                senz.setReceiver(token.substring(1));
+                senz.setReceiver(new User("", token.substring(1)));
             } else if (token.startsWith("^")) {
                 // ^mysensors, ^0775432015
-                senz.setSender(token.substring(1));
+                senz.setSender(new User("", token.substring(1)));
             } else if (token.startsWith("#")) {
                 if (token.equals("#time") || token.equals("#pubkey")) {
                     // #time 2453234, #pubkey ac23edf432fdg
@@ -79,8 +80,8 @@ public class SenzParser {
         }
 
         // add sender and receiver
-        payload = payload.concat(" ").concat("@").concat(senz.getReceiver());
-        payload = payload.concat(" ").concat("^").concat(senz.getSender());
+        payload = payload.concat(" ").concat("@").concat(senz.getReceiver().getUsername());
+        payload = payload.concat(" ").concat("^").concat(senz.getSender().getUsername());
 
         return payload;
     }
@@ -130,8 +131,8 @@ public class SenzParser {
         parse(senzMessage3);
 
         Senz senz = new Senz();
-        senz.setSender("222");
-        senz.setReceiver("111");
+        senz.setSender(new User("", "222"));
+        senz.setReceiver(new User("", "111"));
         senz.setSenzType(SenzTypeEnum.SHARE);
 
         HashMap<String, String> senzAttributes = new HashMap<>();

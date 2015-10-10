@@ -13,7 +13,6 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.text.Html;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -283,9 +282,6 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
      * Need to send share query to server via web socket
      */
     private void share(User user) {
-        String query = "SHARE" + " " + "#lat #lon" + " " + "@" + user.getPhoneNo().trim();
-        Log.d(TAG, "Share: sharing query " + query);
-
         try {
             // create key pair
             PrivateKey privateKey = RSAUtils.getPrivateKey(getActivity());
@@ -299,8 +295,8 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
             // new senz
             Senz senz = new Senz();
             senz.setSenzType(SenzTypeEnum.SHARE);
-            senz.setReceiver(user.getPhoneNo().trim());
-            senz.setSender(PreferenceUtils.getUser(getActivity()).getPhoneNo());
+            senz.setReceiver(user);
+            senz.setSender(PreferenceUtils.getUser(getActivity()));
             senz.setAttributes(senzAttributes);
 
             // get digital signature of the senz

@@ -24,9 +24,7 @@ public class PreferenceUtils {
 
         //keys should be constants as well, or derived from a constant prefix in a loop.
         editor.putString("id", user.getId());
-        editor.putString("phoneNo", user.getPhoneNo());
         editor.putString("username", user.getUsername());
-        editor.putString("password", user.getPassword());
         editor.commit();
     }
 
@@ -38,14 +36,12 @@ public class PreferenceUtils {
     public static User getUser(Context context) throws NoUserException {
         SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         String id = preferences.getString("id", "0");
-        String phoneNo = preferences.getString("phoneNo", "");
         String username = preferences.getString("username", "");
-        String password = preferences.getString("password", "");
 
-        if(phoneNo.isEmpty())
+        if(username.isEmpty())
             throw new NoUserException();
 
-        User user = new User(id, phoneNo, password);
+        User user = new User(id, username);
         user.setUsername(username);
         return user;
     }
@@ -72,28 +68,6 @@ public class PreferenceUtils {
     public static String getRsaKey(Context context, String keyType) {
         SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         return preferences.getString(keyType, "");
-    }
-
-    /**
-     * Save session key in shared preference
-     * @param context application context
-     * @param sessionKey session key
-     */
-    public static void saveSessionKey(Context context, String sessionKey) {
-        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor =  preferences.edit();
-        editor.putString("session_key", sessionKey);
-        editor.commit();
-    }
-
-    /**
-     * Read session key form shared preference
-     * @param context application context
-     * @return session key
-     */
-    public static String getSessionKey(Context context) {
-        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        return preferences.getString("session_key", "");
     }
 
 }

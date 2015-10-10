@@ -232,7 +232,7 @@ public class SensorListFragment extends Fragment {
         getActivity().getActionBar().setTitle(title);
     }
 
-    private void getSenz(String phone) {
+    private void getSenz(User receiver) {
         try {
             // create key pair
             PrivateKey privateKey = RSAUtils.getPrivateKey(this.getActivity());
@@ -243,13 +243,13 @@ public class SensorListFragment extends Fragment {
             senzAttributes.put("lat", "lat");
             senzAttributes.put("lon", "lon");
 
-            User user = PreferenceUtils.getUser(this.getActivity());
+            User sender = PreferenceUtils.getUser(this.getActivity());
 
             // new senz
             Senz senz = new Senz();
             senz.setSenzType(SenzTypeEnum.GET);
-            senz.setReceiver(phone);
-            senz.setSender(user.getPhoneNo());
+            senz.setReceiver(receiver);
+            senz.setSender(sender);
             senz.setAttributes(senzAttributes);
 
             // get digital signature of the senz

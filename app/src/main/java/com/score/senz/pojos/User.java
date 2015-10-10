@@ -12,14 +12,11 @@ import android.os.Parcelable;
  */
 public class User implements Parcelable {
     String id;
-    String phoneNo;
     String username;
-    String password;
 
-    public User(String id, String phoneNo, String password) {
+    public User(String id, String username) {
         this.id = id;
-        this.phoneNo = phoneNo;
-        this.password = password;
+        this.username = username;
     }
 
     /**
@@ -29,9 +26,7 @@ public class User implements Parcelable {
      */
     public User(Parcel in) {
         this.id = in.readString();
-        this.phoneNo = in.readString();
         this.username = in.readString();
-        this.password = in.readString();
     }
 
     /**
@@ -52,9 +47,7 @@ public class User implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
-        dest.writeString(phoneNo);
         dest.writeString(username);
-        dest.writeString(password);
     }
 
     /**
@@ -83,14 +76,6 @@ public class User implements Parcelable {
         this.id = id;
     }
 
-    public String getPhoneNo() {
-        return phoneNo;
-    }
-
-    public void setPhoneNo(String phoneNo) {
-        this.phoneNo = phoneNo;
-    }
-
     public String getUsername() {
         return username;
     }
@@ -99,19 +84,11 @@ public class User implements Parcelable {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof User) {
             User toCompare = (User) obj;
-            return (this.phoneNo.equalsIgnoreCase(toCompare.getPhoneNo()));
+            return (this.username.equalsIgnoreCase(toCompare.getUsername()));
         }
 
         return false;
@@ -119,7 +96,7 @@ public class User implements Parcelable {
 
     @Override
     public int hashCode() {
-        return (this.getPhoneNo()).hashCode();
+        return (this.getUsername()).hashCode();
     }
 
 }

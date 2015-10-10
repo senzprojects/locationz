@@ -210,8 +210,8 @@ public class SenzService extends Service {
             // new senz object
             Senz senz = new Senz();
             senz.setSenzType(SenzTypeEnum.DATA);
-            senz.setSender(user.getPhoneNo());
-            senz.setReceiver("mysensors");
+            senz.setSender(new User("", user.getUsername()));
+            senz.setReceiver(new User("", "mysensors"));
             senz.setAttributes(senzAttributes);
 
             // get digital signature of the senz

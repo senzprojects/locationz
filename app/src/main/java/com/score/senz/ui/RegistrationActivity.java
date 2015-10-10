@@ -33,7 +33,6 @@ import com.score.senz.pojos.User;
 import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.NetworkUtil;
-import com.score.senz.utils.PhoneBookUtils;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;
@@ -59,10 +58,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     private User registeringUser;
 
     // UI fields
-    private EditText editTextPhoneNo;
-    private TextView countryCodeText;
-    private TextView textViewHeaderText;
-    private TextView textViewSignUpText;
+    private EditText editTextUsername;
     private RelativeLayout signUpButton;
     private Typeface typeface;
 
@@ -141,32 +137,19 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      * set custom font for UI fields
      */
     private void initUi() {
-
-        editTextPhoneNo = (EditText) findViewById(R.id.registration_phone_no);
+        editTextUsername = (EditText) findViewById(R.id.registration_phone_no);
         signUpButton = (RelativeLayout) findViewById(R.id.registration_sign_up_button);
-        textViewHeaderText = (TextView) findViewById(R.id.registration_header_text);
-        textViewSignUpText = (TextView) findViewById(R.id.registration_sign_up_text);
         signUpButton.setOnClickListener(RegistrationActivity.this);
 
-        String countryCode = PhoneBookUtils.getCountryCode(this);
-        countryCodeText = (TextView) findViewById(R.id.country_code);
-        if (!countryCode.isEmpty())
-            countryCodeText.setText(countryCode);
-
-        textViewHeaderText.setTypeface(typeface, Typeface.BOLD);
-        textViewSignUpText.setTypeface(typeface, Typeface.BOLD);
-        editTextPhoneNo.setTypeface(typeface, Typeface.NORMAL);
+        editTextUsername.setTypeface(typeface, Typeface.NORMAL);
     }
 
     /**
      * Initialize user object
      */
     private void initRegisteringUser() {
-        String phoneNo = editTextPhoneNo.getText().toString().trim();
-        String internationalPhoneNo = PhoneBookUtils.getFormattedPhoneNo(this, phoneNo);
-
-        registeringUser = new User("0", internationalPhoneNo, "");
-        registeringUser.setUsername("Me");
+        String username = editTextUsername.getText().toString().trim();
+        registeringUser = new User("0", username);
     }
 
     /**
@@ -191,7 +174,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     private void signUp() {
         ActivityUtils.hideSoftKeyboard(this);
         initRegisteringUser();
-        String confirmationMessage = "<font color=#000000>Are you sure you want to register on senz with phone no </font> <font color=#ffc027>" + "<b>" + registeringUser.getPhoneNo() + "</b>" + "</font>";
+        String confirmationMessage = "<font color=#000000>Are you sure you want to register on senz with usename</font> <font color=#ffc027>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
         displayDeleteMessageDialog(confirmationMessage);
     }
 
@@ -213,8 +196,8 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             // new senz
             Senz senz = new Senz();
             senz.setSenzType(SenzTypeEnum.SHARE);
-            senz.setReceiver("mysensors");
-            senz.setSender(registeringUser.getPhoneNo());
+            senz.setReceiver(new User("", "mysensors"));
+            senz.setSender(new User("", registeringUser.getUsername()));
             senz.setAttributes(senzAttributes);
 
             // get digital signature of the senz
