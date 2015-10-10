@@ -75,7 +75,7 @@ public class ActivityUtils {
      * @param user User object
      * @return valid or not
      */
-    public static boolean isValidRegistrationFields(User user) throws InvalidInputFieldsException, InvalidPhoneNoException {
+    public static boolean isValidRegistrationFields(User user) throws InvalidInputFieldsException {
         if (user.getUsername().isEmpty()) {
             throw new InvalidInputFieldsException();
         }

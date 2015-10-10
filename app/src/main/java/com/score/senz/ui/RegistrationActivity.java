@@ -28,6 +28,8 @@ import android.widget.Toast;
 
 import com.score.senz.R;
 import com.score.senz.enums.SenzTypeEnum;
+import com.score.senz.exceptions.InvalidInputFieldsException;
+import com.score.senz.exceptions.InvalidPhoneNoException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.services.SenzService;
@@ -89,7 +91,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         typeface = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
 
         initUi();
-        LocalBroadcastManager.getInstance(this).registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
     }
 
     /**
@@ -174,8 +175,14 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     private void signUp() {
         ActivityUtils.hideSoftKeyboard(this);
         initRegisteringUser();
-        String confirmationMessage = "<font color=#000000>Are you sure you want to register on senz with </font> <font color=#ffc027>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
-        displayDeleteMessageDialog(confirmationMessage);
+        try {
+            ActivityUtils.isValidRegistrationFields(registeringUser);
+            String confirmationMessage = "<font color=#000000>Are you sure you want to register on SenZ with </font> <font color=#ffc027>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
+            displayDeleteMessageDialog(confirmationMessage);
+        } catch (InvalidInputFieldsException e) {
+            Toast.makeText(this, "Invalid username", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -235,7 +242,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     };
 
     /**
-     * Handle brodcase message receives
+     * Handle broadcast message receives
      * Need to handle registration success failure here
      *
      * @param intent intent
@@ -254,8 +261,10 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
                 PreferenceUtils.saveUser(this, registeringUser);
                 navigateToHome();
             } else {
-                Toast.makeText(this, "Fail to register", Toast.LENGTH_LONG).show();
-                // ask user to retry
+                ActivityUtils.cancelProgressDialog();
+
+                String informationMessage = "<font color=#4a4a4a>Seems username </font> <font color=#ffc027>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font> <font color=#4a4a4a> already obtained by some other user, try SenZ with different username</font>";
+                displayInformationMessageDialog("Registration fail", informationMessage);
             }
         }
     }
@@ -288,7 +297,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         // set dialog texts
         TextView messageHeaderTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_header_text);
         TextView messageTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_text);
-        messageHeaderTextView.setText("Confirm phone no");
+        messageHeaderTextView.setText("Confirm username");
         messageTextView.setText(Html.fromHtml(message));
 
         // set custom font
@@ -311,6 +320,44 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         Button cancelButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_cancel_button);
         cancelButton.setTypeface(typeface);
         cancelButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+
+        dialog.show();
+    }
+
+    /**
+     * Display message dialog when user request(click) to delete invoice
+     *
+     * @param message message to be display
+     */
+    public void displayInformationMessageDialog(String title, String message) {
+        final Dialog dialog = new Dialog(RegistrationActivity.this);
+
+        //set layout for dialog
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.information_message_dialog);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(true);
+
+        // set dialog texts
+        TextView messageHeaderTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_header_text);
+        TextView messageTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_text);
+        messageHeaderTextView.setText(title);
+        messageTextView.setText(Html.fromHtml(message));
+
+        // set custom font
+        messageHeaderTextView.setTypeface(typeface);
+        messageTextView.setTypeface(typeface);
+
+        //set ok button
+        Button okButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_ok_button);
+        okButton.setTypeface(typeface);
+        okButton.setTypeface(null, Typeface.BOLD);
+        okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dialog.cancel();
             }
