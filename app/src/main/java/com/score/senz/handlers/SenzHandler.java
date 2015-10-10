@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.score.senz.R;
 import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.pojos.Senz;
+import com.score.senz.pojos.User;
 import com.score.senz.services.LocationAddressReceiver;
 import com.score.senz.services.LocationService;
 import com.score.senz.utils.NotificationUtils;
@@ -73,7 +74,10 @@ public class SenzHandler {
 
     private void handleShareSenz(Context context, Senz senz) {
         // create senz
-        new SenzorsDbSource(context).createSenz(senz);
+        SenzorsDbSource dbSource = new SenzorsDbSource(context);
+        User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
+        senz.setSender(sender);
+        dbSource.createSenz(senz);
 
         // display notification
         NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "SenZ received from @" + PhoneBookUtils.getContactName(context, senz.getSender().getUsername()));
@@ -90,6 +94,11 @@ public class SenzHandler {
     }
 
     private void handleDataSenz(Context context, Senz senz) {
+        // sync data with db data
+        SenzorsDbSource dbSource = new SenzorsDbSource(context);
+        User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
+        senz.setSender(sender);
+
         Intent intent = new Intent("DATA");
 
         // we are broadcasting DATA sensors

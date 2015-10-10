@@ -174,7 +174,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     private void signUp() {
         ActivityUtils.hideSoftKeyboard(this);
         initRegisteringUser();
-        String confirmationMessage = "<font color=#000000>Are you sure you want to register on senz with usename</font> <font color=#ffc027>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
+        String confirmationMessage = "<font color=#000000>Are you sure you want to register on senz with </font> <font color=#ffc027>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
         displayDeleteMessageDialog(confirmationMessage);
     }
 

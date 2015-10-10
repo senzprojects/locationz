@@ -28,12 +28,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.score.senz.R;
+import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
-import com.score.senz.listeners.ContactReaderListener;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
-import com.score.senz.services.ContactReader;
 import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.NetworkUtil;
@@ -54,7 +53,7 @@ import java.util.HashMap;
  *
  * @author eranga herath(erangeb@gmail.com)
  */
-public class FriendListFragment extends android.support.v4.app.Fragment implements SearchView.OnQueryTextListener, SearchView.OnCloseListener, ContactReaderListener {
+public class FriendListFragment extends android.support.v4.app.Fragment implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
     private static final String TAG = SensorListFragment.class.getName();
 
@@ -100,7 +99,7 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
 
         setActionBar("#Friend");
         initFriendListView();
-        readContacts();
+        readFriends();
     }
 
     /**
@@ -165,12 +164,12 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
     }
 
     /**
-     * Read contact from contact DB
+     * Read Friends data from DB
      */
-    private void readContacts() {
-        // read contact list in background
-        ActivityUtils.showProgressDialog(getActivity(), "Searching friends...");
-        new ContactReader(this).execute("READ");
+    private void readFriends() {
+        friendList = (ArrayList)new SenzorsDbSource(getActivity()).readAllUsers();
+        friendListAdapter = new FriendListAdapter(this, friendList);
+        friendListView.setAdapter(friendListAdapter);
     }
 
     /**
@@ -244,20 +243,6 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
             searchView.setQuery(null, true);
         }
         return true;
-    }
-
-    /**
-     * Trigger contact reader task finish
-     *
-     * @param contactList user list
-     */
-    @Override
-    public void onPostReadContacts(ArrayList<User> contactList) {
-        ActivityUtils.cancelProgressDialog();
-
-        friendList = contactList;
-        friendListAdapter = new FriendListAdapter(this, friendList);
-        friendListView.setAdapter(friendListAdapter);
     }
 
     /**

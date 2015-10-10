@@ -58,11 +58,11 @@ public class LocationAddressReceiver extends AsyncTask<String, String, String> {
     }
 
     @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
+    protected void onPostExecute(String address) {
+        super.onPostExecute(address);
 
         // update sender's last know location in database
-        new SenzorsDbSource(context).updateSenz(sender, s);
+        new SenzorsDbSource(context).updateSenz(sender, address);
     }
 
 }

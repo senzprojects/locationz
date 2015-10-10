@@ -102,7 +102,7 @@ public class LocationService extends Service implements LocationListener {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
 
-        this.receiver = intent.getExtras().getParcelable("USER§");
+        this.receiver = intent.getExtras().getParcelable("USER");
 
         // bind with senz service
         if (!isServiceBound) {

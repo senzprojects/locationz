@@ -68,7 +68,7 @@
                             android:textStyle="bold"
                             android:textColor="#ffffff"
                             android:textColorHint="#ffffff"
-                            android:inputType="phone"
+                            android:inputType="text"
                             android:layout_toRightOf="@+id/country_code"
                             android:background="@drawable/username_field_shape"
                             android:id="@+id/registration_phone_no">

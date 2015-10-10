@@ -58,7 +58,7 @@ public class SenzParser {
 //        System.out.println(senz.getSenzType());
 //        System.out.println(senz.getSignature());
 //        System.out.println(senz.getAttributes().entrySet());
-        //System.out.println("------------");
+//        System.out.println("------------");
 
         return senz;
     }

@@ -21,7 +21,7 @@ public class ContactReader extends AsyncTask<String, String, String > {
 
     public ContactReader(FriendListFragment activity) {
         this.activity = activity;
-        this.listener = activity;
+        //this.listener = activity;
     }
 
     /**
@@ -41,7 +41,7 @@ public class ContactReader extends AsyncTask<String, String, String > {
     protected void onPostExecute(String status) {
         super.onPostExecute(status);
 
-        listener.onPostReadContacts(this.contactList);
+        //listener.onPostReadContacts(this.contactList);
     }
 
 }

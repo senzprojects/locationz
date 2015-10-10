@@ -92,7 +92,7 @@ public class SenzorsDbSource {
             long id = db.insert(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_USERNAME, values);
             db.close();
 
-            Log.d(TAG, "no user, so user created:" + username);
+            Log.d(TAG, "no user, so user created: " + username + " " + id);
             return new User(Long.toString(id), username);
         }
     }
@@ -112,7 +112,7 @@ public class SenzorsDbSource {
         values.put(SenzorsDbContract.Senz.COLUMN_NAME_USER, senz.getSender().getId());
 
         // Insert the new row, if fails throw an error
-        db.insertOrThrow(SenzorsDbContract.Senz.TABLE_NAME, SenzorsDbContract.Senz.COLUMN_NAME_VALUE, values);
+        db.insertOrThrow(SenzorsDbContract.Senz.TABLE_NAME, SenzorsDbContract.Senz.COLUMN_NAME_NAME, values);
         db.close();
     }
 
@@ -141,13 +141,14 @@ public class SenzorsDbSource {
      */
     public List<Senz> getSenzes() {
         Log.d(TAG, "GetSensors: getting all sensor");
-        List<Senz> sensorList = new ArrayList<Senz>();
+        List<Senz> sensorList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
 
-        // get matching data via JOIN query
-        String query = "SELECT * " +
-                "FROM senz JOIN user " +
+        // join query to retrieve data
+        String query = "SELECT senz._id, senz.name, senz.value, user._id, user.username " +
+                "FROM senz " +
+                "LEFT OUTER JOIN user " +
                 "ON senz.user = user._id";
         Cursor cursor = db.rawQuery(query, null);
 
@@ -164,6 +165,7 @@ public class SenzorsDbSource {
             HashMap<String, String> senzAttributes = new HashMap<>();
 
             // get senz attributes
+            _senzId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Senz._ID));
             _senzName = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Senz.COLUMN_NAME_NAME));
             _senzValue = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Senz.COLUMN_NAME_VALUE));
 
@@ -188,6 +190,33 @@ public class SenzorsDbSource {
 
         Log.d(TAG, "GetSensors: sensor count " + sensorList.size());
         return sensorList;
+    }
+
+    public List<User> readAllUsers() {
+        Log.d(TAG, "GetSensors: getting all sensor");
+        List<User> userList = new ArrayList<User>();
+
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+        Cursor cursor = db.query(SenzorsDbContract.User.TABLE_NAME, null, null, null, null, null, null);
+
+        // user attributes
+        String _id;
+        String _username;
+
+        // extract attributes
+        while (cursor.moveToNext()) {
+            _id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
+            _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
+            userList.add(new User(_id, _username));
+        }
+
+        // clean
+        cursor.close();
+        db.close();
+
+        Log.d(TAG, "user count " + userList.size());
+
+        return userList;
     }
 
 }
