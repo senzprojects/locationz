@@ -29,7 +29,6 @@ import android.widget.Toast;
 import com.score.senz.R;
 import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.InvalidInputFieldsException;
-import com.score.senz.exceptions.InvalidPhoneNoException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.services.SenzService;

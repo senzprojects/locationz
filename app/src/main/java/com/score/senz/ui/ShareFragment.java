@@ -1,9 +1,11 @@
 package com.score.senz.ui;
 
 import android.app.ActionBar;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -11,6 +13,8 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -109,6 +113,8 @@ public class ShareFragment extends android.support.v4.app.Fragment {
             getActivity().bindService(new Intent(getActivity(), SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
             isServiceBound = true;
         }
+
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
     }
 
     /**
@@ -123,6 +129,8 @@ public class ShareFragment extends android.support.v4.app.Fragment {
             getActivity().unbindService(senzServiceConnection);
             isServiceBound = false;
         }
+
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(senzMessageReceiver);
     }
 
     /**
@@ -232,5 +240,32 @@ public class ShareFragment extends android.support.v4.app.Fragment {
         ActivityUtils.hideSoftKeyboard(getActivity());
         Toast.makeText(getActivity(), "Successfully shared SenZ", Toast.LENGTH_LONG).show();
     }
+
+    private BroadcastReceiver senzMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got message from Senz service");
+            handleMessage(intent);
+        }
+    };
+
+    /**
+     * Handle broadcast message receives
+     * Need to handle registration success failure here
+     *
+     * @param intent intent
+     */
+    private void handleMessage(Intent intent) {
+        ActivityUtils.cancelProgressDialog();
+        String action = intent.getAction();
+
+        if (action.equals("DATA")) {
+            ActivityUtils.cancelProgressDialog();
+            boolean isDone = intent.getExtras().getParcelable("extra");
+
+            if (isDone) onPostShare();
+        }
+    }
+
 
 }

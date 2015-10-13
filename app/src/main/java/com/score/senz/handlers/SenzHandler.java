@@ -82,9 +82,11 @@ public class SenzHandler {
         // if senz already exists in the db, SQLiteConstraintException should throw
         try {
             dbSource.createSenz(senz);
+            OutBoundSenzHandler.getInstance().sendSenz(context, sender, true);
 
             NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "SenZ received from @" + PhoneBookUtils.getContactName(context, senz.getSender().getUsername()));
         } catch (SQLiteConstraintException e) {
+            OutBoundSenzHandler.getInstance().sendSenz(context, sender, false);
             Log.e(TAG, e.toString());
         }
 
@@ -110,7 +112,8 @@ public class SenzHandler {
 
         // we are broadcasting DATA sensors
         if (senz.getAttributes().containsKey("#msg")) {
-            if (senz.getAttributes().get("#msg").equalsIgnoreCase("UserCreated")) {
+            String msg = senz.getAttributes().get("#msg");
+            if (msg.equalsIgnoreCase("UserCreated") || msg.equalsIgnoreCase("ShareDone")) {
                 intent.putExtra("extra", true);
             } else {
                 intent.putExtra("extra", false);

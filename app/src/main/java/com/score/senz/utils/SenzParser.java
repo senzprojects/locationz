@@ -89,6 +89,8 @@ public class SenzParser {
     public static String getSenzMessage(String payload, String signature) {
         String senzMessage = payload + " " + signature;
 
+        System.out.println((senzMessage.replaceAll("\n", "").replaceAll("\r", "")).getBytes().length);
+
         return senzMessage.replaceAll("\n", "").replaceAll("\r", "");
     }
 
