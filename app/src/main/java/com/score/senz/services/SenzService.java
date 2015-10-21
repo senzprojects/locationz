@@ -231,6 +231,27 @@ public class SenzService extends Service {
     }
 
     /**
+     * Send SenZ message to SenZ service via UDP socket
+     * Separate thread used to send messages asynchronously
+     *
+     * @param senz senz message
+     */
+    public void sendSenz(final String senz) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    // send message to SenZ service
+                    if (address == null) address = InetAddress.getByName(SENZ_HOST);
+                    DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SENZ_PORT);
+                    socket.send(sendPacket);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    /**
      * Activities and other Services sends messages to SenzService via this
      * message handler
      */
@@ -241,27 +262,6 @@ public class SenzService extends Service {
             Log.d(TAG, "SenZ to be sent: " + senz);
 
             sendSenz(senz);
-        }
-
-        /**
-         * Send SenZ message to SenZ service via UDP socket
-         * Separate thread used to send messages asynchronously
-         *
-         * @param senz senz message
-         */
-        private void sendSenz(final String senz) {
-            new Thread(new Runnable() {
-                public void run() {
-                    try {
-                        // send message to SenZ service
-                        if (address == null) address = InetAddress.getByName(SENZ_HOST);
-                        DatagramPacket sendPacket = new DatagramPacket(senz.getBytes(), senz.length(), address, SENZ_PORT);
-                        socket.send(sendPacket);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
         }
     }
 

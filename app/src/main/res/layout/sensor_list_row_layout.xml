@@ -14,7 +14,7 @@
 
         <com.github.siyamed.shapeimageview.CircularImageView
             android:id="@+id/contact_image"
-            android:layout_width="match_parent"
+            android:layout_width="95dp"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
             app:siBorderColor="#ffc027"

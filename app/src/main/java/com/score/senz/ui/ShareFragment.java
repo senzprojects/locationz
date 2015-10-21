@@ -1,6 +1,7 @@
 package com.score.senz.ui;
 
 import android.app.ActionBar;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -9,11 +10,13 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,6 +24,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,6 +78,12 @@ public class ShareFragment extends android.support.v4.app.Fragment {
         }
     };
 
+    // use to track share timeout
+    private SenzCountDownTimer senzCountDownTimer;
+    private boolean isResponseReceived;
+
+    private Typeface typeface;
+
     /**
      * {@inheritDoc}
      */
@@ -99,6 +110,8 @@ public class ShareFragment extends android.support.v4.app.Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        senzCountDownTimer = new SenzCountDownTimer(18000, 6000);
+        isResponseReceived = false;
         initUi();
     }
 
@@ -137,7 +150,7 @@ public class ShareFragment extends android.support.v4.app.Fragment {
      * Initialize UI components
      */
     private void initUi() {
-        Typeface typefaceThin = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
+        typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
 
         usernameLabel = (TextView) getActivity().findViewById(R.id.share_layout_phone_no_label);
         usernameEditText = (EditText) getActivity().findViewById(R.id.share_layout_phone_no);
@@ -155,9 +168,9 @@ public class ShareFragment extends android.support.v4.app.Fragment {
         int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
         TextView actionBarTitle = (TextView) (getActivity().findViewById(titleId));
         actionBarTitle.setTextColor(getResources().getColor(R.color.white));
-        actionBarTitle.setTypeface(typefaceThin);
-        usernameLabel.setTypeface(typefaceThin);
-        usernameEditText.setTypeface(typefaceThin);
+        actionBarTitle.setTypeface(typeface);
+        usernameLabel.setTypeface(typeface);
+        usernameEditText.setTypeface(typeface);
     }
 
     /**
@@ -176,7 +189,9 @@ public class ShareFragment extends android.support.v4.app.Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_share_done:
-                share();
+                ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
+                senzCountDownTimer.start();
+
                 return true;
         }
 
@@ -196,6 +211,7 @@ public class ShareFragment extends android.support.v4.app.Fragment {
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("lat", "lat");
             senzAttributes.put("lon", "lon");
+            senzAttributes.put("msg", "msg");
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
 
             // new senz
@@ -213,21 +229,8 @@ public class ShareFragment extends android.support.v4.app.Fragment {
             // send senz to server
             Message msg = new Message();
             msg.obj = senzMessage;
-            try {
-                senzServiceMessenger.send(msg);
-                onPostShare();
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (NoUserException e) {
+            senzServiceMessenger.send(msg);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | NoUserException | SignatureException | RemoteException e) {
             e.printStackTrace();
         }
     }
@@ -237,7 +240,6 @@ public class ShareFragment extends android.support.v4.app.Fragment {
      */
     private void onPostShare() {
         usernameEditText.setText("");
-        ActivityUtils.hideSoftKeyboard(getActivity());
         Toast.makeText(getActivity(), "Successfully shared SenZ", Toast.LENGTH_LONG).show();
     }
 
@@ -256,16 +258,87 @@ public class ShareFragment extends android.support.v4.app.Fragment {
      * @param intent intent
      */
     private void handleMessage(Intent intent) {
-        ActivityUtils.cancelProgressDialog();
         String action = intent.getAction();
 
         if (action.equals("DATA")) {
-            ActivityUtils.cancelProgressDialog();
             boolean isDone = intent.getExtras().getParcelable("extra");
+            isResponseReceived = true;
+            senzCountDownTimer.cancel();
 
+            // on successful share display notification message(Toast)
             if (isDone) onPostShare();
         }
     }
 
+    /**
+     * Keep track with share response timeout
+     */
+    private class SenzCountDownTimer extends CountDownTimer {
+
+        public SenzCountDownTimer(long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            // if response not received yet, resend share
+            if (!isResponseReceived) {
+                share();
+                Log.d(TAG, "Response not received yet");
+            }
+        }
+
+        @Override
+        public void onFinish() {
+            ActivityUtils.hideSoftKeyboard(getActivity());
+            ActivityUtils.cancelProgressDialog();
+
+            // display message dialog that we couldn't reach the user
+            if (!isResponseReceived) {
+                String user = usernameEditText.getText().toString().trim();
+                String message = "<font color=#000000>Seems we couldn't reach the user </font> <font color=#ffc027>" + "<b>" + user + "</b>" + "</font> <font color=#000000> at this moment</font>";
+                displayInformationMessageDialog("Sharing fail", message);
+            }
+        }
+    }
+
+
+    /**
+     * Display message dialog when user request(click) to delete invoice
+     *
+     * @param message message to be display
+     */
+    public void displayInformationMessageDialog(String title, String message) {
+        final Dialog dialog = new Dialog(getActivity());
+
+        //set layout for dialog
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.information_message_dialog);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(true);
+
+        // set dialog texts
+        TextView messageHeaderTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_header_text);
+        TextView messageTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_text);
+        messageHeaderTextView.setText(title);
+        messageTextView.setText(Html.fromHtml(message));
+
+        // set custom font
+        messageHeaderTextView.setTypeface(typeface);
+        messageTextView.setTypeface(typeface);
+
+        //set ok button
+        Button okButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_ok_button);
+        okButton.setTypeface(typeface);
+        okButton.setTypeface(null, Typeface.BOLD);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+
+        dialog.show();
+    }
 
 }

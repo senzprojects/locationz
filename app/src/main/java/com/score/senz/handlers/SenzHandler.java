@@ -9,17 +9,24 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.score.senz.R;
 import com.score.senz.db.SenzorsDbSource;
+import com.score.senz.enums.SenzTypeEnum;
+import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.services.LocationAddressReceiver;
 import com.score.senz.services.LocationService;
+import com.score.senz.services.SenzService;
 import com.score.senz.utils.NotificationUtils;
-import com.score.senz.utils.PhoneBookUtils;
+import com.score.senz.utils.PreferenceUtils;
+import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.HashMap;
 
 /**
  * Handle All senz messages from here
@@ -38,26 +45,26 @@ public class SenzHandler {
         return instance;
     }
 
-    public void handleSenz(Context context, String senzMessage) {
+    public void handleSenz(SenzService senzService, String senzMessage) {
         try {
             // parse and verify senz
             Senz senz = SenzParser.parse(senzMessage);
-            verifySenz(context, senz);
+            verifySenz(senzService, senz);
             switch (senz.getSenzType()) {
                 case PING:
                     Log.d(TAG, "PING received");
                     break;
                 case SHARE:
                     Log.d(TAG, "SHARE received");
-                    handleShareSenz(context, senz);
+                    handleShareSenz(senzService, senz);
                     break;
                 case GET:
                     Log.d(TAG, "GET received");
-                    handleGetSenz(context, senz);
+                    handleGetSenz(senzService, senz);
                     break;
                 case DATA:
                     Log.d(TAG, "DATA received");
-                    handleDataSenz(context, senz);
+                    handleDataSenz(senzService, senz);
                     break;
             }
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
@@ -73,23 +80,22 @@ public class SenzHandler {
         //RSAUtils.verifyDigitalSignature(senz.getPayload(), senz.getSignature(), null);
     }
 
-    private void handleShareSenz(Context context, Senz senz) {
+    private void handleShareSenz(SenzService senzService, Senz senz) {
         // create senz
-        SenzorsDbSource dbSource = new SenzorsDbSource(context);
+        SenzorsDbSource dbSource = new SenzorsDbSource(senzService);
         User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
         senz.setSender(sender);
 
         // if senz already exists in the db, SQLiteConstraintException should throw
         try {
             dbSource.createSenz(senz);
-            OutBoundSenzHandler.getInstance().sendSenz(context, sender, true);
+            //sendShareResponse(sender, senzService, true);
 
-            NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "SenZ received from @" + PhoneBookUtils.getContactName(context, senz.getSender().getUsername()));
+            NotificationUtils.showNotification(senzService, senzService.getString(R.string.new_senz), "SenZ received from @" + senz.getSender().getUsername());
         } catch (SQLiteConstraintException e) {
-            OutBoundSenzHandler.getInstance().sendSenz(context, sender, false);
+            //sendShareResponse(sender, senzService, true);
             Log.e(TAG, e.toString());
         }
-
     }
 
     private void handleGetSenz(Context context, Senz senz) {
@@ -132,6 +138,37 @@ public class SenzHandler {
         }
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    private void sendShareResponse(User receiver, SenzService senzService, boolean isDone) {
+        try {
+            // create key pair
+            PrivateKey privateKey = RSAUtils.getPrivateKey(senzService);
+
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            if (isDone) senzAttributes.put("msg", "ShareDone");
+            else senzAttributes.put("msg", "ShareFail");
+
+            User user = PreferenceUtils.getUser(senzService);
+
+            // new senz
+            Senz senz = new Senz();
+            senz.setSenzType(SenzTypeEnum.DATA);
+            senz.setReceiver(receiver);
+            senz.setSender(user);
+            senz.setAttributes(senzAttributes);
+
+            // get digital signature of the senz
+            String senzPayload = SenzParser.getSenzPayload(senz);
+            String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+            String senzMessage = SenzParser.getSenzMessage(senzPayload, senzSignature);
+
+            senzService.sendSenz(senzMessage);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException | NoUserException e) {
+            e.printStackTrace();
+        }
     }
 
 }
