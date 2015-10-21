@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#e4e4e4"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:orientation="horizontal"
+            android:background="@drawable/transparent_bg"
+            android:layout_weight="1">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/switch1"
+                android:background="@drawable/disable_bg"
+                android:layout_weight="0.35">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:textSize="32sp"
+                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/switch1_text"
+                    android:text="Night Mode"
+                    android:textColor="#4a4a4a"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.65">
+                <Switch
+                    android:id="@+id/bed_room_switch"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="15dp"
+                    android:layout_width="100dp"
+                    android:layout_height="40dp"
+                    android:checked="false"
+                    android:textOn="On"
+                    android:textOff="Off"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:background="@drawable/transparent_bg"
+            android:layout_weight="1">
+            <RelativeLayout
+                android:id="@+id/switch2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/disable_bg"
+                android:layout_weight="0.35">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:textSize="32sp"
+                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/switch2_text"
+                    android:text="Kitchen"
+                    android:textColor="#4a4a4a"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.65">
+                <Switch
+                    android:id="@+id/kitchen_switch"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="15dp"
+                    android:layout_width="100dp"
+                    android:layout_height="40dp"
+                    android:checked="false"
+                    android:textOn="On"
+                    android:textOff="Off"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:background="@drawable/transparent_bg"
+            android:layout_weight="1">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/disable_bg"
+                android:layout_weight="0.35">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:textSize="32sp"
+                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/switch3_text"
+                    android:text="Telivision"
+                    android:textColor="#4a4a4a"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.65">
+                <Switch
+                    android:id="@+id/togglebutton3"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="15dp"
+                    android:layout_width="100dp"
+                    android:checked="false"
+                    android:layout_height="40dp"
+                    android:textOn="On"
+                    android:textOff="Off"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:orientation="horizontal"
+            android:background="@drawable/transparent_bg"
+            android:layout_weight="1">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/disable_bg"
+                android:layout_weight="0.35">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:textSize="32sp"
+                    android:layout_centerVertical="true"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/switch4_text"
+                    android:text="Visitor Mode"
+                    android:textColor="#4a4a4a"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.65">
+                <Switch
+                    android:id="@+id/togglebutton4"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="15dp"
+                    android:layout_width="100dp"
+                    android:layout_height="40dp"
+                    android:checked="false"
+                    android:textOn="On"
+                    android:textOff="Off"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
