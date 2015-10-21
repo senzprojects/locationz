@@ -37,6 +37,7 @@ import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
+import com.score.senz.utils.NetworkUtil;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;
@@ -189,8 +190,12 @@ public class ShareFragment extends android.support.v4.app.Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_share_done:
-                ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
-                senzCountDownTimer.start();
+                if (NetworkUtil.isAvailableNetwork(getActivity())) {
+                    ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
+                    senzCountDownTimer.start();
+                } else {
+                    Toast.makeText(getActivity(), "No network connection available", Toast.LENGTH_LONG).show();
+                }
 
                 return true;
         }
@@ -262,6 +267,10 @@ public class ShareFragment extends android.support.v4.app.Fragment {
 
         if (action.equals("DATA")) {
             boolean isDone = intent.getExtras().getParcelable("extra");
+
+            // response received
+            ActivityUtils.hideSoftKeyboard(getActivity());
+            ActivityUtils.cancelProgressDialog();
             isResponseReceived = true;
             senzCountDownTimer.cancel();
 
@@ -297,7 +306,7 @@ public class ShareFragment extends android.support.v4.app.Fragment {
             if (!isResponseReceived) {
                 String user = usernameEditText.getText().toString().trim();
                 String message = "<font color=#000000>Seems we couldn't reach the user </font> <font color=#ffc027>" + "<b>" + user + "</b>" + "</font> <font color=#000000> at this moment</font>";
-                displayInformationMessageDialog("Sharing fail", message);
+                displayInformationMessageDialog("#SHARE Fail", message);
             }
         }
     }

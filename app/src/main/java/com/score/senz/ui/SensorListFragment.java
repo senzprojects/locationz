@@ -1,5 +1,6 @@
 package com.score.senz.ui;
 
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -8,18 +9,22 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -81,6 +86,11 @@ public class SensorListFragment extends Fragment {
         }
     };
 
+    // use to track response timeout
+    private SenzCountDownTimer senzCountDownTimer;
+    private boolean isResponseReceived;
+    private Senz selectedSenz;
+
     /**
      * {@inheritDoc}
      */
@@ -99,6 +109,9 @@ public class SensorListFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
+
+        senzCountDownTimer = new SenzCountDownTimer(18000, 6000);
+        isResponseReceived = false;
 
         initEmptyView();
         initSensorListView();
@@ -171,11 +184,11 @@ public class SensorListFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.d(TAG, "onItemClick: click on sensor list item");
                 if (position > 0 && position <= senzList.size()) {
-                    Senz senz = senzList.get(position - 1);
+                    selectedSenz = senzList.get(position - 1);
 
                     if (NetworkUtil.isAvailableNetwork(getActivity())) {
                         ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
-                        getSenz(senz.getSender());
+                        senzCountDownTimer.start();
                     } else {
                         Toast.makeText(getActivity(), "No network connection available", Toast.LENGTH_LONG).show();
                     }
@@ -288,8 +301,12 @@ public class SensorListFragment extends Fragment {
         String action = intent.getAction();
 
         if (action.equals("DATA")) {
-            ActivityUtils.cancelProgressDialog();
             LatLng latLng = intent.getExtras().getParcelable("extra");
+
+            // location response received
+            ActivityUtils.cancelProgressDialog();
+            isResponseReceived = true;
+            senzCountDownTimer.cancel();
 
             // start map activity
             Intent mapIntent = new Intent(getActivity(), SensorMap.class);
@@ -297,6 +314,75 @@ public class SensorListFragment extends Fragment {
             getActivity().startActivity(mapIntent);
             getActivity().overridePendingTransition(R.anim.right_in, R.anim.stay_in);
         }
+    }
+
+    /**
+     * Keep track with share response timeout
+     */
+    private class SenzCountDownTimer extends CountDownTimer {
+
+        public SenzCountDownTimer(long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            // if response not received yet, resend share
+            if (!isResponseReceived) {
+                getSenz(selectedSenz.getSender());
+                Log.d(TAG, "Response not received yet");
+            }
+        }
+
+        @Override
+        public void onFinish() {
+            ActivityUtils.cancelProgressDialog();
+
+            // display message dialog that we couldn't reach the user
+            if (!isResponseReceived) {
+                String message = "<font color=#000000>Seems we couldn't get the location of user </font> <font color=#ffc027>" + "<b>" + selectedSenz.getSender().getUsername() + "</b>" + "</font> <font color=#000000> at this moment</font>";
+                displayInformationMessageDialog("#GET Fail", message);
+            }
+        }
+    }
+
+
+    /**
+     * Display message dialog when user request(click) to delete invoice
+     *
+     * @param message message to be display
+     */
+    public void displayInformationMessageDialog(String title, String message) {
+        final Dialog dialog = new Dialog(getActivity());
+
+        //set layout for dialog
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.information_message_dialog);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(true);
+
+        // set dialog texts
+        TextView messageHeaderTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_header_text);
+        TextView messageTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_text);
+        messageHeaderTextView.setText(title);
+        messageTextView.setText(Html.fromHtml(message));
+
+        // set custom font
+        messageHeaderTextView.setTypeface(typeface);
+        messageTextView.setTypeface(typeface);
+
+        //set ok button
+        Button okButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_ok_button);
+        okButton.setTypeface(typeface);
+        okButton.setTypeface(null, Typeface.BOLD);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+
+        dialog.show();
     }
 
 }
