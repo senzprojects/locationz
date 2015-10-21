@@ -89,11 +89,11 @@ public class SenzHandler {
         // if senz already exists in the db, SQLiteConstraintException should throw
         try {
             dbSource.createSenz(senz);
-            //sendShareResponse(sender, senzService, true);
+            sendShareResponse(sender, senzService, true);
 
             NotificationUtils.showNotification(senzService, senzService.getString(R.string.new_senz), "SenZ received from @" + senz.getSender().getUsername());
         } catch (SQLiteConstraintException e) {
-            //sendShareResponse(sender, senzService, true);
+            sendShareResponse(sender, senzService, false);
             Log.e(TAG, e.toString());
         }
     }

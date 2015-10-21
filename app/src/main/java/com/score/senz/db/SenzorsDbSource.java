@@ -158,7 +158,6 @@ public class SenzorsDbSource {
         String _senzValue;
         String _userId;
         String _username;
-        Senz senz = new Senz();
 
         // extract attributes
         while (cursor.moveToNext()) {
@@ -177,6 +176,9 @@ public class SenzorsDbSource {
             if (_senzValue != null && !_senzValue.isEmpty()) {
                 senzAttributes.put(_senzName, _senzValue);
             }
+
+            // create senz
+            Senz senz = new Senz();
             senz.setAttributes(senzAttributes);
             senz.setSender(new User(_userId, _username));
 

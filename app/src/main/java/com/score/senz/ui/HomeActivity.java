@@ -2,6 +2,10 @@ package com.score.senz.ui;
 
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
@@ -13,9 +17,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.senz.R;
+import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.DrawerItem;
+import com.score.senz.pojos.User;
+import com.score.senz.utils.PreferenceUtils;
 
 import java.util.ArrayList;
 
@@ -39,6 +48,13 @@ public class HomeActivity extends FragmentActivity {
     private ArrayList<DrawerItem> drawerItemList;
     private DrawerAdapter drawerAdapter;
 
+    // type face
+    private Typeface typeface;
+
+    // user components
+    private CircularImageView userImage;
+    private TextView username;
+
     /**
      * {@inheritDoc}
      */
@@ -48,6 +64,7 @@ public class HomeActivity extends FragmentActivity {
         setContentView(R.layout.home_layout);
 
         initDrawer();
+        initDrawerUser();
         initDrawerList();
         loadSensors();
     }
@@ -104,6 +121,27 @@ public class HomeActivity extends FragmentActivity {
         //drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         homeActionBarDrawerToggle = new HomeActionBarDrawerToggle(this, drawerLayout);
         drawerLayout.setDrawerListener(homeActionBarDrawerToggle);
+    }
+
+    private void initDrawerUser() {
+        userImage = (CircularImageView) findViewById(R.id.contact_image);
+        Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.default_user_icon);
+        userImage.setImageBitmap(largeIcon);
+
+        typeface = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
+        //typeface = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Black.ttf");
+
+        try {
+            User user = PreferenceUtils.getUser(this);
+            username = (TextView) findViewById(R.id.home_user_text);
+            username.setText("@" + user.getUsername());
+            username.setTextColor(Color.parseColor("#ffc027"));
+            //username.setTextColor(Color.parseColor("#4a4a4a"));
+            username.setTypeface(typeface, Typeface.BOLD);
+        } catch (NoUserException e) {
+            e.printStackTrace();
+        }
+
     }
 
     /**

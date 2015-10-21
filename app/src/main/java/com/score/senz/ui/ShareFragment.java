@@ -111,7 +111,7 @@ public class ShareFragment extends android.support.v4.app.Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        senzCountDownTimer = new SenzCountDownTimer(18000, 6000);
+        senzCountDownTimer = new SenzCountDownTimer(16000, 5000);
         isResponseReceived = false;
         initUi();
     }
@@ -306,7 +306,7 @@ public class ShareFragment extends android.support.v4.app.Fragment {
             if (!isResponseReceived) {
                 String user = usernameEditText.getText().toString().trim();
                 String message = "<font color=#000000>Seems we couldn't reach the user </font> <font color=#ffc027>" + "<b>" + user + "</b>" + "</font> <font color=#000000> at this moment</font>";
-                displayInformationMessageDialog("#SHARE Fail", message);
+                displayInformationMessageDialog("#Share Fail", message);
             }
         }
     }

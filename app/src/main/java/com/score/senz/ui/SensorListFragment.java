@@ -110,7 +110,7 @@ public class SensorListFragment extends Fragment {
 
         typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
 
-        senzCountDownTimer = new SenzCountDownTimer(18000, 6000);
+        senzCountDownTimer = new SenzCountDownTimer(16000, 5000);
         isResponseReceived = false;
 
         initEmptyView();
@@ -341,7 +341,7 @@ public class SensorListFragment extends Fragment {
             // display message dialog that we couldn't reach the user
             if (!isResponseReceived) {
                 String message = "<font color=#000000>Seems we couldn't get the location of user </font> <font color=#ffc027>" + "<b>" + selectedSenz.getSender().getUsername() + "</b>" + "</font> <font color=#000000> at this moment</font>";
-                displayInformationMessageDialog("#GET Fail", message);
+                displayInformationMessageDialog("#Get Fail", message);
             }
         }
     }

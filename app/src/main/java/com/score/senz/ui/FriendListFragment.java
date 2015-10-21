@@ -1,18 +1,23 @@
 package com.score.senz.ui;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -79,6 +84,13 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
         }
     };
 
+    // use to track share timeout
+    private SenzCountDownTimer senzCountDownTimer;
+    private boolean isResponseReceived;
+    private User selectedUser;
+
+    private Typeface typeface;
+
     /**
      * {@inheritDoc}
      */
@@ -97,6 +109,11 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        senzCountDownTimer = new SenzCountDownTimer(16000, 5000);
+        isResponseReceived = false;
+
+        typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
+
         setActionBar("#Friend");
         initFriendListView();
         readFriends();
@@ -114,6 +131,8 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
             this.getActivity().bindService(new Intent(this.getActivity(), SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
             isServiceBound = true;
         }
+
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
     }
 
     /**
@@ -128,6 +147,8 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
             getActivity().unbindService(senzServiceConnection);
             isServiceBound = false;
         }
+
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(senzMessageReceiver);
     }
 
     /**
@@ -202,6 +223,8 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
      * @param user user
      */
     private void handelListItemClick(User user) {
+        selectedUser = user;
+
         // close search view if its visible
         if (searchView.isShown()) {
             searchMenuItem.collapseActionView();
@@ -262,6 +285,37 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
         }
     }
 
+    private BroadcastReceiver senzMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got message from Senz service");
+            handleMessage(intent);
+        }
+    };
+
+    /**
+     * Handle broadcast message receives
+     * Need to handle registration success failure here
+     *
+     * @param intent intent
+     */
+    private void handleMessage(Intent intent) {
+        String action = intent.getAction();
+
+        if (action.equals("DATA")) {
+            boolean isDone = intent.getExtras().getParcelable("extra");
+
+            // response received
+            ActivityUtils.cancelProgressDialog();
+            isResponseReceived = true;
+            senzCountDownTimer.cancel();
+
+            // on successful share display notification message(Toast)
+            if (isDone) onPostShare();
+        }
+    }
+
+
     /**
      * Share current sensor
      * Need to send share query to server via web socket
@@ -294,7 +348,6 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
             msg.obj = senzMessage;
             try {
                 senzServiceMessenger.send(msg);
-                onPostShare();
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -315,7 +368,6 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
      * Clear input fields and reset activity components
      */
     private void onPostShare() {
-        ActivityUtils.hideSoftKeyboard(getActivity());
         Toast.makeText(getActivity(), "Successfully shared SenZ", Toast.LENGTH_LONG).show();
     }
 
@@ -351,7 +403,8 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dialog.cancel();
-                share(user);
+                ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
+                senzCountDownTimer.start();
             }
         });
 
@@ -359,6 +412,75 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
         Button cancelButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_cancel_button);
         cancelButton.setTypeface(face);
         cancelButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+
+        dialog.show();
+    }
+
+    /**
+     * Keep track with share response timeout
+     */
+    private class SenzCountDownTimer extends CountDownTimer {
+
+        public SenzCountDownTimer(long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            // if response not received yet, resend share
+            if (!isResponseReceived) {
+                share(selectedUser);
+                Log.d(TAG, "Response not received yet");
+            }
+        }
+
+        @Override
+        public void onFinish() {
+            ActivityUtils.cancelProgressDialog();
+
+            // display message dialog that we couldn't reach the user
+            if (!isResponseReceived) {
+                String message = "<font color=#000000>Seems we couldn't get the location of user </font> <font color=#ffc027>" + "<b>" + selectedUser.getUsername() + "</b>" + "</font> <font color=#000000> at this moment</font>";
+                displayInformationMessageDialog("#Get Fail", message);
+            }
+        }
+    }
+
+
+    /**
+     * Display message dialog when user request(click) to delete invoice
+     *
+     * @param message message to be display
+     */
+    public void displayInformationMessageDialog(String title, String message) {
+        final Dialog dialog = new Dialog(getActivity());
+
+        //set layout for dialog
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.information_message_dialog);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(true);
+
+        // set dialog texts
+        TextView messageHeaderTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_header_text);
+        TextView messageTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_text);
+        messageHeaderTextView.setText(title);
+        messageTextView.setText(Html.fromHtml(message));
+
+        // set custom font
+        messageHeaderTextView.setTypeface(typeface);
+        messageTextView.setTypeface(typeface);
+
+        //set ok button
+        Button okButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_ok_button);
+        okButton.setTypeface(typeface);
+        okButton.setTypeface(null, Typeface.BOLD);
+        okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dialog.cancel();
             }
