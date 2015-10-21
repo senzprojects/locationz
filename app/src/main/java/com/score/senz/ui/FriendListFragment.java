@@ -60,7 +60,7 @@ import java.util.HashMap;
  */
 public class FriendListFragment extends android.support.v4.app.Fragment implements SearchView.OnQueryTextListener, SearchView.OnCloseListener {
 
-    private static final String TAG = SensorListFragment.class.getName();
+    private static final String TAG = SenzListFragment.class.getName();
 
     private ListView friendListView;
     private SearchView searchView;

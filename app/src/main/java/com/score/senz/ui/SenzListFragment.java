@@ -56,9 +56,9 @@ import java.util.HashMap;
  *
  * @author erangaeb@gmail.com (eranga herath)
  */
-public class SensorListFragment extends Fragment {
+public class SenzListFragment extends Fragment {
 
-    private static final String TAG = SensorListFragment.class.getName();
+    private static final String TAG = SenzListFragment.class.getName();
 
     // list view components
     private ListView sensorListView;
@@ -218,13 +218,13 @@ public class SensorListFragment extends Fragment {
         senzList = (ArrayList<Senz>) new SenzorsDbSource(this.getActivity()).getSenzes();
 
         // construct list adapter
-        SensorListAdapter adapter;
+        SenzListAdapter adapter;
         if (senzList.size() > 0) {
-            adapter = new SensorListAdapter(SensorListFragment.this.getActivity(), senzList);
+            adapter = new SenzListAdapter(SenzListFragment.this.getActivity(), senzList);
             adapter.notifyDataSetChanged();
             sensorListView.setAdapter(adapter);
         } else {
-            adapter = new SensorListAdapter(SensorListFragment.this.getActivity(), senzList);
+            adapter = new SenzListAdapter(SenzListFragment.this.getActivity(), senzList);
             sensorListView.setAdapter(adapter);
             sensorListView.setEmptyView(emptyView);
         }
@@ -309,7 +309,7 @@ public class SensorListFragment extends Fragment {
             senzCountDownTimer.cancel();
 
             // start map activity
-            Intent mapIntent = new Intent(getActivity(), SensorMap.class);
+            Intent mapIntent = new Intent(getActivity(), SenzMapActivity.class);
             mapIntent.putExtra("extra", latLng);
             getActivity().startActivity(mapIntent);
             getActivity().overridePendingTransition(R.anim.right_in, R.anim.stay_in);

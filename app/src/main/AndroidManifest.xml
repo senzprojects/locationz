@@ -100,7 +100,7 @@
             android:windowSoftInputMode="stateHidden"></activity>
 
         <activity
-            android:name=".ui.SensorMap"
+            android:name=".ui.SenzMapActivity"
             android:configChanges="orientation"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"

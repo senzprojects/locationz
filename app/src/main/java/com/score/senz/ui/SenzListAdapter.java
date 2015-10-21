@@ -23,7 +23,7 @@ import java.util.ArrayList;
  *
  * @author erangaeb@gmail.com (eranga herath)
  */
-public class SensorListAdapter extends BaseAdapter {
+public class SenzListAdapter extends BaseAdapter {
 
     private Context context;
     private ArrayList<Senz> senzList;
@@ -38,7 +38,7 @@ public class SensorListAdapter extends BaseAdapter {
      * @param context  activity context
      * @param senzList sharing user list
      */
-    public SensorListAdapter(Context context, ArrayList<Senz> senzList) {
+    public SenzListAdapter(Context context, ArrayList<Senz> senzList) {
         typefaceThin = Typeface.createFromAsset(context.getAssets(), "fonts/vegur_2.otf");
         typefaceBlack = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Black.ttf");
 

@@ -1,4 +1,4 @@
-package com.score.senz.ui;
+package com.score.senz.utils;
 
 import android.location.Criteria;
 import android.location.LocationManager;

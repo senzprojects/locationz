@@ -244,7 +244,7 @@ public class HomeActivity extends FragmentActivity {
      * Load my sensor list fragment
      */
     private void loadSensors() {
-        SensorListFragment sensorListFragment = new SensorListFragment();
+        SenzListFragment sensorListFragment = new SenzListFragment();
 
         // fragment transitions
         // Replace whatever is in the fragment_container view with this fragment,

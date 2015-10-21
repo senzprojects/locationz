@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.score.senz.R;
 import com.score.senz.utils.ActivityUtils;
+import com.score.senz.utils.LocationUtils;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,9 +34,9 @@ import com.score.senz.utils.ActivityUtils;
  * Time: 3:06 PM
  * To change this template use File | Settings | File Templates.
  */
-public class SensorMap extends FragmentActivity implements LocationListener {
+public class SenzMapActivity extends FragmentActivity implements LocationListener {
 
-    private static final String TAG = SensorMap.class.getName();
+    private static final String TAG = SenzMapActivity.class.getName();
 
     RelativeLayout myLocation;
 
@@ -60,9 +61,9 @@ public class SensorMap extends FragmentActivity implements LocationListener {
             @Override
             public void onClick(View v) {
                 //displayMyLocation(new LatLng(7.842891, 80.809937));
-                ActivityUtils.showProgressDialog(SensorMap.this, "Please wait...");
+                ActivityUtils.showProgressDialog(SenzMapActivity.this, "Please wait...");
                 locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-                locationManager.requestLocationUpdates(LocationUtils.getBestLocationProvider(locationManager), 0, 0, SensorMap.this);
+                locationManager.requestLocationUpdates(LocationUtils.getBestLocationProvider(locationManager), 0, 0, SenzMapActivity.this);
             }
         });
 
