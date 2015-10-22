@@ -112,7 +112,6 @@ public class SenzListFragment extends Fragment {
         typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
 
         senzCountDownTimer = new SenzCountDownTimer(16000, 5000);
-        isResponseReceived = false;
 
         initEmptyView();
         initSensorListView();
@@ -183,8 +182,8 @@ public class SenzListFragment extends Fragment {
         sensorListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d(TAG, "onItemClick: click on sensor list item");
                 if (position > 0 && position <= senzList.size()) {
+                    Log.d(TAG, "onItemClick: click on sensor list item");
                     selectedSenz = senzList.get(position - 1);
                     handleListItmeClick(selectedSenz);
                 }
@@ -193,17 +192,18 @@ public class SenzListFragment extends Fragment {
     }
 
     private void handleListItmeClick(Senz senz) {
-        if (senz.getAttributes().containsKey("gpio3") || senz.getSender().getUsername().equalsIgnoreCase("ban")) {
+        if (senz.getAttributes().containsKey("gpio3")) {
             // this is gpio senz
             Intent intent = new Intent(getActivity(), SenzSwitchBoardActivity.class);
             //intent.putExtra("extra", senz);
-            ((SenzApplication)getActivity().getApplication()).setSenz(senz);
+            ((SenzApplication) getActivity().getApplication()).setSenz(senz);
             getActivity().startActivity(intent);
             getActivity().overridePendingTransition(R.anim.right_in, R.anim.stay_in);
         } else {
             // location senz
             if (NetworkUtil.isAvailableNetwork(getActivity())) {
                 ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
+                isResponseReceived = false;
                 senzCountDownTimer.start();
             } else {
                 Toast.makeText(getActivity(), "No network connection available", Toast.LENGTH_LONG).show();
@@ -357,6 +357,7 @@ public class SenzListFragment extends Fragment {
                 String message = "<font color=#000000>Seems we couldn't get the location of user </font> <font color=#ffc027>" + "<b>" + selectedSenz.getSender().getUsername() + "</b>" + "</font> <font color=#000000> at this moment</font>";
                 displayInformationMessageDialog("#Get Fail", message);
             }
+
         }
     }
 
