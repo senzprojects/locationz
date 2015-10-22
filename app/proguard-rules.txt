@@ -20,8 +20,12 @@
 #}
 
 -assumenosideeffects class android.util.Log {
-    public static int v(...);
+    public static *** d(...);
+    public static *** w(...);
+    public static *** v(...);
+    public static *** i(...);
 }
 
 -dontwarn com.google.android.gms.**
 -dontwarn de.tavendo.autobahn.**
+-dontwarn com.github.siyamed.**

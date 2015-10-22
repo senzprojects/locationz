@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.score.senz"
-    android:versionCode="9"
-    android:versionName="1.9">
+    android:versionCode="1"
+    android:versionName="1.0">
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -11,7 +11,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <!-- External storage for caching. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -37,14 +36,14 @@
         android:label="@string/app_name">
 
         <!-- production key -->
-        <!--<meta-data-->
-        <!--android:name="com.google.android.maps.v2.API_KEY"-->
-        <!--android:value="AIzaSyDQBL4MsO4B5qpA3VvX3HtRCQG2I09p7t0"/>-->
-
-        <!-- debug key -->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyAzW1LOJz7zGeKTohFwzmRPDtb1yqt0bC8" />
+            android:value="AIzaSyDQBL4MsO4B5qpA3VvX3HtRCQG2I09p7t0" />
+
+        <!-- debug key -->
+        <!--<meta-data-->
+        <!--android:name="com.google.android.maps.v2.API_KEY"-->
+        <!--android:value="AIzaSyAzW1LOJz7zGeKTohFwzmRPDtb1yqt0bC8" />-->
 
         <meta-data
             android:name="com.google.android.gms.version"

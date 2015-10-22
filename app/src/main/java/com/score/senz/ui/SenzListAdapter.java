@@ -29,8 +29,7 @@ public class SenzListAdapter extends BaseAdapter {
     private ArrayList<Senz> senzList;
 
     // set custom font
-    Typeface typefaceThin;
-    Typeface typefaceBlack;
+    private Typeface typefaceThin;
 
     /**
      * Initialize context variables
@@ -40,7 +39,6 @@ public class SenzListAdapter extends BaseAdapter {
      */
     public SenzListAdapter(Context context, ArrayList<Senz> senzList) {
         typefaceThin = Typeface.createFromAsset(context.getAssets(), "fonts/vegur_2.otf");
-        typefaceBlack = Typeface.createFromAsset(context.getAssets(), "fonts/Roboto-Black.ttf");
 
         this.context = context;
         this.senzList = senzList;
