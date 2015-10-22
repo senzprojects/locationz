@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -219,8 +220,9 @@ public class SenzListFragment extends Fragment {
         emptyView = (ViewStub) getActivity().findViewById(R.id.sensor_list_layout_empty_view);
         View inflatedEmptyView = emptyView.inflate();
         TextView emptyText = (TextView) inflatedEmptyView.findViewById(R.id.empty_text);
-        emptyText.setText("No SenZ available");
-        emptyText.setTypeface(typeface);
+        emptyText.setText("No Senz available. Give your username to a friend and ask them to share senzs to you");
+        emptyText.setTextColor(Color.parseColor("#ffc027"));
+        emptyText.setTypeface(typeface, Typeface.BOLD);
     }
 
     /**
@@ -240,7 +242,7 @@ public class SenzListFragment extends Fragment {
         } else {
             adapter = new SenzListAdapter(SenzListFragment.this.getActivity(), senzList);
             sensorListView.setAdapter(adapter);
-            sensorListView.setEmptyView(emptyView);
+            //sensorListView.setEmptyView(emptyView);
         }
     }
 
