@@ -303,7 +303,7 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
         String action = intent.getAction();
 
         if (action.equals("DATA")) {
-            boolean isDone = intent.getExtras().getParcelable("extra");
+            boolean isDone = intent.getExtras().getBoolean("extra");
 
             // response received
             ActivityUtils.cancelProgressDialog();

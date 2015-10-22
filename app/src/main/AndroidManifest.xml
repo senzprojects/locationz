@@ -107,6 +107,14 @@
             android:theme="@style/Theme.Yello"
             android:windowSoftInputMode="stateHidden"></activity>
 
+        <activity
+            android:name=".ui.SenzSwitchBoardActivity"
+            android:configChanges="orientation"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Yello"
+            android:windowSoftInputMode="stateHidden"></activity>
+
         <service
             android:name=".services.GpsReadingService"
             android:enabled="true" />

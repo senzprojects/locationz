@@ -117,19 +117,19 @@ public class SenzHandler {
         Intent intent = new Intent("DATA");
 
         // we are broadcasting DATA sensors
-        if (senz.getAttributes().containsKey("#msg")) {
-            String msg = senz.getAttributes().get("#msg");
-            if (msg.equalsIgnoreCase("UserCreated") || msg.equalsIgnoreCase("ShareDone")) {
+        if (senz.getAttributes().containsKey("msg")) {
+            String msg = senz.getAttributes().get("msg");
+            if (msg.equalsIgnoreCase("UserCreated") || msg.equalsIgnoreCase("ShareDone") || msg.equalsIgnoreCase("PutDone")) {
                 intent.putExtra("extra", true);
             } else {
                 intent.putExtra("extra", false);
             }
-        } else if (senz.getAttributes().containsKey("#lat")) {
+        } else if (senz.getAttributes().containsKey("lat")) {
             Log.d("TAG", "location response");
 
             // create lat LatLan object and broadcast it
-            double lat = Double.parseDouble(senz.getAttributes().get("#lat"));
-            double lan = Double.parseDouble(senz.getAttributes().get("#lon"));
+            double lat = Double.parseDouble(senz.getAttributes().get("lat"));
+            double lan = Double.parseDouble(senz.getAttributes().get("lon"));
             LatLng latLng = new LatLng(lat, lan);
             intent.putExtra("extra", latLng);
 

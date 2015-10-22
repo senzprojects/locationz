@@ -126,20 +126,26 @@ public class SenzListAdapter extends BaseAdapter {
         viewHolder.user.setText("@" + senz.getSender().getUsername());
 
         if (senz.getAttributes().containsKey("Location")) {
-            String locationText = "<font color=#4a4a4a>Last seen in</font> <font color=#ffc027>" + "<b>" + senz.getAttributes().get("Location") + "</b>" + "</font>";
-            viewHolder.lastSeen.setText(Html.fromHtml(locationText));
-            viewHolder.lastSeen.setTextColor(Color.parseColor("#ffc027"));
-        } else {
-            viewHolder.lastSeen.setText("No last seen location available");
-            viewHolder.lastSeen.setTextColor(Color.parseColor("#4a4a4a"));
+            // Location senz
+            if (senz.getAttributes().get("Location") != null && !senz.getAttributes().get("Location").isEmpty()) {
+                String locationText = "<font color=#4a4a4a>Last seen in</font> <font color=#ffc027>" + "<b>" + senz.getAttributes().get("Location") + "</b>" + "</font>";
+                viewHolder.lastSeen.setText(Html.fromHtml(locationText));
+                viewHolder.lastSeen.setTextColor(Color.parseColor("#ffc027"));
+            } else {
+                viewHolder.lastSeen.setText("No last seen location available");
+                viewHolder.lastSeen.setTextColor(Color.parseColor("#4a4a4a"));
+            }
+        } else if (senz.getAttributes().containsKey("GPIO3")){
+            // GPIO senz
+            if (!senz.getAttributes().get("GPIO3").isEmpty()) {
+                String locationText = "<font color=#4a4a4a>Switch is </font> <font color=#ffc027>" + "<b>" + senz.getAttributes().get("GPIO3") + "</b>" + "</font>";
+                viewHolder.lastSeen.setText(Html.fromHtml(locationText));
+                viewHolder.lastSeen.setTextColor(Color.parseColor("#ffc027"));
+            } else {
+                viewHolder.lastSeen.setText("No switch status available");
+                viewHolder.lastSeen.setTextColor(Color.parseColor("#4a4a4a"));
+            }
         }
-
-//        if (senz.getSenderImage() != null) {
-//            viewHolder.image.setImageBitmap(senz.getSenderImage());
-//        } else {
-//            Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_user_icon);
-//            viewHolder.image.setImageBitmap(largeIcon);
-//        }
 
         Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_user_icon);
         viewHolder.image.setImageBitmap(largeIcon);

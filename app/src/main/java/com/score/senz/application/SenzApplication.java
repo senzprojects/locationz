@@ -2,12 +2,16 @@ package com.score.senz.application;
 
 import android.app.Application;
 
+import com.score.senz.pojos.Senz;
+
 /**
  * Application class to hold shared attributes
  *
  * @author erangaeb@gmail.com (eranga herath)
  */
 public class SenzApplication extends Application {
+
+    private Senz senz;
 
     /**
      * {@inheritDoc}
@@ -25,4 +29,11 @@ public class SenzApplication extends Application {
         super.onTerminate();
     }
 
+    public Senz getSenz() {
+        return senz;
+    }
+
+    public void setSenz(Senz senz) {
+        this.senz = senz;
+    }
 }

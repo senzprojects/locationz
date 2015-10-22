@@ -108,7 +108,12 @@ public class SenzorsDbSource {
 
         // content values to inset
         ContentValues values = new ContentValues();
-        values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "Location");
+        if (senz.getAttributes().containsKey("lat")) {
+            values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "Location");
+        } else if (senz.getAttributes().containsKey("gpio3")) {
+            values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "GPIO3");
+        }
+
         values.put(SenzorsDbContract.Senz.COLUMN_NAME_USER, senz.getSender().getId());
 
         // Insert the new row, if fails throw an error
@@ -172,10 +177,7 @@ public class SenzorsDbSource {
             _userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
             _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
 
-            // senz
-            if (_senzValue != null && !_senzValue.isEmpty()) {
-                senzAttributes.put(_senzName, _senzValue);
-            }
+            senzAttributes.put(_senzName, _senzValue);
 
             // create senz
             Senz senz = new Senz();

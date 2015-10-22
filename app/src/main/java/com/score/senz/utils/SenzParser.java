@@ -36,18 +36,20 @@ public class SenzParser {
                 // ^mysensors, ^0775432015
                 senz.setSender(new User("", token.substring(1)));
             } else if (token.startsWith("#")) {
+                // we remove # from token and store as a key
+                String key = token.substring(1);
                 if (token.equals("#time") || token.equals("#pubkey")) {
                     // #time 2453234, #pubkey ac23edf432fdg
-                    senz.getAttributes().put(token, tokens[i + 1]);
+                    senz.getAttributes().put(key, tokens[i + 1]);
                     i++;
                 } else {
                     if (senz.getSenzType() == SenzTypeEnum.DATA) {
                         // #lat 3.2343 #lon 4.3434
-                        senz.getAttributes().put(token, tokens[i + 1]);
+                        senz.getAttributes().put(key, tokens[i + 1]);
                         i++;
                     } else {
                         // #lat #lon
-                        senz.getAttributes().put(token, "");
+                        senz.getAttributes().put(key, "");
                     }
                 }
             }

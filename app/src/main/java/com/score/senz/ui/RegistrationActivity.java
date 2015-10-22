@@ -252,12 +252,13 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         if (action.equals("DATA")) {
             boolean senzMessage = intent.getExtras().getBoolean("extra");
             if (senzMessage) {
-                ActivityUtils.cancelProgressDialog();
-                Toast.makeText(this, "Successfully registered", Toast.LENGTH_LONG).show();
-
                 // save user
                 // navigate home
                 PreferenceUtils.saveUser(this, registeringUser);
+
+                ActivityUtils.cancelProgressDialog();
+                Toast.makeText(this, "Successfully registered", Toast.LENGTH_LONG).show();
+
                 navigateToHome();
             } else {
                 ActivityUtils.cancelProgressDialog();
