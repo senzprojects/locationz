@@ -295,26 +295,18 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
     @Override
     public void onClick(View v) {
         if (v == nightModeButton) {
-            handleNightModeButtonClick();
-        } else if (v == visitorModeButton) {
-            handleVisitorModeButtonClick();
-        }
-    }
-
-    private void handleNightModeButtonClick() {
-        if (NetworkUtil.isAvailableNetwork(this)) {
             isNightMode = true;
-            ActivityUtils.showProgressDialog(this, "Please wait..");
-            senzCountDownTimer.start();
-        } else {
-            Toast.makeText(this, "No network connection available", Toast.LENGTH_LONG).show();
+            handleSwitchModeButtonClick();
+        } else if (v == visitorModeButton) {
+            isNightMode = false;
+            handleSwitchModeButtonClick();
         }
     }
 
-    private void handleVisitorModeButtonClick() {
+    private void handleSwitchModeButtonClick() {
         if (NetworkUtil.isAvailableNetwork(this)) {
-            isNightMode = false;
             ActivityUtils.showProgressDialog(this, "Please wait..");
+            isResponseReceived = false;
             senzCountDownTimer.start();
         } else {
             Toast.makeText(this, "No network connection available", Toast.LENGTH_LONG).show();
