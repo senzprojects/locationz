@@ -133,7 +133,7 @@ public class SenzListAdapter extends BaseAdapter {
                 viewHolder.lastSeen.setText("No last seen location available");
                 viewHolder.lastSeen.setTextColor(Color.parseColor("#4a4a4a"));
             }
-        } else if (senz.getAttributes().containsKey("GPIO13")) {
+        } else if (senz.getAttributes().containsKey("GPIO13") || senz.getAttributes().containsKey("GPIO15")) {
             // GPIO senz
             String locationText = "<font color=#4a4a4a>Switch</font> <font color=#ffc027>" + "<b>" + " ON/OFF " + "</b>" + "</font>";
             viewHolder.lastSeen.setText(Html.fromHtml(locationText));

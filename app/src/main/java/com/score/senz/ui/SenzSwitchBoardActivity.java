@@ -88,6 +88,7 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
 
     // this activity deals with senz
     private Senz thisSenz;
+    private boolean isNightMode;
 
     /**
      * {@inheritDoc}
@@ -140,6 +141,13 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
             nightModeButton.setBackgroundResource(R.drawable.green_button_selector);
         } else {
             nightModeButton.setBackgroundResource(R.drawable.disable_bg);
+        }
+
+        // set up switches according to ON, OFF state
+        if (thisSenz.getAttributes().get("GPIO15").equalsIgnoreCase("ON")) {
+            visitorModeButton.setBackgroundResource(R.drawable.green_button_selector);
+        } else {
+            visitorModeButton.setBackgroundResource(R.drawable.disable_bg);
         }
 
         nightModeButton.setOnClickListener(this);
@@ -220,7 +228,10 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
 
         if (action.equals("DATA")) {
             String status = intent.getExtras().getString("extra");
-            thisSenz.getAttributes().put("GPIO13", status);
+            if (isNightMode)
+                thisSenz.getAttributes().put("GPIO13", status);
+            else
+                thisSenz.getAttributes().put("GPIO15", status);
 
             // response received
             ActivityUtils.cancelProgressDialog();
@@ -247,9 +258,16 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
             if (!isResponseReceived) {
                 // if switch is on we have to off
                 // if switch if off we have to on
-                boolean switchStatus = (!thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON"));
-
-                put(switchStatus);
+                if (isNightMode)
+                    if (thisSenz.getAttributes().get("#GPIO13").equalsIgnoreCase("ON"))
+                        put("OFF");
+                    else
+                        put("ON");
+                else
+                    if (thisSenz.getAttributes().get("#GPIO15").equalsIgnoreCase("ON"))
+                        put("OFF");
+                    else
+                        put("ON");
                 Log.d(TAG, "Response not received yet");
             }
         }
@@ -261,7 +279,8 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
             // display message dialog that we couldn't reach the user
             if (!isResponseReceived) {
                 // TODO
-                String message = "<font color=#000000>Seems we couldn't switch the </font> <font color=#ffc027>" + "<b>" + "NIGHT MODE" + "</b>" + "</font> <font color=#000000> at this moment</font>";
+                //String message = "<font color=#000000>Seems we couldn't switch the </font> <font color=#ffc027>" + "<b>" + "NIGHT MODE" + "</b>" + "</font> <font color=#000000> at this moment</font>";
+                String message = "<font color=#000000>Seems we couldn't switch at this moment</font>";
                 displayInformationMessageDialog("#Put Fail", message);
             }
         }
@@ -270,13 +289,29 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
     @Override
     public void onClick(View v) {
         if (v == nightModeButton) {
-            handleSwitchButtonClick();
+            handleNightModeButtonClick();
+        } else if (v == visitorModeButton) {
+            handleVisitorModeButtonClick();
         }
     }
 
-    private void handleSwitchButtonClick() {
+    private void handleNightModeButtonClick() {
         if (NetworkUtil.isAvailableNetwork(this)) {
+            isNightMode = true;
             boolean switchStatus = (!thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON"));
+
+            String msg = switchStatus ? "On" : "Off";
+            ActivityUtils.showProgressDialog(this, "Switching " + msg);
+            senzCountDownTimer.start();
+        } else {
+            Toast.makeText(this, "No network connection available", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void handleVisitorModeButtonClick() {
+        if (NetworkUtil.isAvailableNetwork(this)) {
+            isNightMode = false;
+            boolean switchStatus = (!thisSenz.getAttributes().get("GPIO15").equalsIgnoreCase("ON"));
 
             String msg = switchStatus ? "On" : "Off";
             ActivityUtils.showProgressDialog(this, "Switching " + msg);
@@ -292,7 +327,10 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
             new SenzorsDbSource(this).updateSenz(thisSenz.getSender(), "ON");
 
             // update switches
-            nightModeButton.setBackgroundResource(R.drawable.green_button_selector);
+            if (isNightMode)
+                nightModeButton.setBackgroundResource(R.drawable.green_button_selector);
+            else
+                visitorModeButton.setBackgroundResource(R.drawable.green_button_selector);
 
             Toast.makeText(this, "Successfully switched on", Toast.LENGTH_LONG).show();
         } else {
@@ -300,7 +338,10 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
             new SenzorsDbSource(this).updateSenz(thisSenz.getSender(), "OFF");
 
             // update switches
-            nightModeButton.setBackgroundResource(R.drawable.disable_bg);
+            if (isNightMode)
+                visitorModeButton.setBackgroundResource(R.drawable.disable_bg);
+            else
+                visitorModeButton.setBackgroundResource(R.drawable.disable_bg);
 
             Toast.makeText(this, "Successfully switched off", Toast.LENGTH_LONG).show();
         }
@@ -310,15 +351,17 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
      * PUT senz
      * Need to send PUT query to server via senz service
      */
-    private void put(boolean switchStatus) {
+    private void put(String switchStatus) {
         try {
             // create key pair
             PrivateKey privateKey = RSAUtils.getPrivateKey(this);
 
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
-            String gpioValue = switchStatus ? "ON" : "OFF";
-            senzAttributes.put("gpio13", gpioValue);
+            if (isNightMode)
+                senzAttributes.put("gpio13", switchStatus);
+            else
+                senzAttributes.put("gpio15", switchStatus);
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
 
             // new senz
