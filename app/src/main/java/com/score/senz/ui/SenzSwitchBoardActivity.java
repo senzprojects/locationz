@@ -136,12 +136,8 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
         visitorModeText.setTypeface(typeface, Typeface.BOLD);
 
         // set up switches according to ON, OFF state
-        if (thisSenz.getAttributes().get("GPIO13") != null && !thisSenz.getAttributes().get("GPIO13").isEmpty()) {
-            if (thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON")) {
-                nightModeButton.setBackgroundResource(R.drawable.green_button_selector);
-            } else {
-                nightModeButton.setBackgroundResource(R.drawable.disable_bg);
-            }
+        if (thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON")) {
+            nightModeButton.setBackgroundResource(R.drawable.green_button_selector);
         } else {
             nightModeButton.setBackgroundResource(R.drawable.disable_bg);
         }
@@ -223,7 +219,8 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
         String action = intent.getAction();
 
         if (action.equals("DATA")) {
-            boolean isDone = intent.getExtras().getBoolean("extra");
+            String status = intent.getExtras().getString("extra");
+            thisSenz.getAttributes().put("GPIO13", status);
 
             // response received
             ActivityUtils.cancelProgressDialog();
@@ -231,7 +228,7 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
             senzCountDownTimer.cancel();
 
             // on successful share display notification message(Toast)
-            if (isDone) onPostPut();
+            if (status != null && !status.isEmpty()) onPostPut(status);
         }
     }
 
@@ -250,10 +247,7 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
             if (!isResponseReceived) {
                 // if switch is on we have to off
                 // if switch if off we have to on
-                boolean switchStatus = true;
-                if (thisSenz.getAttributes().get("GPIO13") != null && !thisSenz.getAttributes().get("GPIO13").isEmpty()) {
-                    switchStatus = (thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON")) ? false : true;
-                }
+                boolean switchStatus = (!thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON"));
 
                 put(switchStatus);
                 Log.d(TAG, "Response not received yet");
@@ -282,10 +276,7 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
 
     private void handleSwitchButtonClick() {
         if (NetworkUtil.isAvailableNetwork(this)) {
-            boolean switchStatus = true;
-            if (thisSenz.getAttributes().get("GPIO13") != null && !thisSenz.getAttributes().get("GPIO13").isEmpty()) {
-                switchStatus = (thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON")) ? false : true;
-            }
+            boolean switchStatus = (!thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON"));
 
             String msg = switchStatus ? "On" : "Off";
             ActivityUtils.showProgressDialog(this, "Switching " + msg);
@@ -295,12 +286,8 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
         }
     }
 
-    private void onPostPut() {
-        boolean switchStatus = true;
-        if (thisSenz.getAttributes().get("GPIO13") != null && !thisSenz.getAttributes().get("GPIO13").isEmpty()) {
-            switchStatus = (thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON")) ? false : true;
-        }
-        if (switchStatus) {
+    private void onPostPut(String switchStatus) {
+        if (switchStatus.equalsIgnoreCase("ON")) {
             // update db
             new SenzorsDbSource(this).updateSenz(thisSenz.getSender(), "ON");
 

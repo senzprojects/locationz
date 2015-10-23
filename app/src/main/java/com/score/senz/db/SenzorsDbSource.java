@@ -112,8 +112,10 @@ public class SenzorsDbSource {
             values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "Location");
         } else if (senz.getAttributes().containsKey("gpio13")) {
             values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "GPIO13");
+            values.put(SenzorsDbContract.Senz.COLUMN_NAME_VALUE, "OFF");
         } else if (senz.getAttributes().containsKey("gpio15")) {
             values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "GPIO15");
+            values.put(SenzorsDbContract.Senz.COLUMN_NAME_VALUE, "OFF");
         }
 
         values.put(SenzorsDbContract.Senz.COLUMN_NAME_USER, senz.getSender().getId());

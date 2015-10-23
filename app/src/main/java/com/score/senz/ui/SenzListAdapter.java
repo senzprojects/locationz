@@ -135,14 +135,9 @@ public class SenzListAdapter extends BaseAdapter {
             }
         } else if (senz.getAttributes().containsKey("GPIO13")) {
             // GPIO senz
-            if (senz.getAttributes().get("GPIO13") != null && !senz.getAttributes().get("GPIO13").isEmpty()) {
-                String locationText = "<font color=#4a4a4a>Switch is </font> <font color=#ffc027>" + "<b>" + senz.getAttributes().get("GPIO13") + "</b>" + "</font>";
-                viewHolder.lastSeen.setText(Html.fromHtml(locationText));
-                viewHolder.lastSeen.setTextColor(Color.parseColor("#ffc027"));
-            } else {
-                viewHolder.lastSeen.setText("No switch status available");
-                viewHolder.lastSeen.setTextColor(Color.parseColor("#4a4a4a"));
-            }
+            String locationText = "<font color=#4a4a4a>Switch</font> <font color=#ffc027>" + "<b>" + " ON/OFF " + "</b>" + "</font>";
+            viewHolder.lastSeen.setText(Html.fromHtml(locationText));
+            viewHolder.lastSeen.setTextColor(Color.parseColor("#ffc027"));
         }
 
         Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_user_icon);
