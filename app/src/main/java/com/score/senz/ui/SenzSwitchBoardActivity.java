@@ -24,7 +24,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,8 +61,8 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
     private RelativeLayout visitorModeButton;
     private TextView nightModeText;
     private TextView visitorModeText;
-    private Switch nightModeSwitch;
-    private Switch visitorModeSwitch;
+//    private Switch nightModeSwitch;
+//    private Switch visitorModeSwitch;
 
     // use custom font here
     private Typeface typeface;
@@ -135,28 +134,30 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
         nightModeText = (TextView) findViewById(R.id.night_mode_text);
         visitorModeText = (TextView) findViewById(R.id.visitor_mode_text);
 
-        nightModeSwitch = (Switch) findViewById(R.id.night_mode_switch);
-        visitorModeSwitch = (Switch) findViewById(R.id.visitor_mode_switch);
+//        nightModeSwitch = (Switch) findViewById(R.id.night_mode_switch);
+//        visitorModeSwitch = (Switch) findViewById(R.id.visitor_mode_switch);
 
         nightModeText.setTypeface(typeface, Typeface.BOLD);
         visitorModeText.setTypeface(typeface, Typeface.BOLD);
 
-        nightModeSwitch.setOnClickListener(this);
-        visitorModeSwitch.setOnClickListener(this);
+//        nightModeSwitch.setOnClickListener(this);
+//        visitorModeSwitch.setOnClickListener(this);
 
         // set up switches according to ON, OFF state
         if (thisSenz.getAttributes().get("GPIO13") != null && !thisSenz.getAttributes().get("GPIO13").isEmpty()) {
             if (thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON")) {
                 nightModeButton.setBackgroundResource(R.drawable.green_button_selector);
-                nightModeSwitch.setChecked(true);
+                //nightModeSwitch.setChecked(true);
             } else {
                 nightModeButton.setBackgroundResource(R.drawable.disable_bg);
-                nightModeSwitch.setChecked(false);
+                //nightModeSwitch.setChecked(false);
             }
         } else {
             nightModeButton.setBackgroundResource(R.drawable.disable_bg);
-            nightModeSwitch.setChecked(false);
+            //nightModeSwitch.setChecked(false);
         }
+
+        nightModeButton.setOnClickListener(this);
     }
 
     /**
@@ -259,10 +260,11 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
             if (!isResponseReceived) {
                 // if switch is on we have to off
                 // if switch if off we have to on
-                boolean on = false;
+                boolean on = true;
                 if (thisSenz.getAttributes().get("GPIO13") != null && !thisSenz.getAttributes().get("GPIO13").isEmpty()) {
                     on = (thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON")) ? false : true;
                 }
+
                 put(on);
                 Log.d(TAG, "Response not received yet");
             }
@@ -283,16 +285,20 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-        if (v == nightModeSwitch) {
-            handleSwitchButtonClick(true);
-        } else if (v == visitorModeSwitch) {
-            handleSwitchButtonClick(false);
+        if (v == nightModeButton) {
+            handleSwitchButtonClick();
         }
     }
 
-    private void handleSwitchButtonClick(boolean isNightMode) {
+    private void handleSwitchButtonClick() {
         if (NetworkUtil.isAvailableNetwork(this)) {
-            ActivityUtils.showProgressDialog(this, "Please wait...");
+            boolean on = true;
+            if (thisSenz.getAttributes().get("GPIO13") != null && !thisSenz.getAttributes().get("GPIO13").isEmpty()) {
+                on = (thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON")) ? false : true;
+            }
+
+            String msg = on ? "On" : "Off";
+            ActivityUtils.showProgressDialog(this, "Switching " + msg);
             senzCountDownTimer.start();
         } else {
             Toast.makeText(this, "No network connection available", Toast.LENGTH_LONG).show();
@@ -307,7 +313,7 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
 
             // update switches
             nightModeButton.setBackgroundResource(R.drawable.green_button_selector);
-            nightModeSwitch.setChecked(true);
+            //nightModeSwitch.setChecked(true);
 
             Toast.makeText(this, "Successfully switched on", Toast.LENGTH_LONG).show();
         } else {
@@ -316,7 +322,7 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
 
             // update switches
             nightModeButton.setBackgroundResource(R.drawable.disable_bg);
-            nightModeSwitch.setChecked(false);
+            //nightModeSwitch.setChecked(false);
 
             Toast.makeText(this, "Successfully switched off", Toast.LENGTH_LONG).show();
         }

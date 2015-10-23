@@ -119,7 +119,7 @@ public class SenzHandler {
         // we are broadcasting DATA sensors
         if (senz.getAttributes().containsKey("msg")) {
             String msg = senz.getAttributes().get("msg");
-            if (msg.equalsIgnoreCase("UserCreated") || msg.equalsIgnoreCase("ShareDone") || msg.equalsIgnoreCase("PutDone")) {
+            if (msg.equalsIgnoreCase("UserCreated") || msg.equalsIgnoreCase("ShareDone") || msg.equalsIgnoreCase("ON")) {
                 intent.putExtra("extra", true);
             } else {
                 intent.putExtra("extra", false);
