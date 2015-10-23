@@ -154,7 +154,7 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
         }
 
         nightModeButton.setOnClickListener(this);
-        visitorModeText.setOnClickListener(this);
+        visitorModeButton.setOnClickListener(this);
     }
 
     /**
