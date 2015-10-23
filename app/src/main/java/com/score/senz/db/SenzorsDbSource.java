@@ -9,6 +9,9 @@ import android.util.Log;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -110,12 +113,18 @@ public class SenzorsDbSource {
         ContentValues values = new ContentValues();
         if (senz.getAttributes().containsKey("lat")) {
             values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "Location");
-        } else if (senz.getAttributes().containsKey("gpio13")) {
-            values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "GPIO13");
-            values.put(SenzorsDbContract.Senz.COLUMN_NAME_VALUE, "OFF");
-        } else if (senz.getAttributes().containsKey("gpio15")) {
-            values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "GPIO15");
-            values.put(SenzorsDbContract.Senz.COLUMN_NAME_VALUE, "OFF");
+        } else if (senz.getAttributes().containsKey("gpio13") || senz.getAttributes().containsKey("gpio15")) {
+            // store json string in db
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("GPIO13", "OFF");
+                jsonObject.put("GPIO15", "OFF");
+
+                values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "GPIO");
+                values.put(SenzorsDbContract.Senz.COLUMN_NAME_VALUE, jsonObject.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         values.put(SenzorsDbContract.Senz.COLUMN_NAME_USER, senz.getSender().getId());

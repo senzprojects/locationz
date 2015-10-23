@@ -40,6 +40,9 @@ import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -137,14 +140,14 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
         visitorModeText.setTypeface(typeface, Typeface.BOLD);
 
         // set up switches according to ON, OFF state
-        if (thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON")) {
+        if (getGpio13(thisSenz).equalsIgnoreCase("ON")) {
             nightModeButton.setBackgroundResource(R.drawable.green_button_selector);
         } else {
             nightModeButton.setBackgroundResource(R.drawable.disable_bg);
         }
 
         // set up switches according to ON, OFF state
-        if (thisSenz.getAttributes().get("GPIO15").equalsIgnoreCase("ON")) {
+        if (getGpio15(thisSenz).equalsIgnoreCase("ON")) {
             visitorModeButton.setBackgroundResource(R.drawable.green_button_selector);
         } else {
             visitorModeButton.setBackgroundResource(R.drawable.disable_bg);
@@ -227,11 +230,14 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
         String action = intent.getAction();
 
         if (action.equals("DATA")) {
-            String status = intent.getExtras().getString("extra");
-            if (isNightMode)
-                thisSenz.getAttributes().put("GPIO13", status);
-            else
-                thisSenz.getAttributes().put("GPIO15", status);
+            String switchStatus = intent.getExtras().getString("extra");
+            if (isNightMode) {
+                String value = getGpio(switchStatus, getGpio15(thisSenz));
+                thisSenz.getAttributes().put("GPIO", value);
+            } else {
+                String value = getGpio(getGpio13(thisSenz), switchStatus);
+                thisSenz.getAttributes().put("GPIO", value);
+            }
 
             // response received
             ActivityUtils.cancelProgressDialog();
@@ -239,7 +245,7 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
             senzCountDownTimer.cancel();
 
             // on successful share display notification message(Toast)
-            if (status != null && !status.isEmpty()) onPostPut(status);
+            if (switchStatus != null && !switchStatus.isEmpty()) onPostPut(switchStatus);
         }
     }
 
@@ -259,12 +265,12 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
                 // if switch is on we have to off
                 // if switch if off we have to on
                 if (isNightMode)
-                    if (thisSenz.getAttributes().get("#GPIO13").equalsIgnoreCase("ON"))
+                    if (getGpio13(thisSenz).equalsIgnoreCase("ON"))
                         put("OFF");
                     else
                         put("ON");
                 else
-                    if (thisSenz.getAttributes().get("#GPIO15").equalsIgnoreCase("ON"))
+                    if (getGpio15(thisSenz).equalsIgnoreCase("ON"))
                         put("OFF");
                     else
                         put("ON");
@@ -298,10 +304,7 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
     private void handleNightModeButtonClick() {
         if (NetworkUtil.isAvailableNetwork(this)) {
             isNightMode = true;
-            boolean switchStatus = (!thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON"));
-
-            String msg = switchStatus ? "On" : "Off";
-            ActivityUtils.showProgressDialog(this, "Switching " + msg);
+            ActivityUtils.showProgressDialog(this, "Please wait..");
             senzCountDownTimer.start();
         } else {
             Toast.makeText(this, "No network connection available", Toast.LENGTH_LONG).show();
@@ -311,10 +314,7 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
     private void handleVisitorModeButtonClick() {
         if (NetworkUtil.isAvailableNetwork(this)) {
             isNightMode = false;
-            boolean switchStatus = (!thisSenz.getAttributes().get("GPIO15").equalsIgnoreCase("ON"));
-
-            String msg = switchStatus ? "On" : "Off";
-            ActivityUtils.showProgressDialog(this, "Switching " + msg);
+            ActivityUtils.showProgressDialog(this, "Please wait..");
             senzCountDownTimer.start();
         } else {
             Toast.makeText(this, "No network connection available", Toast.LENGTH_LONG).show();
@@ -322,10 +322,9 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
     }
 
     private void onPostPut(String switchStatus) {
-        if (switchStatus.equalsIgnoreCase("ON")) {
-            // update db
-            new SenzorsDbSource(this).updateSenz(thisSenz.getSender(), "ON");
+        new SenzorsDbSource(this).updateSenz(thisSenz.getSender(), thisSenz.getAttributes().get("GPIO"));
 
+        if (switchStatus.equalsIgnoreCase("ON")) {
             // update switches
             if (isNightMode)
                 nightModeButton.setBackgroundResource(R.drawable.green_button_selector);
@@ -334,9 +333,6 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
 
             Toast.makeText(this, "Successfully switched on", Toast.LENGTH_LONG).show();
         } else {
-            // update db
-            new SenzorsDbSource(this).updateSenz(thisSenz.getSender(), "OFF");
-
             // update switches
             if (isNightMode)
                 visitorModeButton.setBackgroundResource(R.drawable.disable_bg);
@@ -421,6 +417,40 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
         });
 
         dialog.show();
+    }
+
+    private String getGpio13(Senz senz) {
+        try {
+            JSONObject jsonObject = new JSONObject(senz.getAttributes().get("GPIO"));
+            return jsonObject.getString("GPIO13");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return "OFF";
+    }
+
+    private String getGpio15(Senz senz) {
+        try {
+            JSONObject jsonObject = new JSONObject(senz.getAttributes().get("GPIO"));
+            jsonObject.getString("GPIO13");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return "OFF";
+    }
+
+    private String getGpio(String gpio13, String gpio15) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("GPIO13", gpio13);
+            jsonObject.put("GPIO15", gpio15);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return jsonObject.toString();
     }
 
 }
