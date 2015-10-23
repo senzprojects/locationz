@@ -145,13 +145,18 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
         visitorModeSwitch.setOnClickListener(this);
 
         // set up switches according to ON, OFF state
-//        if (thisSenz.getAttributes().get("gpio3").equalsIgnoreCase("ON")) {
-//            nightModeButton.setBackgroundResource(R.drawable.green_button_selector);
-//            nightModeSwitch.setChecked(true);
-//        } else {
-//            nightModeButton.setBackgroundResource(R.drawable.disable_bg);
-//            nightModeSwitch.setChecked(false);
-//        }
+        if (thisSenz.getAttributes().get("GPIO13") != null && !thisSenz.getAttributes().get("GPIO13").isEmpty()) {
+            if (thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON")) {
+                nightModeButton.setBackgroundResource(R.drawable.green_button_selector);
+                nightModeSwitch.setChecked(true);
+            } else {
+                nightModeButton.setBackgroundResource(R.drawable.disable_bg);
+                nightModeSwitch.setChecked(false);
+            }
+        } else {
+            nightModeButton.setBackgroundResource(R.drawable.disable_bg);
+            nightModeSwitch.setChecked(false);
+        }
     }
 
     /**
@@ -254,7 +259,10 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
             if (!isResponseReceived) {
                 // if switch is on we have to off
                 // if switch if off we have to on
-                boolean on = (thisSenz.getAttributes().get("gpio3").equalsIgnoreCase("ON")) ? false : true;
+                boolean on = false;
+                if (thisSenz.getAttributes().get("GPIO13") != null && !thisSenz.getAttributes().get("GPIO13").isEmpty()) {
+                    on = (thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON")) ? false : true;
+                }
                 put(on);
                 Log.d(TAG, "Response not received yet");
             }
@@ -292,7 +300,7 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
     }
 
     private void onPostPut() {
-        boolean on = (thisSenz.getAttributes().get("gpio3").equalsIgnoreCase("ON")) ? false : true;
+        boolean on = (thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON")) ? false : true;
         if (on) {
             // update db
             new SenzorsDbSource(this).updateSenz(thisSenz.getSender(), "ON");
@@ -326,14 +334,13 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
             String gpioValue = on ? "ON" : "OFF";
-            senzAttributes.put("gpio3", gpioValue);
+            senzAttributes.put("gpio13", gpioValue);
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
 
-            // TODO
             // new senz
             Senz senz = new Senz();
             senz.setSenzType(SenzTypeEnum.PUT);
-            //senz.setReceiver(new User("", usernameEditText.getText().toString().trim()));
+            senz.setReceiver(thisSenz.getSender());
             senz.setSender(PreferenceUtils.getUser(this));
             senz.setAttributes(senzAttributes);
 

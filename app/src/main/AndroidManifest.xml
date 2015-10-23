@@ -62,8 +62,8 @@
             android:configChanges="orientation"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Yello"
-            android:windowSoftInputMode="stateHidden"></activity>
+            android:theme="@style/Theme.Yello">
+        </activity>
 
         <activity
             android:name=".ui.SplashActivity"
@@ -95,8 +95,8 @@
             android:configChanges="orientation"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.NoActionBar"
-            android:windowSoftInputMode="stateHidden"></activity>
+            android:theme="@android:style/Theme.Holo.NoActionBar">
+        </activity>
 
         <activity
             android:name=".ui.SenzMapActivity"

@@ -110,8 +110,10 @@ public class SenzorsDbSource {
         ContentValues values = new ContentValues();
         if (senz.getAttributes().containsKey("lat")) {
             values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "Location");
-        } else if (senz.getAttributes().containsKey("gpio3")) {
-            values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "GPIO3");
+        } else if (senz.getAttributes().containsKey("gpio13")) {
+            values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "GPIO13");
+        } else if (senz.getAttributes().containsKey("gpio15")) {
+            values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "GPIO15");
         }
 
         values.put(SenzorsDbContract.Senz.COLUMN_NAME_USER, senz.getSender().getId());

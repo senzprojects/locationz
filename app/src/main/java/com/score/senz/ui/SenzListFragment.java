@@ -193,7 +193,7 @@ public class SenzListFragment extends Fragment {
     }
 
     private void handleListItmeClick(Senz senz) {
-        if (senz.getAttributes().containsKey("gpio3")) {
+        if (senz.getAttributes().containsKey("GPIO13") || senz.getAttributes().containsKey("GPIO15")) {
             // this is gpio senz
             Intent intent = new Intent(getActivity(), SenzSwitchBoardActivity.class);
             //intent.putExtra("extra", senz);
