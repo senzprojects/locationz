@@ -327,7 +327,7 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
         } else {
             // update switches
             if (isNightMode)
-                visitorModeButton.setBackgroundResource(R.drawable.disable_bg);
+                nightModeButton.setBackgroundResource(R.drawable.disable_bg);
             else
                 visitorModeButton.setBackgroundResource(R.drawable.disable_bg);
 
