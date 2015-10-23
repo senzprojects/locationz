@@ -296,7 +296,10 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
     }
 
     private void onPostPut() {
-        boolean switchStatus = (thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON")) ? false : true;
+        boolean switchStatus = true;
+        if (thisSenz.getAttributes().get("GPIO13") != null && !thisSenz.getAttributes().get("GPIO13").isEmpty()) {
+            switchStatus = (thisSenz.getAttributes().get("GPIO13").equalsIgnoreCase("ON")) ? false : true;
+        }
         if (switchStatus) {
             // update db
             new SenzorsDbSource(this).updateSenz(thisSenz.getSender(), "ON");
