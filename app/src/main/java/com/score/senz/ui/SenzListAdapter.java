@@ -126,7 +126,7 @@ public class SenzListAdapter extends BaseAdapter {
         if (senz.getAttributes().containsKey("Location")) {
             // Location senz
             if (senz.getAttributes().get("Location") != null && !senz.getAttributes().get("Location").isEmpty()) {
-                String locationText = "<font color=#4a4a4a>Last seen in</font> <font color=#ffc027>" + "<b>" + senz.getAttributes().get("Location") + "</b>" + "</font>";
+                String locationText = "<font color=#4a4a4a>Last seen in</font> <font color=#eada00>" + "<b>" + senz.getAttributes().get("Location") + "</b>" + "</font>";
                 viewHolder.lastSeen.setText(Html.fromHtml(locationText));
                 viewHolder.lastSeen.setTextColor(Color.parseColor("#ffc027"));
             } else {
@@ -135,7 +135,7 @@ public class SenzListAdapter extends BaseAdapter {
             }
         } else if (senz.getAttributes().containsKey("GPIO")) {
             // GPIO senz
-            String locationText = "<font color=#4a4a4a>Switch</font> <font color=#ffc027>" + "<b>" + " ON/OFF " + "</b>" + "</font>";
+            String locationText = "<font color=#4a4a4a>Switch</font> <font color=#eada00>" + "<b>" + " ON/OFF " + "</b>" + "</font>";
             viewHolder.lastSeen.setText(Html.fromHtml(locationText));
             viewHolder.lastSeen.setTextColor(Color.parseColor("#ffc027"));
         }

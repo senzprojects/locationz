@@ -199,9 +199,9 @@ public class SenzListFragment extends Fragment {
                 Log.v(TAG, "Long clicked" + pos);
 
                 if (pos > 0 && pos <= senzList.size()) {
-                    Log.d(TAG, "onItemClick: click on sensor list item");
+                    Log.d(TAG, "Long click: click on sensor list item");
                     selectedSenz = senzList.get(pos - 1);
-                    String message = "<font color=#000000>Are you sure you want to delete the senz of </font> <font color=#ffc027>" + "<b>" + selectedSenz.getSender().getUsername() + "</b>" + "</font>";
+                    String message = "<font color=#000000>Are you sure you want to delete the senz of </font> <font color=#eada00>" + "<b>" + selectedSenz.getSender().getUsername() + "</b>" + "</font>";
                     displayDeleteMessageDialog(message, selectedSenz);
                 }
 
@@ -239,7 +239,7 @@ public class SenzListFragment extends Fragment {
         View inflatedEmptyView = emptyView.inflate();
         TextView emptyText = (TextView) inflatedEmptyView.findViewById(R.id.empty_text);
         emptyText.setText("No Senz available. Give your username to a friend and ask them to share senzs to you");
-        emptyText.setTextColor(Color.parseColor("#ffc027"));
+        emptyText.setTextColor(Color.parseColor("#eada00"));
         emptyText.setTypeface(typeface, Typeface.BOLD);
     }
 
@@ -373,7 +373,7 @@ public class SenzListFragment extends Fragment {
 
             // display message dialog that we couldn't reach the user
             if (!isResponseReceived) {
-                String message = "<font color=#000000>Seems we couldn't get the location of user </font> <font color=#ffc027>" + "<b>" + selectedSenz.getSender().getUsername() + "</b>" + "</font> <font color=#000000> at this moment</font>";
+                String message = "<font color=#000000>Seems we couldn't get the location of user </font> <font color=#eada00>" + "<b>" + selectedSenz.getSender().getUsername() + "</b>" + "</font> <font color=#000000> at this moment</font>";
                 displayInformationMessageDialog("#Get Fail", message);
             }
 

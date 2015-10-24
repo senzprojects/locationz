@@ -41,7 +41,7 @@
                     android:layout_width="80dp"
                     android:layout_height="80dp"
                     android:layout_centerHorizontal="true"
-                    app:siBorderColor="#ffc027"
+                    app:siBorderColor="#eada00"
                     app:siBorderWidth="1dp">
                 </com.github.siyamed.shapeimageview.CircularImageView>
 

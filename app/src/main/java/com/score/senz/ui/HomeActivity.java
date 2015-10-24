@@ -135,7 +135,7 @@ public class HomeActivity extends FragmentActivity {
             User user = PreferenceUtils.getUser(this);
             username = (TextView) findViewById(R.id.home_user_text);
             username.setText("@" + user.getUsername());
-            username.setTextColor(Color.parseColor("#ffc027"));
+            username.setTextColor(Color.parseColor("#eada00"));
             //username.setTextColor(Color.parseColor("#4a4a4a"));
             username.setTypeface(typeface, Typeface.BOLD);
         } catch (NoUserException e) {

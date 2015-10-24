@@ -20,6 +20,7 @@
 <resources>
     <color name="pressed_sensor">#CCD0D0D2</color>
     <color name="white">#FFFFFF</color>
+    <color name="lightg">#4a4a4a</color>
     <color name="blue">#5e7d9a</color>
     <color name="green">#588c73</color>
     <color name="red">#d96459</color>
