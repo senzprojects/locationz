@@ -8,11 +8,20 @@ import java.util.HashMap;
  * Created by eranga on 8/27/15.
  */
 public class Senz {
+    private String id;
     private String signature;
     private SenzTypeEnum senzType;
     private User sender;
     private User receiver;
     private HashMap<String, String> attributes;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getSignature() {
         return signature;

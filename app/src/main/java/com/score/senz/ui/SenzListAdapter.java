@@ -120,7 +120,7 @@ public class SenzListAdapter extends BaseAdapter {
 
     private void setUpSenzRow(int i, Senz senz, View view, ViewHolder viewHolder) {
         // enable share and change color of view
-        view.setBackgroundResource(R.drawable.my_sensor_background);
+        view.setBackgroundResource(R.drawable.more_layout_selector_normal);
         viewHolder.user.setText("@" + senz.getSender().getUsername());
 
         if (senz.getAttributes().containsKey("Location")) {

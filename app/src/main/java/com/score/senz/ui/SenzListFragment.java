@@ -65,6 +65,7 @@ public class SenzListFragment extends Fragment {
     // list view components
     private ListView sensorListView;
     private ArrayList<Senz> senzList;
+    private SenzListAdapter adapter;
 
     // empty view to display when no sensors available
     private ViewStub emptyView;
@@ -190,6 +191,23 @@ public class SenzListFragment extends Fragment {
                 }
             }
         });
+
+        // set long click listener to unshare
+        sensorListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
+                Log.v(TAG, "Long clicked" + pos);
+
+                if (pos > 0 && pos <= senzList.size()) {
+                    Log.d(TAG, "onItemClick: click on sensor list item");
+                    selectedSenz = senzList.get(pos - 1);
+                    String message = "<font color=#000000>Are you sure you want to delete the senz of </font> <font color=#ffc027>" + "<b>" + selectedSenz.getSender().getUsername() + "</b>" + "</font>";
+                    displayDeleteMessageDialog(message, selectedSenz);
+                }
+
+                return true;
+            }
+        });
     }
 
     private void handleListItmeClick(Senz senz) {
@@ -234,7 +252,6 @@ public class SenzListFragment extends Fragment {
         senzList = (ArrayList<Senz>) new SenzorsDbSource(this.getActivity()).getSenzes();
 
         // construct list adapter
-        SenzListAdapter adapter;
         if (senzList.size() > 0) {
             adapter = new SenzListAdapter(SenzListFragment.this.getActivity(), senzList);
             adapter.notifyDataSetChanged();
@@ -400,6 +417,65 @@ public class SenzListFragment extends Fragment {
         });
 
         dialog.show();
+    }
+
+    /**
+     * Display message dialog when user request(click) to delete invoice
+     *
+     * @param message message to be display
+     */
+    public void displayDeleteMessageDialog(String message, final Senz senz) {
+        final Dialog dialog = new Dialog(getActivity());
+
+        //set layout for dialog
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.share_confirm_message_dialog);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(true);
+
+        // set dialog texts
+        TextView messageHeaderTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_header_text);
+        TextView messageTextView = (TextView) dialog.findViewById(R.id.information_message_dialog_layout_message_text);
+        messageHeaderTextView.setText("#Delete senz");
+        messageTextView.setText(Html.fromHtml(message));
+
+        // set custom font
+        messageHeaderTextView.setTypeface(typeface);
+        messageTextView.setTypeface(typeface);
+
+        //set ok button
+        Button okButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_ok_button);
+        okButton.setTypeface(typeface);
+        okButton.setTypeface(null, Typeface.BOLD);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dialog.cancel();
+                ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
+                deleteSenz(senz);
+            }
+        });
+
+        // cancel button
+        Button cancelButton = (Button) dialog.findViewById(R.id.information_message_dialog_layout_cancel_button);
+        cancelButton.setTypeface(typeface);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dialog.cancel();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void deleteSenz(Senz senz) {
+        new SenzorsDbSource(getActivity()).deleteSenz(senz);
+        senzList = (ArrayList<Senz>) new SenzorsDbSource(getActivity()).getSenzes();
+
+        ActivityUtils.cancelProgressDialog();
+
+        adapter.notifyDataSetChanged();
+        sensorListView.setAdapter(adapter);
     }
 
 }

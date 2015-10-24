@@ -12,6 +12,24 @@
         android:layout_width="match_parent"
         android:layout_height="95dp">
 
+        <RelativeLayout
+            android:background="@drawable/share_button_selector"
+            android:layout_width="70dp"
+            android:visibility="gone"
+            android:layout_height="35dp"
+            android:layout_alignParentRight="true">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Close"
+                android:textColor="#ffc027"
+                android:textStyle="bold"
+                android:textSize="18sp">
+            </TextView>
+
+        </RelativeLayout>
+
         <com.github.siyamed.shapeimageview.CircularImageView
             android:id="@+id/contact_image"
             android:layout_width="95dp"

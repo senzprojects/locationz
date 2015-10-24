@@ -194,6 +194,7 @@ public class SenzorsDbSource {
 
             // create senz
             Senz senz = new Senz();
+            senz.setId(_senzId);
             senz.setAttributes(senzAttributes);
             senz.setSender(new User(_userId, _username));
 
@@ -236,6 +237,20 @@ public class SenzorsDbSource {
         Log.d(TAG, "user count " + userList.size());
 
         return userList;
+    }
+
+    /**
+     * Delete senz from database,
+     * @param senz senz
+     */
+    public void deleteSenz(Senz senz) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // delete sensor matching sensor of given user
+        db.delete(SenzorsDbContract.Senz.TABLE_NAME,
+                SenzorsDbContract.Senz._ID + "=?",
+                new String[]{senz.getId()});
+        db.close();
     }
 
 }

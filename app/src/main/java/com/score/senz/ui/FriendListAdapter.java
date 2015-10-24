@@ -112,7 +112,7 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
         holder.iconText.setText("#");
         holder.name.setText(user.getUsername());
         holder.phoneNo.setText(user.getUsername());
-        view.setBackgroundResource(R.drawable.friend_list_selector);
+        view.setBackgroundResource(R.drawable.more_layout_selector_normal);
 
         return view;
     }
