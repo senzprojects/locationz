@@ -247,12 +247,11 @@ public class SenzorsDbSource {
     public void deleteSenz(Senz senz) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
-        // delete sensor matching sensor of given user
-//        int cnt = db.delete(SenzorsDbContract.Senz.TABLE_NAME,
-//                SenzorsDbContract.Senz._ID + "=?",
-//                new String[]{senz.getId()});
-        String deleteQuery = "DELETE FROM senz where _id='"+ senz.getId() +"'";
-        db.execSQL(deleteQuery);
+        // delete senz of given user
+        db.delete(SenzorsDbContract.Senz.TABLE_NAME,
+                SenzorsDbContract.Senz.COLUMN_NAME_USER + "=?" + " AND " +
+                        SenzorsDbContract.Senz.COLUMN_NAME_NAME + "=?",
+                new String[]{senz.getSender().getId(), senz.getAttributes().keySet().iterator().next()});
         db.close();
     }
 

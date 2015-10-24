@@ -232,7 +232,7 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
         }
 
         if (NetworkUtil.isAvailableNetwork(getActivity())) {
-            String confirmationMessage = "<font color=#000000>Are you sure you want to share senz with </font> <font color=#ffc027>" + "<b>" + user.getUsername() + "</b>" + "</font>";
+            String confirmationMessage = "<font color=#000000>Are you sure you want to share senz with </font> <font color=#eada00>" + "<b>" + user.getUsername() + "</b>" + "</font>";
             displayDeleteMessageDialog(confirmationMessage, user);
         } else {
             Toast.makeText(getActivity(), "No network connection available", Toast.LENGTH_LONG).show();

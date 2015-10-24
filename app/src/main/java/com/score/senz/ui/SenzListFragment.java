@@ -451,7 +451,6 @@ public class SenzListFragment extends Fragment {
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dialog.cancel();
-                ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
                 deleteSenz(senz);
             }
         });
@@ -470,12 +469,7 @@ public class SenzListFragment extends Fragment {
 
     private void deleteSenz(Senz senz) {
         new SenzorsDbSource(getActivity()).deleteSenz(senz);
-        senzList = (ArrayList<Senz>) new SenzorsDbSource(getActivity()).getSenzes();
-
-        ActivityUtils.cancelProgressDialog();
-
-        adapter.notifyDataSetChanged();
-        sensorListView.setAdapter(adapter);
+        displaySensorList();
     }
 
 }
