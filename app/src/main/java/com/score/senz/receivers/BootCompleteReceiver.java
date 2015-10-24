@@ -19,8 +19,7 @@ public class BootCompleteReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "restarting the service");
-
+        Log.d(TAG, "Starting senz service");
         context.startService(new Intent(context, SenzService.class));
     }
 }

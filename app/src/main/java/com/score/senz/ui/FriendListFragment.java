@@ -489,5 +489,4 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
         dialog.show();
     }
 
-
 }
