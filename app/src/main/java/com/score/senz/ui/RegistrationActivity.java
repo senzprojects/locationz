@@ -263,7 +263,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             } else {
                 ActivityUtils.cancelProgressDialog();
 
-                String informationMessage = "<font color=#4a4a4a>Seems username </font> <font color=#ffc027>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font> <font color=#4a4a4a> already obtained by some other user, try SenZ with different username</font>";
+                String informationMessage = "<font color=#4a4a4a>Seems username </font> <font color=#eada00>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font> <font color=#4a4a4a> already obtained by some other user, try SenZ with different username</font>";
                 displayInformationMessageDialog("Registration fail", informationMessage);
             }
         }

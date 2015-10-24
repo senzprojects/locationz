@@ -444,7 +444,7 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
 
             // display message dialog that we couldn't reach the user
             if (!isResponseReceived) {
-                String message = "<font color=#000000>Seems we couldn't get the location of user </font> <font color=#ffc027>" + "<b>" + selectedUser.getUsername() + "</b>" + "</font> <font color=#000000> at this moment</font>";
+                String message = "<font color=#000000>Seems we couldn't get the location of user </font> <font color=#eada00>" + "<b>" + selectedUser.getUsername() + "</b>" + "</font> <font color=#000000> at this moment</font>";
                 displayInformationMessageDialog("#Get Fail", message);
             }
         }

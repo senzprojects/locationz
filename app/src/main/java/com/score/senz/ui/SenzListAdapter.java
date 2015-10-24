@@ -128,7 +128,6 @@ public class SenzListAdapter extends BaseAdapter {
             if (senz.getAttributes().get("Location") != null && !senz.getAttributes().get("Location").isEmpty()) {
                 String locationText = "<font color=#4a4a4a>Last seen in</font> <font color=#eada00>" + "<b>" + senz.getAttributes().get("Location") + "</b>" + "</font>";
                 viewHolder.lastSeen.setText(Html.fromHtml(locationText));
-                viewHolder.lastSeen.setTextColor(Color.parseColor("#ffc027"));
             } else {
                 viewHolder.lastSeen.setText("No last seen location available");
                 viewHolder.lastSeen.setTextColor(Color.parseColor("#4a4a4a"));
@@ -137,7 +136,6 @@ public class SenzListAdapter extends BaseAdapter {
             // GPIO senz
             String locationText = "<font color=#4a4a4a>Switch</font> <font color=#eada00>" + "<b>" + " ON/OFF " + "</b>" + "</font>";
             viewHolder.lastSeen.setText(Html.fromHtml(locationText));
-            viewHolder.lastSeen.setTextColor(Color.parseColor("#ffc027"));
         }
 
         Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_user_icon);

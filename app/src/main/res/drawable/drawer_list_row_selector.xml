@@ -7,8 +7,8 @@
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:shape="rectangle">
             <gradient
-                    android:startColor="#f4cb6a"
-                    android:endColor="#f4cb6a"
+                    android:startColor="#d5d3d3"
+                    android:endColor="#d5d3d3"
                     android:angle="270" />
         </shape>
     </item>
@@ -20,8 +20,8 @@
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:shape="rectangle">
             <gradient
-                    android:startColor="#f4cb6a"
-                    android:endColor="#f4cb6a"
+                    android:startColor="#d5d3d3"
+                    android:endColor="#d5d3d3"
                     android:angle="270" />
         </shape>
     </item>

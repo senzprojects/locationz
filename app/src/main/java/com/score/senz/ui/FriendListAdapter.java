@@ -99,7 +99,7 @@ public class FriendListAdapter extends BaseAdapter implements Filterable {
             holder.phoneNo = (TextView) view.findViewById(R.id.friend_list_row_layout_phone);
             holder.iconText.setTypeface(typeface, Typeface.BOLD);
             holder.iconText.setTextColor(activity.getResources().getColor(R.color.white));
-            holder.name.setTypeface(typeface, Typeface.NORMAL);
+            holder.name.setTypeface(typeface, Typeface.BOLD);
             holder.phoneNo.setTypeface(typeface, Typeface.NORMAL);
 
             view.setTag(holder);
