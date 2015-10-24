@@ -305,12 +305,11 @@ public class ShareFragment extends android.support.v4.app.Fragment {
             // display message dialog that we couldn't reach the user
             if (!isResponseReceived) {
                 String user = usernameEditText.getText().toString().trim();
-                String message = "<font color=#000000>Seems we couldn't reach the user </font> <font color=#ffc027>" + "<b>" + user + "</b>" + "</font> <font color=#000000> at this moment</font>";
+                String message = "<font color=#000000>Seems we couldn't reach the user </font> <font color=#eada00>" + "<b>" + user + "</b>" + "</font> <font color=#000000> at this moment</font>";
                 displayInformationMessageDialog("#Share Fail", message);
             }
         }
     }
-
 
     /**
      * Display message dialog when user request(click) to delete invoice
