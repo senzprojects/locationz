@@ -58,8 +58,6 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
     private FriendListAdapter friendListAdapter;
     private ArrayList<User> friendList = new ArrayList<>();
 
-    boolean isServiceBound = false;
-
     // service interface
     private ISenzService senzService = null;
 
@@ -118,13 +116,9 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
     public void onStart() {
         super.onStart();
 
-        // bind to senz service
-        if (!isServiceBound) {
-            Intent intent = new Intent();
-            intent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
-            getActivity().bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
-            isServiceBound = true;
-        }
+        Intent intent = new Intent();
+        intent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
+        getActivity().bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
 
         getActivity().registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
     }
@@ -136,12 +130,7 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
     public void onStop() {
         super.onStop();
 
-        // Unbind from the service
-        if (isServiceBound) {
-            getActivity().unbindService(senzServiceConnection);
-            isServiceBound = false;
-        }
-
+        getActivity().unbindService(senzServiceConnection);
         getActivity().unregisterReceiver(senzMessageReceiver);
     }
 
@@ -296,6 +285,7 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
     private void handleMessage(Intent intent) {
         String action = intent.getAction();
 
+        Log.d(TAG, "Message received with action " + action);
         if (action.equals("DATA")) {
             boolean isDone = intent.getExtras().getBoolean("extra");
 
@@ -305,7 +295,12 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
             senzCountDownTimer.cancel();
 
             // on successful share display notification message(Toast)
-            if (isDone) onPostShare();
+            if (isDone) {
+                onPostShare();
+            } else {
+                String message = "<font color=#000000>Seems we couldn't share the senz with </font> <font color=#eada00>" + "<b>" + selectedUser.getUsername() + "</b>" + "</font>";
+                displayInformationMessageDialog("#Share Fail", message);
+            }
         }
     }
 
@@ -374,6 +369,7 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 dialog.cancel();
+                isResponseReceived = false;
                 ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
                 senzCountDownTimer.start();
             }
@@ -411,12 +407,13 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
 
         @Override
         public void onFinish() {
+            Log.d(TAG, "Finish time task");
             ActivityUtils.cancelProgressDialog();
 
             // display message dialog that we couldn't reach the user
             if (!isResponseReceived) {
-                String message = "<font color=#000000>Seems we couldn't get the location of user </font> <font color=#eada00>" + "<b>" + selectedUser.getUsername() + "</b>" + "</font> <font color=#000000> at this moment</font>";
-                displayInformationMessageDialog("#Get Fail", message);
+                String message = "<font color=#000000>Seems we couldn't reach the user </font> <font color=#eada00>" + "<b>" + selectedUser.getUsername() + "</b>" + "</font> <font color=#000000> at this moment</font>";
+                displayInformationMessageDialog("#Share Fail", message);
             }
         }
     }

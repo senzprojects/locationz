@@ -59,9 +59,6 @@ public class ShareFragment extends android.support.v4.app.Fragment {
     // custom font
     private Typeface typeface;
 
-    // keeps weather service already bound or not
-    boolean isServiceBound = false;
-
     // service interface
     private ISenzService senzService = null;
 
@@ -118,13 +115,10 @@ public class ShareFragment extends android.support.v4.app.Fragment {
         super.onResume();
 
         // bind with senz service
-        if (!isServiceBound) {
-            // bind to service from here as well
-            Intent intent = new Intent();
-            intent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
-            getActivity().bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
-            isServiceBound = true;
-        }
+        // bind to service from here as well
+        Intent intent = new Intent();
+        intent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
+        getActivity().bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
 
         getActivity().registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
     }
@@ -137,10 +131,7 @@ public class ShareFragment extends android.support.v4.app.Fragment {
         super.onStop();
 
         // Unbind from the service
-        if (isServiceBound) {
-            getActivity().unbindService(senzServiceConnection);
-            isServiceBound = false;
-        }
+        getActivity().unbindService(senzServiceConnection);
 
         getActivity().unregisterReceiver(senzMessageReceiver);
     }
