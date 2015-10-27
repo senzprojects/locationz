@@ -36,6 +36,7 @@ import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
+import com.score.senz.services.LocationAddressReceiver;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.NetworkUtil;
 import com.score.senz.utils.PreferenceUtils;
@@ -310,19 +311,28 @@ public class SenzListFragment extends Fragment {
     private void handleMessage(Intent intent) {
         String action = intent.getAction();
 
-        if (action.equals("DATA")) {
-            LatLng latLng = intent.getExtras().getParcelable("extra");
+        if (action.equalsIgnoreCase("DATA")) {
+            Senz senz = intent.getExtras().getParcelable("SENZ");
 
-            // location response received
-            ActivityUtils.cancelProgressDialog();
-            isResponseReceived = true;
-            senzCountDownTimer.cancel();
+            if (senz.getAttributes().containsKey("lat")) {
+                // location response received
+                ActivityUtils.cancelProgressDialog();
+                isResponseReceived = true;
+                senzCountDownTimer.cancel();
 
-            // start map activity
-            Intent mapIntent = new Intent(getActivity(), SenzMapActivity.class);
-            mapIntent.putExtra("extra", latLng);
-            getActivity().startActivity(mapIntent);
-            getActivity().overridePendingTransition(R.anim.right_in, R.anim.stay_in);
+                double lat = Double.parseDouble(senz.getAttributes().get("lat"));
+                double lan = Double.parseDouble(senz.getAttributes().get("lon"));
+                LatLng latLng = new LatLng(lat, lan);
+
+                // start location address receiver
+                new LocationAddressReceiver(getActivity(), latLng, senz.getSender()).execute("PARAM");
+
+                // start map activity
+                Intent mapIntent = new Intent(getActivity(), SenzMapActivity.class);
+                mapIntent.putExtra("extra", latLng);
+                getActivity().startActivity(mapIntent);
+                getActivity().overridePendingTransition(R.anim.right_in, R.anim.stay_in);
+            }
         }
     }
 

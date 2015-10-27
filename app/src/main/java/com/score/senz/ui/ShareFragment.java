@@ -244,17 +244,24 @@ public class ShareFragment extends android.support.v4.app.Fragment {
     private void handleMessage(Intent intent) {
         String action = intent.getAction();
 
-        if (action.equals("DATA")) {
-            boolean isDone = intent.getExtras().getBoolean("extra");
+        if (action.equalsIgnoreCase("DATA")) {
+            Senz senz = intent.getExtras().getParcelable("SENZ");
 
-            // response received
-            ActivityUtils.hideSoftKeyboard(getActivity());
-            ActivityUtils.cancelProgressDialog();
-            isResponseReceived = true;
-            senzCountDownTimer.cancel();
+            if (senz.getAttributes().containsKey("msg")) {
+                // msg response received
+                ActivityUtils.cancelProgressDialog();
+                isResponseReceived = true;
+                senzCountDownTimer.cancel();
 
-            // on successful share display notification message(Toast)
-            if (isDone) onPostShare();
+                String msg = senz.getAttributes().get("msg");
+                if (msg != null && msg.equalsIgnoreCase("ShareDone")) {
+                    onPostShare();
+                } else {
+                    String user = usernameEditText.getText().toString().trim();
+                    String message = "<font color=#000000>Seems we couldn't share the senz with </font> <font color=#eada00>" + "<b>" + user + "</b>" + "</font>";
+                    displayInformationMessageDialog("#Share Fail", message);
+                }
+            }
         }
     }
 

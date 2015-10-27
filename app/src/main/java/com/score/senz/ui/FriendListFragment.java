@@ -285,25 +285,25 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
     private void handleMessage(Intent intent) {
         String action = intent.getAction();
 
-        Log.d(TAG, "Message received with action " + action);
-        if (action.equals("DATA")) {
-            boolean isDone = intent.getExtras().getBoolean("extra");
+        if (action.equalsIgnoreCase("DATA")) {
+            Senz senz = intent.getExtras().getParcelable("SENZ");
 
-            // response received
-            ActivityUtils.cancelProgressDialog();
-            isResponseReceived = true;
-            senzCountDownTimer.cancel();
+            if (senz.getAttributes().containsKey("msg")) {
+                // msg response received
+                ActivityUtils.cancelProgressDialog();
+                isResponseReceived = true;
+                senzCountDownTimer.cancel();
 
-            // on successful share display notification message(Toast)
-            if (isDone) {
-                onPostShare();
-            } else {
-                String message = "<font color=#000000>Seems we couldn't share the senz with </font> <font color=#eada00>" + "<b>" + selectedUser.getUsername() + "</b>" + "</font>";
-                displayInformationMessageDialog("#Share Fail", message);
+                String msg = senz.getAttributes().get("msg");
+                if (msg != null && msg.equalsIgnoreCase("ShareDone")) {
+                    onPostShare();
+                } else {
+                    String message = "<font color=#000000>Seems we couldn't share the senz with </font> <font color=#eada00>" + "<b>" + selectedUser.getUsername() + "</b>" + "</font>";
+                    displayInformationMessageDialog("#Share Fail", message);
+                }
             }
         }
     }
-
 
     /**
      * Share current sensor

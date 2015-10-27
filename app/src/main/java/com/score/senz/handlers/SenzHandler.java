@@ -101,7 +101,6 @@ public class SenzHandler {
     }
 
     private void handleGetSenz(Senz senz) {
-        // TODO Start Location service here, rest of the operation handles by Location Service
         Log.d("Tag", senz.getSender() + " : " + senz.getSenzType().toString());
 
         Intent serviceIntent = new Intent(context, LocationService.class);
@@ -116,35 +115,9 @@ public class SenzHandler {
         User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
         senz.setSender(sender);
 
+        // we broadcast data senz
         Intent intent = new Intent("DATA");
-
-        // we are broadcasting DATA sensors
-        if (senz.getAttributes().containsKey("msg")) {
-            String msg = senz.getAttributes().get("msg");
-            if (msg.equalsIgnoreCase("UserCreated") || msg.equalsIgnoreCase("ShareDone")) {
-                intent.putExtra("extra", true);
-            } else if (msg.equalsIgnoreCase("ON")) {
-                // switch on
-                intent.putExtra("extra", "ON");
-            } else if (msg.equalsIgnoreCase("OFF")) {
-                // switch off
-                intent.putExtra("extra", "OFF");
-            } else {
-                intent.putExtra("extra", false);
-            }
-        } else if (senz.getAttributes().containsKey("lat")) {
-            Log.d("TAG", "location response");
-
-            // create lat LatLan object and broadcast it
-            double lat = Double.parseDouble(senz.getAttributes().get("lat"));
-            double lan = Double.parseDouble(senz.getAttributes().get("lon"));
-            LatLng latLng = new LatLng(lat, lan);
-            intent.putExtra("extra", latLng);
-
-            // start background worker to get address and save in database
-            new LocationAddressReceiver(context, latLng, senz.getSender()).execute("PARAM");
-        }
-
+        intent.putExtra("SENZ", senz);
         context.sendBroadcast(intent);
     }
 
