@@ -12,8 +12,6 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
@@ -30,23 +28,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.score.senz.ISenzService;
 import com.score.senz.R;
 import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
-import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.NetworkUtil;
 import com.score.senz.utils.PreferenceUtils;
-import com.score.senz.utils.RSAUtils;
-import com.score.senz.utils.SenzParser;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
 
 /**
@@ -62,28 +53,32 @@ public class ShareFragment extends android.support.v4.app.Fragment {
     private TextView usernameLabel;
     private EditText usernameEditText;
 
-    // keeps weather service already bound or not
-    boolean isServiceBound = false;
-
-    // use to send senz messages to SenzService
-    Messenger senzServiceMessenger;
-
-    // connection for SenzService
-    private ServiceConnection senzServiceConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            senzServiceMessenger = new Messenger(service);
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            senzServiceMessenger = null;
-        }
-    };
-
     // use to track share timeout
     private SenzCountDownTimer senzCountDownTimer;
     private boolean isResponseReceived;
 
+    // custom font
     private Typeface typeface;
+
+    // keeps weather service already bound or not
+    boolean isServiceBound = false;
+
+    // service interface
+    private ISenzService senzService = null;
+
+    // service connection
+    private ServiceConnection senzServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d("TAG", "Connected with senz service");
+            senzService = ISenzService.Stub.asInterface(service);
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            senzService = null;
+            Log.d("TAG", "Disconnected from senz service");
+        }
+    };
+
 
     /**
      * {@inheritDoc}
@@ -92,6 +87,7 @@ public class ShareFragment extends android.support.v4.app.Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
     }
 
     /**
@@ -124,11 +120,14 @@ public class ShareFragment extends android.support.v4.app.Fragment {
 
         // bind with senz service
         if (!isServiceBound) {
-            getActivity().bindService(new Intent(getActivity(), SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
+            // bind to service from here as well
+            Intent intent = new Intent();
+            intent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
+            getActivity().bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
             isServiceBound = true;
         }
 
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
+        getActivity().registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
     }
 
     /**
@@ -209,9 +208,6 @@ public class ShareFragment extends android.support.v4.app.Fragment {
      */
     private void share() {
         try {
-            // create key pair
-            PrivateKey privateKey = RSAUtils.getPrivateKey(getActivity());
-
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("lat", "lat");
@@ -220,22 +216,15 @@ public class ShareFragment extends android.support.v4.app.Fragment {
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
 
             // new senz
-            Senz senz = new Senz();
-            senz.setSenzType(SenzTypeEnum.SHARE);
-            senz.setReceiver(new User("", usernameEditText.getText().toString().trim()));
-            senz.setSender(PreferenceUtils.getUser(getActivity()));
-            senz.setAttributes(senzAttributes);
+            String id = "_ID";
+            String signature = "";
+            SenzTypeEnum senzType = SenzTypeEnum.SHARE;
+            User sender = PreferenceUtils.getUser(getActivity());
+            User receiver = new User("", usernameEditText.getText().toString().trim());
+            Senz senz = new Senz(id, signature, senzType, sender, receiver, senzAttributes);
 
-            // get digital signature of the senz
-            String senzPayload = SenzParser.getSenzPayload(senz);
-            String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
-            String senzMessage = SenzParser.getSenzMessage(senzPayload, senzSignature);
-
-            // send senz to server
-            Message msg = new Message();
-            msg.obj = senzMessage;
-            senzServiceMessenger.send(msg);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | NoUserException | SignatureException | RemoteException e) {
+            senzService.send(senz);
+        } catch (NoUserException | RemoteException e) {
             e.printStackTrace();
         }
     }

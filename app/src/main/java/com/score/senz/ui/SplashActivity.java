@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.score.senz.R;
 import com.score.senz.exceptions.NoUserException;
+import com.score.senz.services.RemoteSenzService;
 import com.score.senz.services.SenzService;
 import com.score.senz.utils.PreferenceUtils;
 
@@ -30,7 +31,7 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.splash_layout);
 
         initUi();
-        initSenzService();
+        //initSenzService();
         initNavigation();
     }
 
@@ -47,9 +48,10 @@ public class SplashActivity extends Activity {
      * Initialize senz service
      */
     private void initSenzService() {
-        // start senz service
-        Intent serviceIntent = new Intent(SplashActivity.this, SenzService.class);
+        // start service from here
+        Intent serviceIntent = new Intent(SplashActivity.this, RemoteSenzService.class);
         startService(serviceIntent);
+
     }
 
     /**
@@ -68,6 +70,7 @@ public class SplashActivity extends Activity {
         // 2. goto home
         try {
             PreferenceUtils.getUser(this);
+            initSenzService();
             navigateToHome();
         } catch (NoUserException e) {
             e.printStackTrace();

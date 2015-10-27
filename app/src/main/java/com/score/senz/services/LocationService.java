@@ -10,24 +10,16 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.score.senz.ISenzService;
 import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.utils.PreferenceUtils;
-import com.score.senz.utils.RSAUtils;
-import com.score.senz.utils.SenzParser;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
 
 /**
@@ -47,17 +39,19 @@ public class LocationService extends Service implements LocationListener {
     // keeps weather service already bound or not
     boolean isServiceBound = false;
 
-    // use to send senz messages to SenzService
-    Messenger senzServiceMessenger;
+    // service interface
+    private ISenzService senzService = null;
 
-    // connection for SenzService
+    // service connection
     private ServiceConnection senzServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
-            senzServiceMessenger = new Messenger(service);
+            Log.d("TAG", "Connected with senz service");
+            senzService = ISenzService.Stub.asInterface(service);
         }
 
         public void onServiceDisconnected(ComponentName className) {
-            senzServiceMessenger = null;
+            senzService = null;
+            Log.d("TAG", "Disconnected from senz service");
         }
     };
 
@@ -106,7 +100,9 @@ public class LocationService extends Service implements LocationListener {
 
         // bind with senz service
         if (!isServiceBound) {
-            bindService(new Intent(LocationService.this, SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
+            Intent serviceIntent = new Intent();
+            serviceIntent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
+            bindService(serviceIntent, senzServiceConnection, Context.BIND_AUTO_CREATE);
             isServiceBound = true;
         }
 
@@ -159,38 +155,20 @@ public class LocationService extends Service implements LocationListener {
 
     private void sendLocation(Location location) {
         try {
-            // create key pair
-            PrivateKey privateKey = RSAUtils.getPrivateKey(this);
-
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
             senzAttributes.put("lat", Double.toString(location.getLatitude()));
             senzAttributes.put("lon", Double.toString(location.getLongitude()));
 
-            User user = PreferenceUtils.getUser(this);
+            String id = "_ID";
+            String signature = "";
+            SenzTypeEnum senzType = SenzTypeEnum.DATA;
+            User sender = PreferenceUtils.getUser(this);
+            Senz senz = new Senz(id, signature, senzType, sender, receiver, senzAttributes);
 
-            // new senz
-            Senz senz = new Senz();
-            senz.setSenzType(SenzTypeEnum.DATA);
-            senz.setReceiver(receiver);
-            senz.setSender(user);
-            senz.setAttributes(senzAttributes);
-
-            // get digital signature of the senz
-            String senzPayload = SenzParser.getSenzPayload(senz);
-            String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
-            String senzMessage = SenzParser.getSenzMessage(senzPayload, senzSignature);
-
-            // send senz to server
-            Message msg = new Message();
-            msg.obj = senzMessage;
-            try {
-                senzServiceMessenger.send(msg);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException | NoUserException e) {
+            senzService.send(senz);
+        } catch (NoUserException | RemoteException e) {
             e.printStackTrace();
         }
     }

@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.score.senz.services.SenzService;
+import com.score.senz.services.RemoteSenzService;
 
 /**
  * This receiver will be call
@@ -20,6 +20,6 @@ public class BootCompleteReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "Starting senz service");
-        context.startService(new Intent(context, SenzService.class));
+        context.startService(new Intent(context, RemoteSenzService.class));
     }
 }

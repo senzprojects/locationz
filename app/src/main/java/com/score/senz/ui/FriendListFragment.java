@@ -11,10 +11,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
 import android.os.RemoteException;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
@@ -32,24 +29,17 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.score.senz.ISenzService;
 import com.score.senz.R;
 import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
-import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.NetworkUtil;
 import com.score.senz.utils.PreferenceUtils;
-import com.score.senz.utils.RSAUtils;
-import com.score.senz.utils.SenzParser;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -70,17 +60,19 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
 
     boolean isServiceBound = false;
 
-    // use to send senz messages to SenzService
-    Messenger senzServiceMessenger;
+    // service interface
+    private ISenzService senzService = null;
 
-    // connection for SenzService
+    // service connection
     private ServiceConnection senzServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
-            senzServiceMessenger = new Messenger(service);
+            Log.d("TAG", "Connected with senz service");
+            senzService = ISenzService.Stub.asInterface(service);
         }
 
         public void onServiceDisconnected(ComponentName className) {
-            senzServiceMessenger = null;
+            senzService = null;
+            Log.d("TAG", "Disconnected from senz service");
         }
     };
 
@@ -128,11 +120,13 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
 
         // bind to senz service
         if (!isServiceBound) {
-            this.getActivity().bindService(new Intent(this.getActivity(), SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
+            Intent intent = new Intent();
+            intent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
+            getActivity().bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
             isServiceBound = true;
         }
 
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
+        getActivity().registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
     }
 
     /**
@@ -148,7 +142,7 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
             isServiceBound = false;
         }
 
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(senzMessageReceiver);
+        getActivity().unregisterReceiver(senzMessageReceiver);
     }
 
     /**
@@ -188,7 +182,7 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
      * Read Friends data from DB
      */
     private void readFriends() {
-        friendList = (ArrayList)new SenzorsDbSource(getActivity()).readAllUsers();
+        friendList = (ArrayList) new SenzorsDbSource(getActivity()).readAllUsers();
         friendListAdapter = new FriendListAdapter(this, friendList);
         friendListView.setAdapter(friendListAdapter);
     }
@@ -322,9 +316,6 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
      */
     private void share(User user) {
         try {
-            // create key pair
-            PrivateKey privateKey = RSAUtils.getPrivateKey(getActivity());
-
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("lat", "lat");
@@ -332,34 +323,14 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
 
             // new senz
-            Senz senz = new Senz();
-            senz.setSenzType(SenzTypeEnum.SHARE);
-            senz.setReceiver(user);
-            senz.setSender(PreferenceUtils.getUser(getActivity()));
-            senz.setAttributes(senzAttributes);
+            String id = "_ID";
+            String signature = "";
+            SenzTypeEnum senzType = SenzTypeEnum.SHARE;
+            User sender = PreferenceUtils.getUser(getActivity());
+            Senz senz = new Senz(id, signature, senzType, sender, user, senzAttributes);
 
-            // get digital signature of the senz
-            String senzPayload = SenzParser.getSenzPayload(senz);
-            String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
-            String senzMessage = SenzParser.getSenzMessage(senzPayload, senzSignature);
-
-            // send senz to server
-            Message msg = new Message();
-            msg.obj = senzMessage;
-            try {
-                senzServiceMessenger.send(msg);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (NoUserException e) {
+            senzService.send(senz);
+        } catch (NoUserException | RemoteException e) {
             e.printStackTrace();
         }
     }

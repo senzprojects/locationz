@@ -12,11 +12,8 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.score.senz.ISenzService;
 import com.score.senz.R;
 import com.score.senz.application.SenzApplication;
 import com.score.senz.db.SenzorsDbSource;
@@ -38,18 +36,10 @@ import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
-import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.NetworkUtil;
 import com.score.senz.utils.PreferenceUtils;
-import com.score.senz.utils.RSAUtils;
-import com.score.senz.utils.SenzParser;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -75,17 +65,19 @@ public class SenzListFragment extends Fragment {
 
     boolean isServiceBound = false;
 
-    // use to send senz messages to SenzService
-    Messenger senzServiceMessenger;
+    // service interface
+    private ISenzService senzService = null;
 
-    // connection for SenzService
+    // service connection
     private ServiceConnection senzServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
-            senzServiceMessenger = new Messenger(service);
+            Log.d("TAG", "Connected with senz service");
+            senzService = ISenzService.Stub.asInterface(service);
         }
 
         public void onServiceDisconnected(ComponentName className) {
-            senzServiceMessenger = null;
+            senzService = null;
+            Log.d("TAG", "Disconnected from senz service");
         }
     };
 
@@ -128,11 +120,13 @@ public class SenzListFragment extends Fragment {
 
         // bind to senz service
         if (!isServiceBound) {
-            this.getActivity().bindService(new Intent(this.getActivity(), SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
+            Intent intent = new Intent();
+            intent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
+            getActivity().bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
             isServiceBound = true;
         }
 
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
+        getActivity().registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
     }
 
     /**
@@ -165,7 +159,7 @@ public class SenzListFragment extends Fragment {
             isServiceBound = false;
         }
 
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(senzMessageReceiver);
+        getActivity().unregisterReceiver(senzMessageReceiver);
     }
 
     /**
@@ -280,38 +274,21 @@ public class SenzListFragment extends Fragment {
 
     private void getSenz(User receiver) {
         try {
-            // create key pair
-            PrivateKey privateKey = RSAUtils.getPrivateKey(this.getActivity());
-
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
             senzAttributes.put("lat", "lat");
             senzAttributes.put("lon", "lon");
 
-            User sender = PreferenceUtils.getUser(this.getActivity());
-
             // new senz
-            Senz senz = new Senz();
-            senz.setSenzType(SenzTypeEnum.GET);
-            senz.setReceiver(receiver);
-            senz.setSender(sender);
-            senz.setAttributes(senzAttributes);
+            String id = "_ID";
+            String signature = "";
+            SenzTypeEnum senzType = SenzTypeEnum.GET;
+            User sender = PreferenceUtils.getUser(this.getActivity());
+            Senz senz = new Senz(id, signature, senzType, sender, receiver, senzAttributes);
 
-            // get digital signature of the senz
-            String senzPayload = SenzParser.getSenzPayload(senz);
-            String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
-            String senzMessage = SenzParser.getSenzMessage(senzPayload, senzSignature);
-
-            // send senz to server
-            Message msg = new Message();
-            msg.obj = senzMessage;
-            try {
-                senzServiceMessenger.send(msg);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidKeySpecException | SignatureException | NoUserException e) {
+            senzService.send(senz);
+        } catch (NoUserException | RemoteException e) {
             e.printStackTrace();
         }
     }

@@ -127,10 +127,6 @@
             android:enabled="true">
         </service>
         <service
-            android:name=".services.SenzService"
-            android:enabled="true">
-        </service>
-        <service
             android:name=".services.RemoteSenzService"
             android:enabled="true"
             android:process=":remote">

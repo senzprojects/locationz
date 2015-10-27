@@ -42,7 +42,7 @@ import java.util.HashMap;
  */
 public class RemoteSenzService extends Service implements ShareSenzListener {
 
-    private static final String TAG = SenzService.class.getName();
+    private static final String TAG = RemoteSenzService.class.getName();
 
     // senz service host and port
     private static final String SENZ_HOST = "udp.mysensors.info";
