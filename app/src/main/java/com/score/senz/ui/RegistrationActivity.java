@@ -11,8 +11,6 @@ import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
@@ -26,24 +24,20 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.score.senz.ISenzService;
 import com.score.senz.R;
 import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.InvalidInputFieldsException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
-import com.score.senz.services.SenzService;
+import com.score.senz.services.RemoteSenzService;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.NetworkUtil;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
-import com.score.senz.utils.SenzParser;
 
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
 
 /**
@@ -63,20 +57,20 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     private RelativeLayout signUpButton;
     private Typeface typeface;
 
-    // keeps weather service already bound or not
-    boolean isServiceBound = false;
+    // service interface
+    private ISenzService senzService = null;
 
-    // use to send senz messages to SenzService
-    Messenger senzServiceMessenger;
-
-    // connection for SenzService
+    // service connection
     private ServiceConnection senzServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
-            senzServiceMessenger = new Messenger(service);
+            Log.d("TAG", "Connected with senz service");
+            senzService = ISenzService.Stub.asInterface(service);
+            doRegistration();
         }
 
         public void onServiceDisconnected(ComponentName className) {
-            senzServiceMessenger = null;
+            senzService = null;
+            Log.d("TAG", "Disconnected from senz service");
         }
     };
 
@@ -86,7 +80,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.registration_layout);
-
         typeface = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
 
         initUi();
@@ -95,8 +88,10 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     /**
      * {@inheritDoc}
      */
-    protected void onResume() {
-        super.onResume();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(senzServiceConnection);
     }
 
     /**
@@ -105,12 +100,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     @Override
     protected void onStart() {
         super.onStart();
-
-        // bind to senz service
-        if (!isServiceBound) {
-            bindService(new Intent(RegistrationActivity.this, SenzService.class), senzServiceConnection, Context.BIND_AUTO_CREATE);
-            isServiceBound = true;
-        }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
     }
@@ -121,12 +110,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     @Override
     protected void onStop() {
         super.onStop();
-
-        // Unbind from the service
-        if (isServiceBound) {
-            unbindService(senzServiceConnection);
-            isServiceBound = false;
-        }
 
         LocalBroadcastManager.getInstance(this).unregisterReceiver(senzMessageReceiver);
     }
@@ -145,21 +128,13 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     }
 
     /**
-     * Initialize user object
-     */
-    private void initRegisteringUser() {
-        String username = editTextUsername.getText().toString().trim();
-        registeringUser = new User("0", username);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public void onClick(View v) {
         if (v == signUpButton) {
             if (NetworkUtil.isAvailableNetwork(this)) {
-                signUp();
+                onClickRegister();
             } else {
                 Toast.makeText(this, "No network connection available", Toast.LENGTH_LONG).show();
             }
@@ -171,13 +146,13 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      * Need to connect web socket and send PUT query to register
      * the user
      */
-    private void signUp() {
+    private void onClickRegister() {
         ActivityUtils.hideSoftKeyboard(this);
-        initRegisteringUser();
+
         try {
             ActivityUtils.isValidRegistrationFields(registeringUser);
             String confirmationMessage = "<font color=#000000>Are you sure you want to register on SenZ with </font> <font color=#ffc027>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font>";
-            displayDeleteMessageDialog(confirmationMessage);
+            displayConfirmationMessageDialog(confirmationMessage);
         } catch (InvalidInputFieldsException e) {
             Toast.makeText(this, "Invalid username", Toast.LENGTH_LONG).show();
             e.printStackTrace();
@@ -185,16 +160,40 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     }
 
     /**
-     * Create user via sending PUT query to server,
-     * need to send the query via the web socket
+     * Create user
+     * First initialize key pair
+     * start service
+     * bind service
      */
-    private void registerUser() {
+    private void doPreRegistration() {
         try {
-            // create key pair
-            RSAUtils.initKeys(this);
-            PrivateKey privateKey = RSAUtils.getPrivateKey(this);
+            // crate user
+            String username = editTextUsername.getText().toString().trim();
+            registeringUser = new User("0", username);
 
-            // create senz attributes
+            // init keys
+            RSAUtils.initKeys(this);
+
+            // start service from here
+            Intent serviceIntent = new Intent(RegistrationActivity.this, RemoteSenzService.class);
+            startService(serviceIntent);
+
+            // bind to service from here as well
+            Intent intent = new Intent();
+            intent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
+            bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
+        } catch (NoSuchProviderException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Create register senz
+     * Send register senz to senz service via service binder
+     */
+    private void doRegistration() {
+        try {
+            // first create create senz
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
             senzAttributes.put("pubkey", PreferenceUtils.getRsaKey(this, RSAUtils.PUBLIC_KEY));
@@ -206,28 +205,8 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             senz.setSender(new User("", registeringUser.getUsername()));
             senz.setAttributes(senzAttributes);
 
-            // get digital signature of the senz
-            String senzPayload = SenzParser.getSenzPayload(senz);
-            String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
-            String senzMessage = SenzParser.getSenzMessage(senzPayload, senzSignature);
-
-            // send senz to server
-            Message msg = new Message();
-            msg.obj = senzMessage;
-            try {
-                senzServiceMessenger.send(msg);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
+            senzService.sendSenz(registeringUser);
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
@@ -280,11 +259,11 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     }
 
     /**
-     * Display message dialog when user request(click) to delete invoice
+     * Display message dialog when user request(click) to register
      *
      * @param message message to be display
      */
-    public void displayDeleteMessageDialog(String message) {
+    public void displayConfirmationMessageDialog(String message) {
         final Dialog dialog = new Dialog(RegistrationActivity.this);
 
         //set layout for dialog
@@ -312,7 +291,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             public void onClick(View v) {
                 dialog.cancel();
                 ActivityUtils.showProgressDialog(RegistrationActivity.this, "Please wait...");
-                registerUser();
+                doPreRegistration();
             }
         });
 
@@ -329,7 +308,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     }
 
     /**
-     * Display message dialog when user request(click) to delete invoice
+     * Display message dialog with registration status
      *
      * @param message message to be display
      */
@@ -372,8 +351,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
-        Log.d("TAG", "OnBackPressed: go back");
         this.overridePendingTransition(R.anim.stay_in, R.anim.bottom_out);
     }
 }

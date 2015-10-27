@@ -1,14 +1,9 @@
 package com.score.senz;
 
+import com.score.senz.pojos.User;
+
 
 interface ISenzService {
-
-    void sendSenz();
-
-    /**
-     * Demonstrates some basic types that you can use as parameters
-     * and return values in AIDL.
-     */
-    void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat,
-            double aDouble, String aString);
+    // send senz messages to service via this function
+    void sendSenz(in User user);
 }

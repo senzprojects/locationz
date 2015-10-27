@@ -11,4 +11,8 @@
     <string name="new_senz">SenZ received</string>
     <string name="launch_senzors">Touch for launch senZors</string>
     <string name="disconnected">Disconnected from senZors</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 </resources>

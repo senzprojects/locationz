@@ -8,8 +8,10 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 
+import com.score.senz.ISenzService;
 import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Senz;
@@ -67,6 +69,26 @@ public class RemoteSenzService extends Service {
         }
     };
 
+    // API end point of this service, we expose the endpoints define in ISenzService.aidl
+    private final ISenzService.Stub apiEndPoints = new ISenzService.Stub() {
+        @Override
+        public void sendSenz(User user) throws RemoteException {
+            Log.d(TAG, "Senz service call with senz " + user.getUsername());
+
+            // TODO
+            //sendSenzMessage(new Senz());
+            sendPingMessage();
+        }
+    };
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IBinder onBind(Intent intent) {
+        return apiEndPoints;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -97,15 +119,6 @@ public class RemoteSenzService extends Service {
      * {@inheritDoc}
      */
     @Override
-    public IBinder onBind(Intent intent) {
-        // TODO AIDL
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void onDestroy() {
         Log.d(TAG, "Destroyed");
 
@@ -128,6 +141,8 @@ public class RemoteSenzService extends Service {
             } catch (SocketException e) {
                 e.printStackTrace();
             }
+        } else {
+            Log.e(TAG, "Socket already initialized");
         }
     }
 
@@ -136,17 +151,16 @@ public class RemoteSenzService extends Service {
      * We initialize UDP connection from here
      */
     private void initUdpSender() {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
+        if (socket != null) {
+            new Thread(new Runnable() {
+                public void run() {
                     // send ping message
-                    sendPing();
-                } catch (IOException | NoSuchAlgorithmException | NoUserException | SignatureException |
-                        InvalidKeyException | InvalidKeySpecException e) {
-                    e.printStackTrace();
+                    sendPingMessage();
                 }
-            }
-        }).start();
+            }).start();
+        } else {
+            Log.e(TAG, "Socket not connected");
+        }
     }
 
     /**
@@ -168,6 +182,7 @@ public class RemoteSenzService extends Service {
 
                         Log.d(TAG, "SenZ received: " + senz);
 
+                        //TODO
                         //SenzHandler.getInstance().handleSenz(SenzService.this, senz);
                     }
                 } catch (IOException e) {
@@ -179,42 +194,39 @@ public class RemoteSenzService extends Service {
 
     /**
      * Send ping message to server, this method will be invoked by a thread
-     *
-     * @throws InvalidKeySpecException
-     * @throws NoSuchAlgorithmException
-     * @throws NoUserException
-     * @throws SignatureException
-     * @throws InvalidKeyException
-     * @throws IOException
      */
-    private void sendPing() throws InvalidKeySpecException, NoSuchAlgorithmException, NoUserException, SignatureException, InvalidKeyException, IOException {
+    private void sendPingMessage() {
         if (NetworkUtil.isAvailableNetwork(RemoteSenzService.this)) {
-            String message;
-            PrivateKey privateKey = RSAUtils.getPrivateKey(RemoteSenzService.this);
-            User user = PreferenceUtils.getUser(RemoteSenzService.this);
+            try {
+                String message;
+                PrivateKey privateKey = RSAUtils.getPrivateKey(RemoteSenzService.this);
+                User user = PreferenceUtils.getUser(RemoteSenzService.this);
 
-            // create senz attributes
-            HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+                // create senz attributes
+                HashMap<String, String> senzAttributes = new HashMap<>();
+                senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
 
-            // new senz object
-            Senz senz = new Senz();
-            senz.setSenzType(SenzTypeEnum.DATA);
-            senz.setSender(new User("", user.getUsername()));
-            senz.setReceiver(new User("", "mysensors"));
-            senz.setAttributes(senzAttributes);
+                // new senz object
+                Senz senz = new Senz();
+                senz.setSenzType(SenzTypeEnum.DATA);
+                senz.setSender(new User("", user.getUsername()));
+                senz.setReceiver(new User("", "mysensors"));
+                senz.setAttributes(senzAttributes);
 
-            // get digital signature of the senz
-            String senzPayload = SenzParser.getSenzPayload(senz);
-            String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
-            message = SenzParser.getSenzMessage(senzPayload, senzSignature);
+                // get digital signature of the senz
+                String senzPayload = SenzParser.getSenzPayload(senz);
+                String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+                message = SenzParser.getSenzMessage(senzPayload, senzSignature);
 
-            Log.d(TAG, "Ping to be send: " + message);
+                Log.d(TAG, "Ping to be send: " + message);
 
-            // send message
-            if (address == null) address = InetAddress.getByName(SENZ_HOST);
-            DatagramPacket sendPacket = new DatagramPacket(message.getBytes(), message.length(), address, SENZ_PORT);
-            socket.send(sendPacket);
+                // send message
+                if (address == null) address = InetAddress.getByName(SENZ_HOST);
+                DatagramPacket sendPacket = new DatagramPacket(message.getBytes(), message.length(), address, SENZ_PORT);
+                socket.send(sendPacket);
+            } catch (IOException | NoSuchAlgorithmException | NoUserException | SignatureException | InvalidKeyException | InvalidKeySpecException e) {
+                e.printStackTrace();
+            }
         } else {
             Log.e(TAG, "Cannot send ping, No connection available");
         }
@@ -226,7 +238,7 @@ public class RemoteSenzService extends Service {
      *
      * @param senz senz message
      */
-    public void sendSenz(final Senz senz) {
+    public void sendSenzMessage(final Senz senz) {
         if (NetworkUtil.isAvailableNetwork(RemoteSenzService.this)) {
             new Thread(new Runnable() {
                 public void run() {
