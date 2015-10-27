@@ -178,7 +178,7 @@ public class SenzService extends Service {
 
                         Log.d(TAG, "SenZ received: " + senz);
 
-                        SenzHandler.getInstance().handleSenz(SenzService.this, senz);
+                        //SenzHandler.getInstance().handleSenz(SenzService.this, senz);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

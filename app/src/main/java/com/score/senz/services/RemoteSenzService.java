@@ -14,6 +14,8 @@ import android.util.Log;
 import com.score.senz.ISenzService;
 import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
+import com.score.senz.handlers.SenzHandler;
+import com.score.senz.listeners.ShareSenzListener;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.utils.NetworkUtil;
@@ -38,7 +40,7 @@ import java.util.HashMap;
  *
  * @author eranga herath(erangaeb@gamil.com)
  */
-public class RemoteSenzService extends Service {
+public class RemoteSenzService extends Service implements ShareSenzListener {
 
     private static final String TAG = SenzService.class.getName();
 
@@ -74,10 +76,12 @@ public class RemoteSenzService extends Service {
         @Override
         public void sendSenz(User user) throws RemoteException {
             Log.d(TAG, "Senz service call with senz " + user.getUsername());
+        }
 
-            // TODO
-            //sendSenzMessage(new Senz());
-            sendPingMessage();
+        @Override
+        public void send(Senz senz) throws RemoteException {
+            Log.d(TAG, "Senz service call with senz " + senz.getId());
+            sendSenzMessage(senz);
         }
     };
 
@@ -182,8 +186,7 @@ public class RemoteSenzService extends Service {
 
                         Log.d(TAG, "SenZ received: " + senz);
 
-                        //TODO
-                        //SenzHandler.getInstance().handleSenz(SenzService.this, senz);
+                        SenzHandler.getInstance(RemoteSenzService.this, RemoteSenzService.this).handleSenz(senz);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -266,4 +269,8 @@ public class RemoteSenzService extends Service {
         }
     }
 
+    @Override
+    public void onShareSenz(Senz senz) {
+        sendSenzMessage(senz);
+    }
 }

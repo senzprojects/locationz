@@ -12,7 +12,6 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -83,6 +82,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         typeface = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
 
         initUi();
+        registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
     }
 
     /**
@@ -92,26 +92,7 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     protected void onDestroy() {
         super.onDestroy();
         unbindService(senzServiceConnection);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        LocalBroadcastManager.getInstance(this).registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(senzMessageReceiver);
+        unregisterReceiver(senzMessageReceiver);
     }
 
     /**
@@ -143,11 +124,14 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
 
     /**
      * Sign-up button action,
-     * Need to connect web socket and send PUT query to register
-     * the user
+     * create user and validate fields from here
      */
     private void onClickRegister() {
         ActivityUtils.hideSoftKeyboard(this);
+
+        // crate user
+        String username = editTextUsername.getText().toString().trim();
+        registeringUser = new User("0", username);
 
         try {
             ActivityUtils.isValidRegistrationFields(registeringUser);
@@ -167,10 +151,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      */
     private void doPreRegistration() {
         try {
-            // crate user
-            String username = editTextUsername.getText().toString().trim();
-            registeringUser = new User("0", username);
-
             // init keys
             RSAUtils.initKeys(this);
 
@@ -199,13 +179,14 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
             senzAttributes.put("pubkey", PreferenceUtils.getRsaKey(this, RSAUtils.PUBLIC_KEY));
 
             // new senz
-            Senz senz = new Senz();
-            senz.setSenzType(SenzTypeEnum.SHARE);
-            senz.setReceiver(new User("", "mysensors"));
-            senz.setSender(new User("", registeringUser.getUsername()));
-            senz.setAttributes(senzAttributes);
+            String id = "_ID";
+            String signature = "";
+            SenzTypeEnum senzType = SenzTypeEnum.SHARE;
+            User sender = new User("", registeringUser.getUsername());
+            User receiver = new User("", "mysensors");
+            Senz senz = new Senz(id, signature, senzType, sender, receiver, senzAttributes);
 
-            senzService.sendSenz(registeringUser);
+            senzService.send(senz);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
