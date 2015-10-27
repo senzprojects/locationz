@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteConstraintException;
 import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.score.senz.R;
 import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.enums.SenzTypeEnum;
@@ -13,7 +12,6 @@ import com.score.senz.exceptions.NoUserException;
 import com.score.senz.listeners.ShareSenzListener;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
-import com.score.senz.services.LocationAddressReceiver;
 import com.score.senz.services.LocationService;
 import com.score.senz.utils.NotificationUtils;
 import com.score.senz.utils.PreferenceUtils;
