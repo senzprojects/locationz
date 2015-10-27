@@ -14,7 +14,6 @@ import android.widget.Button;
 
 import com.score.senz.ISenzService;
 import com.score.senz.R;
-import com.score.senz.pojos.User;
 import com.score.senz.services.RemoteSenzService;
 
 public class MainActivity extends Activity implements View.OnClickListener {
@@ -61,7 +60,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     public void onClick(View v) {
         if (v == connect) {
             try {
-                senzService.sendSenz(new User("1", "eranga"));
+                senzService.send(null);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }

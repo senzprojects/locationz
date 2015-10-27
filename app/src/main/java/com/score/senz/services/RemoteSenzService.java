@@ -74,11 +74,6 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
     // API end point of this service, we expose the endpoints define in ISenzService.aidl
     private final ISenzService.Stub apiEndPoints = new ISenzService.Stub() {
         @Override
-        public void sendSenz(User user) throws RemoteException {
-            Log.d(TAG, "Senz service call with senz " + user.getUsername());
-        }
-
-        @Override
         public void send(Senz senz) throws RemoteException {
             Log.d(TAG, "Senz service call with senz " + senz.getId());
             sendSenzMessage(senz);
