@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.score.senz.R;
 import com.score.senz.exceptions.NoUserException;
 import com.score.senz.services.RemoteSenzService;
-import com.score.senz.services.SenzService;
 import com.score.senz.utils.PreferenceUtils;
 
 /**

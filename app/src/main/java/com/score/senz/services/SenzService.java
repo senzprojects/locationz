@@ -15,7 +15,6 @@ import android.util.Log;
 
 import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
-import com.score.senz.handlers.SenzHandler;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.utils.NetworkUtil;

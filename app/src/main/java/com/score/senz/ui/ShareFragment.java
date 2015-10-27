@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -143,7 +142,7 @@ public class ShareFragment extends android.support.v4.app.Fragment {
             isServiceBound = false;
         }
 
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(senzMessageReceiver);
+        getActivity().unregisterReceiver(senzMessageReceiver);
     }
 
     /**

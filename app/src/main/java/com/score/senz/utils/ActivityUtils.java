@@ -12,7 +12,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.score.senz.exceptions.InvalidInputFieldsException;
-import com.score.senz.exceptions.InvalidPhoneNoException;
 import com.score.senz.pojos.User;
 
 /**
