@@ -40,13 +40,13 @@
 
         <!-- production key -->
         <!--<meta-data-->
-            <!--android:name="com.google.android.maps.v2.API_KEY"-->
-            <!--android:value="AIzaSyDQBL4MsO4B5qpA3VvX3HtRCQG2I09p7t0" />-->
+        <!--android:name="com.google.android.maps.v2.API_KEY"-->
+        <!--android:value="AIzaSyDQBL4MsO4B5qpA3VvX3HtRCQG2I09p7t0" />-->
 
         <!-- debug key -->
         <meta-data
-        android:name="com.google.android.maps.v2.API_KEY"
-        android:value="AIzaSyAzW1LOJz7zGeKTohFwzmRPDtb1yqt0bC8" />
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyAzW1LOJz7zGeKTohFwzmRPDtb1yqt0bC8" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -65,8 +65,7 @@
             android:configChanges="orientation"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Yello">
-        </activity>
+            android:theme="@style/Theme.Yello"></activity>
 
         <activity
             android:name=".ui.SplashActivity"
@@ -98,8 +97,7 @@
             android:configChanges="orientation"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.NoActionBar">
-        </activity>
+            android:theme="@android:style/Theme.Holo.NoActionBar"></activity>
 
         <activity
             android:name=".ui.SenzMapActivity"
@@ -119,13 +117,27 @@
 
         <service
             android:name=".services.GpsReadingService"
-            android:enabled="true" />
+            android:enabled="true">
+        </service>
+
         <service
             android:name=".services.LocationService"
-            android:enabled="true" />
+            android:enabled="true">
+        </service>
+
         <service
             android:name=".services.SenzService"
-            android:enabled="true" />
+            android:enabled="true">
+        </service>
+
+        <service
+            android:name=".services.SenzService"
+            android:enabled="true"
+            android:process=":remote">
+            <intent-filter>
+                <action android:name="com.score.senz.RemoteSenzService" />
+            </intent-filter>
+        </service>
 
         <receiver android:name=".receivers.BootCompleteReceiver">
             <intent-filter>
