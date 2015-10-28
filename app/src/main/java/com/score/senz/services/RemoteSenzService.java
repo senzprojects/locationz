@@ -93,8 +93,6 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
      */
     @Override
     public void onCreate() {
-        // TODO register AIDL here
-
         // Register network status receiver
         IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -107,7 +105,7 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         initUdpSocket();
-        initUdpSender();
+        initPingSender();
         initUdpListener();
 
         // If we get killed, after returning from here, restart
@@ -155,6 +153,30 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
                 public void run() {
                     // send ping message
                     sendPingMessage();
+                }
+            }).start();
+        } else {
+            Log.e(TAG, "Socket not connected");
+        }
+    }
+
+    /**
+     * Start thread to send PING message to server in every 30 minutes
+     */
+    private void initPingSender() {
+        if (socket != null) {
+            new Thread(new Runnable() {
+                public void run() {
+                    while (true) {
+                        // send ping message
+                        sendPingMessage();
+
+                        try {
+                            Thread.currentThread().sleep(1000 * 60 * 30);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }).start();
         } else {
