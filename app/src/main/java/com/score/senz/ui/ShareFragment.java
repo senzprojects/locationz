@@ -179,11 +179,15 @@ public class ShareFragment extends android.support.v4.app.Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_share_done:
-                if (NetworkUtil.isAvailableNetwork(getActivity())) {
-                    ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
-                    senzCountDownTimer.start();
+                if (usernameEditText.getText().toString().trim().isEmpty()) {
+                    Toast.makeText(getActivity(), "Empty username", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(getActivity(), "No network connection available", Toast.LENGTH_LONG).show();
+                    if (NetworkUtil.isAvailableNetwork(getActivity())) {
+                        ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
+                        senzCountDownTimer.start();
+                    } else {
+                        Toast.makeText(getActivity(), "No network connection available", Toast.LENGTH_LONG).show();
+                    }
                 }
 
                 return true;

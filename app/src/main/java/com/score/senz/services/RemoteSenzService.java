@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -80,6 +81,23 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
         }
     };
 
+    // handler to periodic ping sending
+    private Handler handlerPingSender;
+
+    // periodic ping sender
+    private Runnable runnablePingSender = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(TAG, "About to send ping");
+            if (socket != null) {
+                sendPingMessage();
+            } else {
+                Log.e(TAG, "Socket not connected");
+            }
+            handlerPingSender.postDelayed(this, 1000 * 60 * 28);
+        }
+    };
+
     /**
      * {@inheritDoc}
      */
@@ -122,6 +140,9 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
         // unregister connectivity listener
         unregisterReceiver(networkStatusReceiver);
 
+        // stop periodic ping sender
+        handlerPingSender.removeCallbacks(runnablePingSender);
+
         // restart service again
         // its done via broadcast receiver
         Intent intent = new Intent("com.score.senz.senzservice");
@@ -149,39 +170,18 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
      */
     private void initUdpSender() {
         if (socket != null) {
-            new Thread(new Runnable() {
-                public void run() {
-                    // send ping message
-                    sendPingMessage();
-                }
-            }).start();
+            sendPingMessage();
         } else {
             Log.e(TAG, "Socket not connected");
         }
     }
 
     /**
-     * Start thread to send PING message to server in every 30 minutes
+     * Start thread to send PING message to server in every 28 minutes
      */
     private void initPingSender() {
-        if (socket != null) {
-            new Thread(new Runnable() {
-                public void run() {
-                    while (true) {
-                        // send ping message
-                        sendPingMessage();
-
-                        try {
-                            Thread.currentThread().sleep(1000 * 60 * 30);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }).start();
-        } else {
-            Log.e(TAG, "Socket not connected");
-        }
+        handlerPingSender = new Handler();
+        runnablePingSender.run();
     }
 
     /**
@@ -217,36 +217,40 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
      */
     private void sendPingMessage() {
         if (NetworkUtil.isAvailableNetwork(RemoteSenzService.this)) {
-            try {
-                String message;
-                PrivateKey privateKey = RSAUtils.getPrivateKey(RemoteSenzService.this);
-                User user = PreferenceUtils.getUser(RemoteSenzService.this);
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        String message;
+                        PrivateKey privateKey = RSAUtils.getPrivateKey(RemoteSenzService.this);
+                        User user = PreferenceUtils.getUser(RemoteSenzService.this);
 
-                // create senz attributes
-                HashMap<String, String> senzAttributes = new HashMap<>();
-                senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+                        // create senz attributes
+                        HashMap<String, String> senzAttributes = new HashMap<>();
+                        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
 
-                // new senz object
-                Senz senz = new Senz();
-                senz.setSenzType(SenzTypeEnum.DATA);
-                senz.setSender(new User("", user.getUsername()));
-                senz.setReceiver(new User("", "mysensors"));
-                senz.setAttributes(senzAttributes);
+                        // new senz object
+                        Senz senz = new Senz();
+                        senz.setSenzType(SenzTypeEnum.DATA);
+                        senz.setSender(new User("", user.getUsername()));
+                        senz.setReceiver(new User("", "mysensors"));
+                        senz.setAttributes(senzAttributes);
 
-                // get digital signature of the senz
-                String senzPayload = SenzParser.getSenzPayload(senz);
-                String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
-                message = SenzParser.getSenzMessage(senzPayload, senzSignature);
+                        // get digital signature of the senz
+                        String senzPayload = SenzParser.getSenzPayload(senz);
+                        String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+                        message = SenzParser.getSenzMessage(senzPayload, senzSignature);
 
-                Log.d(TAG, "Ping to be send: " + message);
+                        Log.d(TAG, "Ping to be send: " + message);
 
-                // send message
-                if (address == null) address = InetAddress.getByName(SENZ_HOST);
-                DatagramPacket sendPacket = new DatagramPacket(message.getBytes(), message.length(), address, SENZ_PORT);
-                socket.send(sendPacket);
-            } catch (IOException | NoSuchAlgorithmException | NoUserException | SignatureException | InvalidKeyException | InvalidKeySpecException e) {
-                e.printStackTrace();
-            }
+                        // send message
+                        if (address == null) address = InetAddress.getByName(SENZ_HOST);
+                        DatagramPacket sendPacket = new DatagramPacket(message.getBytes(), message.length(), address, SENZ_PORT);
+                        socket.send(sendPacket);
+                    } catch (IOException | NoSuchAlgorithmException | NoUserException | SignatureException | InvalidKeyException | InvalidKeySpecException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
         } else {
             Log.e(TAG, "Cannot send ping, No connection available");
         }
