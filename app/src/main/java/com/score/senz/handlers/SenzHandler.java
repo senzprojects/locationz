@@ -7,15 +7,15 @@ import android.util.Log;
 
 import com.score.senz.R;
 import com.score.senz.db.SenzorsDbSource;
-import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
 import com.score.senz.listeners.ShareSenzListener;
-import com.score.senz.pojos.Senz;
-import com.score.senz.pojos.User;
 import com.score.senz.services.LocationService;
 import com.score.senz.utils.NotificationUtils;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.SenzParser;
+import com.score.senzc.enums.SenzTypeEnum;
+import com.score.senzc.pojos.Senz;
+import com.score.senzc.pojos.User;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -118,11 +118,9 @@ public class SenzHandler {
         intent.putExtra("SENZ", senz);
         context.sendBroadcast(intent);
 
-        com.score.senzc.pojos.Senz senz1 = new com.score.senzc.pojos.Senz(senz.getId(), senz.getSignature(), com.score.senzc.enums.SenzTypeEnum.DATA, new com.score.senzc.pojos.User("1", "23"), new com.score.senzc.pojos.User("23", "er"), senz.getAttributes());
-
         // broadcast received senz
         Intent newSenzIntent = new Intent("com.score.senz.NEW_SENZ");
-        newSenzIntent.putExtra("SENZ", senz1);
+        newSenzIntent.putExtra("SENZ", senz);
         context.sendBroadcast(newSenzIntent);
     }
 

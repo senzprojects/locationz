@@ -1,6 +1,6 @@
 package com.score.senz;
 
-import com.score.senz.pojos.Senz;
+import com.score.senzc.pojos.Senz;
 
 
 interface ISenzService {

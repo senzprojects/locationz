@@ -12,7 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.score.senz.exceptions.InvalidInputFieldsException;
-import com.score.senz.pojos.User;
+import com.score.senzc.pojos.User;
 
 /**
  * Utility class to handle activity related common functions

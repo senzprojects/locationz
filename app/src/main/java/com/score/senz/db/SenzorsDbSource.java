@@ -6,8 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.score.senz.pojos.Senz;
-import com.score.senz.pojos.User;
+import com.score.senzc.pojos.Senz;
+import com.score.senzc.pojos.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;

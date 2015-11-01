@@ -11,7 +11,7 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.score.senz.R;
-import com.score.senz.pojos.User;
+import com.score.senzc.pojos.User;
 
 import java.util.ArrayList;
 

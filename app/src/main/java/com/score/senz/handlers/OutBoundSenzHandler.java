@@ -9,14 +9,14 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
-import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
-import com.score.senz.pojos.Senz;
-import com.score.senz.pojos.User;
 import com.score.senz.services.RemoteSenzService;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;
+import com.score.senzc.enums.SenzTypeEnum;
+import com.score.senzc.pojos.Senz;
+import com.score.senzc.pojos.User;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;

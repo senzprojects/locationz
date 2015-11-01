@@ -1,8 +1,8 @@
 package com.score.senz.utils;
 
-import com.score.senz.enums.SenzTypeEnum;
-import com.score.senz.pojos.Senz;
-import com.score.senz.pojos.User;
+import com.score.senzc.enums.SenzTypeEnum;
+import com.score.senzc.pojos.Senz;
+import com.score.senzc.pojos.User;
 
 import java.util.HashMap;
 

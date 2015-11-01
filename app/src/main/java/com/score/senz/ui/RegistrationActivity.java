@@ -25,15 +25,15 @@ import android.widget.Toast;
 
 import com.score.senz.ISenzService;
 import com.score.senz.R;
-import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.InvalidInputFieldsException;
-import com.score.senz.pojos.Senz;
-import com.score.senz.pojos.User;
 import com.score.senz.services.RemoteSenzService;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.NetworkUtil;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
+import com.score.senzc.enums.SenzTypeEnum;
+import com.score.senzc.pojos.Senz;
+import com.score.senzc.pojos.User;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;

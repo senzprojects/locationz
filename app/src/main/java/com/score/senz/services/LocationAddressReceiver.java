@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.score.senz.db.SenzorsDbSource;
-import com.score.senz.pojos.User;
+import com.score.senzc.pojos.User;
 
 import java.io.IOException;
 import java.util.List;

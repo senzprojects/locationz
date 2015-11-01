@@ -13,10 +13,10 @@ import android.os.Message;
 import android.os.Messenger;
 import android.util.Log;
 
-import com.score.senz.enums.SenzTypeEnum;
+import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
-import com.score.senz.pojos.Senz;
-import com.score.senz.pojos.User;
+import com.score.senzc.pojos.Senz;
+import com.score.senzc.pojos.User;
 import com.score.senz.utils.NetworkUtil;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;

@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.senz.R;
-import com.score.senz.pojos.Senz;
+import com.score.senzc.pojos.Senz;
 
 import java.util.ArrayList;
 

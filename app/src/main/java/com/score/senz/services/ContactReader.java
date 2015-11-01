@@ -2,7 +2,7 @@ package com.score.senz.services;
 
 import android.os.AsyncTask;
 import com.score.senz.listeners.ContactReaderListener;
-import com.score.senz.pojos.User;
+import com.score.senzc.pojos.User;
 import com.score.senz.ui.FriendListFragment;
 import com.score.senz.utils.PhoneBookUtils;
 

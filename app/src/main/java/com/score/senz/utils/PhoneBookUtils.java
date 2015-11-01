@@ -13,7 +13,7 @@ import android.telephony.TelephonyManager;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.score.senz.R;
-import com.score.senz.pojos.User;
+import com.score.senzc.pojos.User;
 
 import java.io.IOException;
 import java.util.ArrayList;

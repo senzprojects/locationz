@@ -32,12 +32,12 @@ import com.score.senz.ISenzService;
 import com.score.senz.R;
 import com.score.senz.application.SenzApplication;
 import com.score.senz.db.SenzorsDbSource;
-import com.score.senz.enums.SenzTypeEnum;
-import com.score.senz.pojos.Senz;
-import com.score.senz.pojos.User;
 import com.score.senz.services.LocationAddressReceiver;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.NetworkUtil;
+import com.score.senzc.enums.SenzTypeEnum;
+import com.score.senzc.pojos.Senz;
+import com.score.senzc.pojos.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;

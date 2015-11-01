@@ -30,15 +30,15 @@ import android.widget.Toast;
 import com.score.senz.R;
 import com.score.senz.application.SenzApplication;
 import com.score.senz.db.SenzorsDbSource;
-import com.score.senz.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
-import com.score.senz.pojos.Senz;
 import com.score.senz.services.SenzService;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.NetworkUtil;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;
+import com.score.senzc.enums.SenzTypeEnum;
+import com.score.senzc.pojos.Senz;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -269,11 +269,10 @@ public class SenzSwitchBoardActivity extends Activity implements View.OnClickLis
                         put("OFF");
                     else
                         put("ON");
+                else if (getGpio15(thisSenz).equalsIgnoreCase("ON"))
+                    put("OFF");
                 else
-                    if (getGpio15(thisSenz).equalsIgnoreCase("ON"))
-                        put("OFF");
-                    else
-                        put("ON");
+                    put("ON");
                 Log.d(TAG, "Response not received yet");
             }
         }

@@ -13,7 +13,7 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationRequest;
 import com.score.senz.application.SenzApplication;
-import com.score.senz.pojos.LatLon;
+import com.score.senzc.pojos.LatLon;
 
 //import com.google.android.gms.location.LocationClient;
 

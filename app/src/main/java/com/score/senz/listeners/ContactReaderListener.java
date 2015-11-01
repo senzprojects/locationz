@@ -1,6 +1,6 @@
 package com.score.senz.listeners;
 
-import com.score.senz.pojos.User;
+import com.score.senzc.pojos.User;
 
 import java.util.ArrayList;
 

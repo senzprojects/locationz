@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.score.senz.pojos.DrawerItem;
+import com.score.senzc.pojos.DrawerItem;
 import com.score.senz.R;
 
 import java.util.ArrayList;

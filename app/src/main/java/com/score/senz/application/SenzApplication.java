@@ -2,7 +2,7 @@ package com.score.senz.application;
 
 import android.app.Application;
 
-import com.score.senz.pojos.Senz;
+import com.score.senzc.pojos.Senz;
 
 /**
  * Application class to hold shared attributes

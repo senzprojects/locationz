@@ -22,8 +22,8 @@ import android.widget.TextView;
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.senz.R;
 import com.score.senz.exceptions.NoUserException;
-import com.score.senz.pojos.DrawerItem;
-import com.score.senz.pojos.User;
+import com.score.senzc.pojos.DrawerItem;
+import com.score.senzc.pojos.User;
 import com.score.senz.utils.PreferenceUtils;
 
 import java.util.ArrayList;

@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import com.score.senz.R;
 import com.score.senz.application.SenzApplication;
-import com.score.senz.pojos.Country;
+import com.score.senzc.pojos.Country;
 import com.score.senz.utils.ActivityUtils;
 
 import java.util.ArrayList;

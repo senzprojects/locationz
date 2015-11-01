@@ -14,11 +14,9 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.score.senz.ISenzService;
-import com.score.senz.enums.SenzTypeEnum;
-import com.score.senz.exceptions.NoUserException;
-import com.score.senz.pojos.Senz;
-import com.score.senz.pojos.User;
-import com.score.senz.utils.PreferenceUtils;
+import com.score.senzc.enums.SenzTypeEnum;
+import com.score.senzc.pojos.Senz;
+import com.score.senzc.pojos.User;
 
 import java.util.HashMap;
 
