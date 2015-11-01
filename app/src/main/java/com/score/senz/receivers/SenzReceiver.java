@@ -5,7 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.score.senz.pojos.Senz;
+import com.score.senzc.pojos.Senz;
+
 
 /**
  * Broadcast receiver to receive senz messages which broadcast from SenzService

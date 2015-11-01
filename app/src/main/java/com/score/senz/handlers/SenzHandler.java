@@ -118,7 +118,7 @@ public class SenzHandler {
         intent.putExtra("SENZ", senz);
         context.sendBroadcast(intent);
 
-        com.score.senzc.pojos.Senz senz1 = new com.score.senzc.pojos.Senz(senz.getId(), senz.getSignature(), null, null, null, senz.getAttributes());
+        com.score.senzc.pojos.Senz senz1 = new com.score.senzc.pojos.Senz(senz.getId(), senz.getSignature(), com.score.senzc.enums.SenzTypeEnum.DATA, new com.score.senzc.pojos.User("1", "23"), new com.score.senzc.pojos.User("23", "er"), senz.getAttributes());
 
         // broadcast received senz
         Intent newSenzIntent = new Intent("com.score.senz.NEW_SENZ");
