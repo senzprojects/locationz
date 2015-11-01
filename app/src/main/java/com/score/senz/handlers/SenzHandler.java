@@ -117,6 +117,11 @@ public class SenzHandler {
         Intent intent = new Intent("DATA");
         intent.putExtra("SENZ", senz);
         context.sendBroadcast(intent);
+
+        // broadcast received senz
+        Intent newSenzIntent = new Intent("com.score.senz.NEW_SENZ");
+        intent.putExtra("SENZ", senz);
+        context.sendBroadcast(newSenzIntent);
     }
 
     private void sendShareResponse(User receiver, boolean isDone) {
