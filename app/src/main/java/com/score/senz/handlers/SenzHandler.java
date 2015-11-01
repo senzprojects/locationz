@@ -120,7 +120,7 @@ public class SenzHandler {
 
         // broadcast received senz
         Intent newSenzIntent = new Intent("com.score.senz.NEW_SENZ");
-        intent.putExtra("SENZ", senz);
+        newSenzIntent.putExtra("SENZ", senz);
         context.sendBroadcast(newSenzIntent);
     }
 
