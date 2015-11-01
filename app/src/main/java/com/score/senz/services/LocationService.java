@@ -162,13 +162,12 @@ public class LocationService extends Service implements LocationListener {
             senzAttributes.put("lon", Double.toString(location.getLongitude()));
 
             String id = "_ID";
-            String signature = "";
+            String signature = "_SIGNATURE";
             SenzTypeEnum senzType = SenzTypeEnum.DATA;
-            User sender = PreferenceUtils.getUser(this);
-            Senz senz = new Senz(id, signature, senzType, sender, receiver, senzAttributes);
+            Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
 
             senzService.send(senz);
-        } catch (NoUserException | RemoteException e) {
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
     }

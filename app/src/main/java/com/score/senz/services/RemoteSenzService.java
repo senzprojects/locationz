@@ -269,6 +269,9 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
                     try {
                         PrivateKey privateKey = RSAUtils.getPrivateKey(RemoteSenzService.this);
 
+                        // find user(sender) and set it to senz first
+                        senz.setSender(PreferenceUtils.getUser(RemoteSenzService.this));
+
                         // get digital signature of the senz
                         String senzPayload = SenzParser.getSenzPayload(senz);
                         String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
@@ -280,7 +283,7 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
                         if (address == null) address = InetAddress.getByName(SENZ_HOST);
                         DatagramPacket sendPacket = new DatagramPacket(message.getBytes(), message.length(), address, SENZ_PORT);
                         socket.send(sendPacket);
-                    } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException e) {
+                    } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException | NoUserException e) {
                         e.printStackTrace();
                     }
                 }

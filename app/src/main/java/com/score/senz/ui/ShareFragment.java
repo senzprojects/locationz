@@ -30,12 +30,10 @@ import android.widget.Toast;
 import com.score.senz.ISenzService;
 import com.score.senz.R;
 import com.score.senz.enums.SenzTypeEnum;
-import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.NetworkUtil;
-import com.score.senz.utils.PreferenceUtils;
 
 import java.util.HashMap;
 
@@ -211,14 +209,13 @@ public class ShareFragment extends android.support.v4.app.Fragment {
 
             // new senz
             String id = "_ID";
-            String signature = "";
+            String signature = "_SIGNATURE";
             SenzTypeEnum senzType = SenzTypeEnum.SHARE;
-            User sender = PreferenceUtils.getUser(getActivity());
             User receiver = new User("", usernameEditText.getText().toString().trim());
-            Senz senz = new Senz(id, signature, senzType, sender, receiver, senzAttributes);
+            Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
 
             senzService.send(senz);
-        } catch (NoUserException | RemoteException e) {
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
     }

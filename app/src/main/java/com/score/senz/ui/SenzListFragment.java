@@ -33,13 +33,11 @@ import com.score.senz.R;
 import com.score.senz.application.SenzApplication;
 import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.enums.SenzTypeEnum;
-import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.services.LocationAddressReceiver;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.NetworkUtil;
-import com.score.senz.utils.PreferenceUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -273,6 +271,11 @@ public class SenzListFragment extends Fragment {
         getActivity().getActionBar().setTitle(title);
     }
 
+    /**
+     * Send GET senz to service, actual senz sending task done by SenzService
+     *
+     * @param receiver senz receiver
+     */
     private void getSenz(User receiver) {
         try {
             // create senz attributes
@@ -283,13 +286,12 @@ public class SenzListFragment extends Fragment {
 
             // new senz
             String id = "_ID";
-            String signature = "";
+            String signature = "_SIGNATURE";
             SenzTypeEnum senzType = SenzTypeEnum.GET;
-            User sender = PreferenceUtils.getUser(this.getActivity());
-            Senz senz = new Senz(id, signature, senzType, sender, receiver, senzAttributes);
+            Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
 
             senzService.send(senz);
-        } catch (NoUserException | RemoteException e) {
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
     }

@@ -33,12 +33,10 @@ import com.score.senz.ISenzService;
 import com.score.senz.R;
 import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.enums.SenzTypeEnum;
-import com.score.senz.exceptions.NoUserException;
 import com.score.senz.pojos.Senz;
 import com.score.senz.pojos.User;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.NetworkUtil;
-import com.score.senz.utils.PreferenceUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -306,10 +304,11 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
     }
 
     /**
-     * Share current sensor
-     * Need to send share query to server via web socket
+     * Share current sensor to given user, sharing done via SenzService
+     *
+     * @param receiver senz receive
      */
-    private void share(User user) {
+    private void share(User receiver) {
         try {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
@@ -319,13 +318,12 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
 
             // new senz
             String id = "_ID";
-            String signature = "";
+            String signature = "_SIGNATURE";
             SenzTypeEnum senzType = SenzTypeEnum.SHARE;
-            User sender = PreferenceUtils.getUser(getActivity());
-            Senz senz = new Senz(id, signature, senzType, sender, user, senzAttributes);
+            Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
 
             senzService.send(senz);
-        } catch (NoUserException | RemoteException e) {
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
     }
