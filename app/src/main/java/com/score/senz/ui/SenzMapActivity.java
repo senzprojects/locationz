@@ -67,7 +67,6 @@ public class SenzMapActivity extends FragmentActivity implements LocationListene
             }
         });
 
-
         setUpActionBar();
         initLocationCoordinates();
         setUpMapIfNeeded();

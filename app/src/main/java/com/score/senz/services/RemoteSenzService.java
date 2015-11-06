@@ -1,5 +1,7 @@
 package com.score.senz.services;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,23 +9,26 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Handler;
+import android.os.Environment;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
 import com.score.senz.ISenzService;
-import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senz.exceptions.NoUserException;
 import com.score.senz.handlers.SenzHandler;
 import com.score.senz.listeners.ShareSenzListener;
-import com.score.senzc.pojos.Senz;
-import com.score.senzc.pojos.User;
+import com.score.senz.receivers.AlarmReceiver;
 import com.score.senz.utils.NetworkUtil;
 import com.score.senz.utils.PreferenceUtils;
 import com.score.senz.utils.RSAUtils;
 import com.score.senz.utils.SenzParser;
+import com.score.senzc.enums.SenzTypeEnum;
+import com.score.senzc.pojos.Senz;
+import com.score.senzc.pojos.User;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -34,6 +39,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 
 /**
@@ -72,29 +79,22 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
         }
     };
 
+    // broadcast receiver to check send ping
+    private final BroadcastReceiver pingAlarmReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Ping alarm received");
+            writePing();
+            sendPingMessage();
+        }
+    };
+
     // API end point of this service, we expose the endpoints define in ISenzService.aidl
     private final ISenzService.Stub apiEndPoints = new ISenzService.Stub() {
         @Override
         public void send(Senz senz) throws RemoteException {
             Log.d(TAG, "Senz service call with senz " + senz.getId());
             sendSenzMessage(senz);
-        }
-    };
-
-    // handler to periodic ping sending
-    private Handler handlerPingSender;
-
-    // periodic ping sender
-    private Runnable runnablePingSender = new Runnable() {
-        @Override
-        public void run() {
-            Log.d(TAG, "About to send ping");
-            if (socket != null) {
-                sendPingMessage();
-            } else {
-                Log.e(TAG, "Socket not connected");
-            }
-            handlerPingSender.postDelayed(this, 1000 * 60 * 28);
         }
     };
 
@@ -115,6 +115,11 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(networkStatusReceiver, filter);
+
+        // register ping alarm receiver
+        IntentFilter alarmFilter = new IntentFilter();
+        alarmFilter.addAction("PING_ALARM");
+        registerReceiver(pingAlarmReceiver, alarmFilter);
     }
 
     /**
@@ -122,6 +127,7 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "Start service");
         initUdpSocket();
         initPingSender();
         initUdpListener();
@@ -140,8 +146,8 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
         // unregister connectivity listener
         unregisterReceiver(networkStatusReceiver);
 
-        // stop periodic ping sender
-        handlerPingSender.removeCallbacks(runnablePingSender);
+        // un register ping receiver
+        unregisterReceiver(pingAlarmReceiver);
 
         // restart service again
         // its done via broadcast receiver
@@ -170,7 +176,11 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
      */
     private void initUdpSender() {
         if (socket != null) {
-            sendPingMessage();
+            new Thread(new Runnable() {
+                public void run() {
+                    sendPingMessage();
+                }
+            }).start();
         } else {
             Log.e(TAG, "Socket not connected");
         }
@@ -180,9 +190,30 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
      * Start thread to send PING message to server in every 28 minutes
      */
     private void initPingSender() {
-        handlerPingSender = new Handler();
-        runnablePingSender.run();
+        // register ping alarm receiver
+        Intent intentAlarm = new Intent(this, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
     }
+
+    private void writePing() {
+        File file = new File(Environment.getExternalStorageDirectory(), "pinggg.txt");
+        try {
+            Calendar c = Calendar.getInstance();
+            System.out.println("Current time => " + c.getTime());
+
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String formattedDate = df.format(c.getTime());
+
+            FileWriter fw = new FileWriter(file, true);
+            fw.append(formattedDate + ": " + "peroidc task to send ping \n");
+            fw.close();
+        } catch (IOException e) {
+            Log.w("ExternalStorage", "Error writing " + file, e);
+        }
+    }
+
 
     /**
      * Start thread for listen to UDP socket, all the incoming messages receives from
@@ -216,9 +247,9 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
      * Send ping message to server, this method will be invoked by a thread
      */
     private void sendPingMessage() {
-        if (NetworkUtil.isAvailableNetwork(RemoteSenzService.this)) {
-            new Thread(new Runnable() {
-                public void run() {
+        new Thread(new Runnable() {
+            public void run() {
+                if (NetworkUtil.isAvailableNetwork(RemoteSenzService.this)) {
                     try {
                         String message;
                         PrivateKey privateKey = RSAUtils.getPrivateKey(RemoteSenzService.this);
@@ -249,11 +280,11 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
                     } catch (IOException | NoSuchAlgorithmException | NoUserException | SignatureException | InvalidKeyException | InvalidKeySpecException e) {
                         e.printStackTrace();
                     }
+                } else {
+                    Log.e(TAG, "Cannot send ping, No connection available");
                 }
-            }).start();
-        } else {
-            Log.e(TAG, "Cannot send ping, No connection available");
-        }
+            }
+        }).start();
     }
 
     /**
@@ -297,4 +328,5 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
     public void onShareSenz(Senz senz) {
         sendSenzMessage(senz);
     }
+
 }
