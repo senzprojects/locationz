@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Environment;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -27,8 +26,6 @@ import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -39,8 +36,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.HashMap;
 
 /**
@@ -79,12 +74,11 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
         }
     };
 
-    // broadcast receiver to check send ping
+    // broadcast receiver to send ping message
     private final BroadcastReceiver pingAlarmReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Ping alarm received");
-            writePing();
+            Log.d(TAG, "Ping alarm received in senz service");
             sendPingMessage();
         }
     };
@@ -197,24 +191,6 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
     }
 
-    private void writePing() {
-        File file = new File(Environment.getExternalStorageDirectory(), "pinggg.txt");
-        try {
-            Calendar c = Calendar.getInstance();
-            System.out.println("Current time => " + c.getTime());
-
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String formattedDate = df.format(c.getTime());
-
-            FileWriter fw = new FileWriter(file, true);
-            fw.append(formattedDate + ": " + "peroidc task to send ping \n");
-            fw.close();
-        } catch (IOException e) {
-            Log.w("ExternalStorage", "Error writing " + file, e);
-        }
-    }
-
-
     /**
      * Start thread for listen to UDP socket, all the incoming messages receives from
      * here, when message receives it should be broadcast or delegate to appropriate message
@@ -244,7 +220,7 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
     }
 
     /**
-     * Send ping message to server, this method will be invoked by a thread
+     * Send ping message to server
      */
     private void sendPingMessage() {
         new Thread(new Runnable() {
