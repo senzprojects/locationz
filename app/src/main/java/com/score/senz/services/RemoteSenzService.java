@@ -276,8 +276,9 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
                     try {
                         PrivateKey privateKey = RSAUtils.getPrivateKey(RemoteSenzService.this);
 
-                        // find user(sender) and set it to senz first
-                        senz.setSender(PreferenceUtils.getUser(RemoteSenzService.this));
+                        // if sender not already set find user(sender) and set it to senz first
+                        if (senz.getSender() == null)
+                            senz.setSender(PreferenceUtils.getUser(getApplicationContext()));
 
                         // get digital signature of the senz
                         String senzPayload = SenzParser.getSenzPayload(senz);

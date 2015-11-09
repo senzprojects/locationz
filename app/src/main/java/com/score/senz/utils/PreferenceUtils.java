@@ -37,7 +37,7 @@ public class PreferenceUtils {
      * @return user object
      */
     public static User getUser(Context context) throws NoUserException {
-        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_MULTI_PROCESS);
         String id = preferences.getString("id", "0");
         String username = preferences.getString("username", "");
 
@@ -57,7 +57,7 @@ public class PreferenceUtils {
      * @param keyType public_key, private_key, server_key
      */
     public static void saveRsaKey(Context context, String key, String keyType) {
-        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_MULTI_PROCESS);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(keyType, key);
         editor.commit();

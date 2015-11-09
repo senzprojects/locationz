@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.text.Html;
@@ -26,6 +27,7 @@ import android.widget.Toast;
 import com.score.senz.ISenzService;
 import com.score.senz.R;
 import com.score.senz.exceptions.InvalidInputFieldsException;
+import com.score.senz.exceptions.NoUserException;
 import com.score.senz.services.RemoteSenzService;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.NetworkUtil;
@@ -56,6 +58,10 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
     private RelativeLayout signUpButton;
     private Typeface typeface;
 
+    // use to track registration timeout
+    private SenzCountDownTimer senzCountDownTimer;
+    private boolean isResponseReceived;
+
     // service interface
     private ISenzService senzService = null;
 
@@ -64,7 +70,8 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.d("TAG", "Connected with senz service");
             senzService = ISenzService.Stub.asInterface(service);
-            doRegistration();
+
+            senzCountDownTimer.start();
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -80,6 +87,9 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.registration_layout);
         typeface = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
+
+        senzCountDownTimer = new SenzCountDownTimer(16000, 5000);
+        isResponseReceived = false;
 
         initUi();
         registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
@@ -192,6 +202,37 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         }
     }
 
+    /**
+     * Keep track with share response timeout
+     */
+    private class SenzCountDownTimer extends CountDownTimer {
+
+        public SenzCountDownTimer(long millisInFuture, long countDownInterval) {
+            super(millisInFuture, countDownInterval);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            // if response not received yet, resend share
+            if (!isResponseReceived) {
+                doRegistration();
+                Log.d(TAG, "Response not received yet");
+            }
+        }
+
+        @Override
+        public void onFinish() {
+            ActivityUtils.hideSoftKeyboard(RegistrationActivity.this);
+            ActivityUtils.cancelProgressDialog();
+
+            // display message dialog that we couldn't reach the user
+            if (!isResponseReceived) {
+                String message = "<font color=#000000>Seems we couldn't reach the senz service at this moment</font>";
+                displayInformationMessageDialog("#Registration Fail", message);
+            }
+        }
+    }
+
     private BroadcastReceiver senzMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -210,21 +251,26 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         String action = intent.getAction();
 
         if (action.equals("DATA")) {
-            boolean senzMessage = intent.getExtras().getBoolean("extra");
-            if (senzMessage) {
-                // save user
-                // navigate home
-                PreferenceUtils.saveUser(this, registeringUser);
+            Senz senz = intent.getExtras().getParcelable("SENZ");
 
+            if (senz.getAttributes().containsKey("msg")) {
+                // msg response received
                 ActivityUtils.cancelProgressDialog();
-                Toast.makeText(this, "Successfully registered", Toast.LENGTH_LONG).show();
+                isResponseReceived = true;
+                senzCountDownTimer.cancel();
 
-                navigateToHome();
-            } else {
-                ActivityUtils.cancelProgressDialog();
+                String msg = senz.getAttributes().get("msg");
+                if (msg != null && msg.equalsIgnoreCase("UserCreated")) {
+                    Toast.makeText(this, "Successfully registered", Toast.LENGTH_LONG).show();
 
-                String informationMessage = "<font color=#4a4a4a>Seems username </font> <font color=#eada00>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font> <font color=#4a4a4a> already obtained by some other user, try SenZ with different username</font>";
-                displayInformationMessageDialog("Registration fail", informationMessage);
+                    // save user
+                    // navigate home
+                    PreferenceUtils.saveUser(getApplicationContext(), registeringUser);
+                    navigateToHome();
+                } else {
+                    String informationMessage = "<font color=#4a4a4a>Seems username </font> <font color=#eada00>" + "<b>" + registeringUser.getUsername() + "</b>" + "</font> <font color=#4a4a4a> already obtained by some other user, try SenZ with different username</font>";
+                    displayInformationMessageDialog("Registration fail", informationMessage);
+                }
             }
         }
     }
