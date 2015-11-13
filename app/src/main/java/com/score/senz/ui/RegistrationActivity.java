@@ -27,7 +27,6 @@ import android.widget.Toast;
 import com.score.senz.ISenzService;
 import com.score.senz.R;
 import com.score.senz.exceptions.InvalidInputFieldsException;
-import com.score.senz.exceptions.NoUserException;
 import com.score.senz.services.RemoteSenzService;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.NetworkUtil;

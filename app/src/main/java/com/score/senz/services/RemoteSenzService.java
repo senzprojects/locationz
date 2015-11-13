@@ -49,6 +49,7 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
 
     // senz service host and port
     private static final String SENZ_HOST = "udp.mysensors.info";
+    //private static final String SENZ_HOST = "192.168.59.103";
     private static final int SENZ_PORT = 9090;
 
     // we are listing for UDP socket
