@@ -63,19 +63,24 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
 
     // service interface
     private ISenzService senzService = null;
+    private boolean isServiceBound = false;
 
     // service connection
     private ServiceConnection senzServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.d("TAG", "Connected with senz service");
+            isServiceBound = true;
             senzService = ISenzService.Stub.asInterface(service);
 
+            isResponseReceived = false;
             senzCountDownTimer.start();
         }
 
         public void onServiceDisconnected(ComponentName className) {
-            senzService = null;
             Log.d("TAG", "Disconnected from senz service");
+
+            senzService = null;
+            isServiceBound = false;
         }
     };
 
@@ -88,7 +93,6 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         typeface = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
 
         senzCountDownTimer = new SenzCountDownTimer(16000, 5000);
-        isResponseReceived = false;
 
         initUi();
         registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
@@ -160,17 +164,23 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
      */
     private void doPreRegistration() {
         try {
-            // init keys
-            RSAUtils.initKeys(this);
+            if (!isServiceBound) {
+                // init keys
+                RSAUtils.initKeys(this);
 
-            // start service from here
-            Intent serviceIntent = new Intent(RegistrationActivity.this, RemoteSenzService.class);
-            startService(serviceIntent);
+                // start service from here
+                Intent serviceIntent = new Intent(RegistrationActivity.this, RemoteSenzService.class);
+                startService(serviceIntent);
 
-            // bind to service from here as well
-            Intent intent = new Intent();
-            intent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
-            bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
+                // bind to service from here as well
+                Intent intent = new Intent();
+                intent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
+                bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
+            } else {
+                // start to send senz to server form here
+                isResponseReceived = false;
+                senzCountDownTimer.start();
+            }
         } catch (NoSuchProviderException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -379,4 +389,5 @@ public class RegistrationActivity extends Activity implements View.OnClickListen
         super.onBackPressed();
         this.overridePendingTransition(R.anim.stay_in, R.anim.bottom_out);
     }
+
 }
