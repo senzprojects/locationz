@@ -1,10 +1,12 @@
 package com.score.senz.ui;
 
 import android.app.ActionBar;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -23,9 +25,25 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.PolyUtil;
 import com.score.senz.R;
 import com.score.senz.utils.ActivityUtils;
 import com.score.senz.utils.LocationUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -39,6 +57,7 @@ public class SenzMapActivity extends FragmentActivity implements LocationListene
     private static final String TAG = SenzMapActivity.class.getName();
 
     RelativeLayout myLocation;
+    RelativeLayout myRoute;
 
     private LocationManager locationManager;
 
@@ -49,12 +68,15 @@ public class SenzMapActivity extends FragmentActivity implements LocationListene
     private Marker marker;
     private Circle circle;
 
+    Polyline line;
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.senz_map_layout);
         myLocation = (RelativeLayout) findViewById(R.id.map_location);
         myLocation.setOnClickListener(new View.OnClickListener() {
@@ -64,6 +86,22 @@ public class SenzMapActivity extends FragmentActivity implements LocationListene
                 ActivityUtils.showProgressDialog(SenzMapActivity.this, "Please wait...");
                 locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
                 locationManager.requestLocationUpdates(LocationUtils.getBestLocationProvider(locationManager), 0, 0, SenzMapActivity.this);
+            }
+        });
+
+        myRoute = (RelativeLayout) findViewById(R.id.map_route);
+        myRoute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //Toast.makeText(getApplicationContext(),"work",Toast.LENGTH_LONG).show();
+                if (myLatLan ==null){
+                    Toast.makeText(getApplicationContext(),"Please select your location first",Toast.LENGTH_LONG).show();
+
+                }
+                else {
+                    new MapDerection().execute(makeURL(myLatLan.latitude, myLatLan.longitude, friendLatLan.latitude, friendLatLan.longitude));
+                }
             }
         });
 
@@ -211,7 +249,9 @@ public class SenzMapActivity extends FragmentActivity implements LocationListene
     public void onLocationChanged(Location location) {
         ActivityUtils.cancelProgressDialog();
         locationManager.removeUpdates(this);
-        displayMyLocation(new LatLng(location.getLatitude(), location.getLongitude()));
+        myLatLan =new LatLng(location.getLatitude(), location.getLongitude());
+        displayMyLocation(myLatLan);
+
     }
 
     @Override
@@ -228,5 +268,113 @@ public class SenzMapActivity extends FragmentActivity implements LocationListene
     public void onProviderDisabled(String provider) {
 
     }
+
+    public String makeURL (double sourcelat, double sourcelog, double destlat, double destlog ){
+        StringBuilder urlString = new StringBuilder();
+        urlString.append("https://maps.googleapis.com/maps/api/directions/json");
+        urlString.append("?origin=");// from
+        urlString.append(Double.toString(sourcelat));
+        urlString.append(",");
+        urlString
+                .append(Double.toString( sourcelog));
+        urlString.append("&destination=");// to
+        urlString
+                .append(Double.toString( destlat));
+        urlString.append(",");
+        urlString.append(Double.toString( destlog));
+        urlString.append("&sensor=false&mode=driving&alternatives=true");
+        urlString.append("&key=AIzaSyBmbqJcnUO5up5j_DPB330nV8esjlsk32s");
+        return urlString.toString();
+    }
+
+    private class MapDerection extends AsyncTask<String,Void,String>{
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            ActivityUtils.showProgressDialog(SenzMapActivity.this, "Please wait...");
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            //Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
+            LatLng previous = null;
+
+            try {
+
+                JSONObject jsnObj = new JSONObject(s);
+                JSONArray Jroute = jsnObj.getJSONArray("routes");
+                for (int i=0; i<1; i++){
+                    JSONArray Jlegs = ((JSONObject) Jroute.get(i)).getJSONArray("legs");
+                    for (int j=0; j<Jlegs.length(); j++){
+                        JSONArray Jsteps = ((JSONObject) Jlegs.get(j)).getJSONArray("steps");
+                        for (int n=0; n<Jsteps.length(); n++){
+                            String polyline = (String) ((JSONObject)((JSONObject) Jsteps.get(n)).get("polyline")).get("points");
+                            List<LatLng> data= PolyUtil.decode(polyline);
+                            PolylineOptions poly = new PolylineOptions()
+                                    .color(Color.rgb(0,92,130))
+                                    .width(7)
+                                    .visible(true)
+                                    .zIndex(30);
+                            poly.addAll(data);
+                            map.addPolyline(poly);
+                        }
+
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            ActivityUtils.cancelProgressDialog();
+        }
+
+        @Override
+        protected String doInBackground(String... url) {
+            return GET(url[0]);
+        }
+
+        public String GET(String url){
+            InputStream inputStream = null;
+            String result = "";
+            try {
+
+                // create HttpClient
+
+                HttpClient httpclient = new DefaultHttpClient();
+
+                // make GET request to the given URL
+                HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
+
+                // receive response as inputStream
+                inputStream = httpResponse.getEntity().getContent();
+
+                // convert inputstream to string
+                if(inputStream != null)
+                    result = convertInputStreamToString(inputStream);
+                else
+                    result = "Did not work!";
+
+            } catch (Exception e) {
+                Log.d("InputStream", e.getLocalizedMessage());
+            }
+            //Toast.makeText(getApplicationContext(),result,Toast.LENGTH_LONG).show();
+            return result;
+        }
+
+        private String convertInputStreamToString(InputStream inputStream) throws IOException {
+            BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
+            String line = "";
+            String result = "";
+            while((line = bufferedReader.readLine()) != null)
+                result += line;
+
+
+            return result;
+
+        }
+    }
+
 
 }

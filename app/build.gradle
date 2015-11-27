@@ -26,4 +26,6 @@ dependencies {
     compile 'com.google.android.gms:play-services:6.5.87'
     compile 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
     compile project(':senzc')
+    compile 'org.json:json:20141113'
+    compile 'com.google.maps.android:android-maps-utils:0.4+'
 }

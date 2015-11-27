@@ -78,6 +78,24 @@
                 android:background="@drawable/activity"></ImageView>
 
         </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/map_route"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="70dp"
+            android:background="@drawable/share_button_selector"
+            android:visibility="visible">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/route"></ImageView>
+
+        </RelativeLayout>
 
 
     </RelativeLayout>
