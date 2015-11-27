@@ -1,12 +1,15 @@
 package com.score.senz.ui;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -18,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.senz.R;
@@ -123,10 +127,28 @@ public class HomeActivity extends FragmentActivity {
         drawerLayout.setDrawerListener(homeActionBarDrawerToggle);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if( requestCode == 1888 && resultCode == -1) { //-1 = TOT HA ANAT BE.
+            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            userImage.setImageBitmap(photo);
+        }
+    }
+
     private void initDrawerUser() {
         userImage = (CircularImageView) findViewById(R.id.contact_image);
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.default_user_icon);
         userImage.setImageBitmap(largeIcon);
+        userImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Toast.makeText(getApplicationContext(),"click",Toast.LENGTH_LONG).show();
+                Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                camera.putExtra("android.intent.extras.CAMERA_FACING", 1);
+                startActivityForResult(camera, 1888);
+            }
+        });
 
         typeface = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
         //typeface = Typeface.createFromAsset(getAssets(), "fonts/Roboto-Black.ttf");
