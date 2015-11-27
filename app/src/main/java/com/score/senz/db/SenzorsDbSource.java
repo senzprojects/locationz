@@ -256,4 +256,35 @@ public class SenzorsDbSource {
         db.close();
     }
 
+    public void insertImageToDB(String username, String encodedImage){
+
+        ContentValues cv = new ContentValues();
+
+        cv.put(SenzorsDbContract.User.COLOMN_NAME_IMAGE, encodedImage);
+
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+
+        db.update(SenzorsDbContract.Senz.TABLE_NAME, cv, SenzorsDbContract.Senz.COLUMN_NAME_USER + " = ?", new String[]{username});
+
+
+    }
+
+    public String getImageFromDB(String username){
+
+        String selectQuery = "SELECT image from  " + SenzorsDbContract.User.TABLE_NAME + " where " + SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = '"+username+"'";
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        String image = null;
+        if (cursor.moveToFirst()) {
+            do {
+                image = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLOMN_NAME_IMAGE));
+                // get  the  data into array,or class variable
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        return image;
+
+    }
+
 }
