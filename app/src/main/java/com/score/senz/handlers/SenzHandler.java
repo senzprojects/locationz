@@ -81,20 +81,29 @@ public class SenzHandler {
     }
 
     private void handleShareSenz(Senz senz) {
-        // create senz
-        SenzorsDbSource dbSource = new SenzorsDbSource(context);
-        User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
-        senz.setSender(sender);
+        if (senz.getAttributes().containsKey("#lat") || senz.getAttributes().containsKey("lon")) {
+            // location senz
+            // create senz
+            SenzorsDbSource dbSource = new SenzorsDbSource(context);
+            User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
+            senz.setSender(sender);
 
-        // if senz already exists in the db, SQLiteConstraintException should throw
-        try {
-            dbSource.createSenz(senz);
-            sendShareResponse(sender, true);
+            // if senz already exists in the db, SQLiteConstraintException should throw
+            try {
+                dbSource.createSenz(senz);
+                sendShareResponse(sender, true);
 
-            NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "SenZ received from @" + senz.getSender().getUsername());
-        } catch (SQLiteConstraintException e) {
-            sendShareResponse(sender, false);
-            Log.e(TAG, e.toString());
+                NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "SenZ received from @" + senz.getSender().getUsername());
+            } catch (SQLiteConstraintException e) {
+                sendShareResponse(sender, false);
+                Log.e(TAG, e.toString());
+            }
+        } else if (senz.getAttributes().containsKey("#gpio")) {
+            // pi senz
+            // we broadcast it
+            Intent newSenzIntent = new Intent("com.score.senz.NEW_SENZ");
+            newSenzIntent.putExtra("SENZ", senz);
+            context.sendBroadcast(newSenzIntent);
         }
     }
 
