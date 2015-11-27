@@ -78,6 +78,7 @@ public class SenzorsDbSource {
             // we return id as password since we no storing users password in database
             String _id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
             String _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
+            String _image = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLOMN_NAME_IMAGE));
 
             // clear
             cursor.close();
