@@ -14,6 +14,8 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,11 +27,13 @@ import android.widget.Toast;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.senz.R;
+import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.exceptions.NoUserException;
 import com.score.senzc.pojos.DrawerItem;
 import com.score.senzc.pojos.User;
 import com.score.senz.utils.PreferenceUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 /**
@@ -58,7 +62,7 @@ public class HomeActivity extends FragmentActivity {
     // user components
     private CircularImageView userImage;
     private TextView username;
-
+    private HomeActivity curActivity;
     /**
      * {@inheritDoc}
      */
@@ -71,6 +75,7 @@ public class HomeActivity extends FragmentActivity {
         initDrawerUser();
         initDrawerList();
         loadSensors();
+        curActivity=this;
     }
 
     /**
@@ -130,16 +135,43 @@ public class HomeActivity extends FragmentActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if( requestCode == 1888 && resultCode == -1) { //-1 = TOT HA ANAT BE.
+        if( requestCode == 1888 && resultCode == -1) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             userImage.setImageBitmap(photo);
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            photo.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            byte [] bytephoto = byteArrayOutputStream.toByteArray();
+            String encodeddata= Base64.encodeToString(bytephoto, Base64.DEFAULT);
+
+           try {
+                User user = PreferenceUtils.getUser(curActivity.getApplicationContext());
+                SenzorsDbSource db=new SenzorsDbSource(curActivity.getApplicationContext());
+                db.insertImageToDB(user.getUsername(), encodeddata);
+
+            } catch (NoUserException e ) {
+               e.printStackTrace();
+
+            }
+
+
         }
     }
 
     private void initDrawerUser() {
         userImage = (CircularImageView) findViewById(R.id.contact_image);
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.default_user_icon);
-        userImage.setImageBitmap(largeIcon);
+        try {
+            User user = PreferenceUtils.getUser(this);
+            SenzorsDbSource db=new SenzorsDbSource(this);
+            byte[] decodedString = Base64.decode(db.getImageFromDB(user.getUsername()), Base64.DEFAULT);
+            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+            userImage.setImageBitmap(decodedByte);
+
+        } catch (Exception e) {
+            userImage.setImageBitmap(largeIcon);
+        }
+
         userImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

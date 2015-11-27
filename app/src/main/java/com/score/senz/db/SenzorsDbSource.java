@@ -262,9 +262,14 @@ public class SenzorsDbSource {
 
         cv.put(SenzorsDbContract.User.COLOMN_NAME_IMAGE, encodedImage);
 
+
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
 
-        db.update(SenzorsDbContract.Senz.TABLE_NAME, cv, SenzorsDbContract.Senz.COLUMN_NAME_USER + " = ?", new String[]{username});
+        int p=db.update(SenzorsDbContract.User.TABLE_NAME, cv, SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?", new String[]{username});
+        if(p==0){
+            cv.put(SenzorsDbContract.User.COLUMN_NAME_USERNAME, username);
+            db.insert(SenzorsDbContract.User.TABLE_NAME,null,cv);
+        }
 
 
     }
