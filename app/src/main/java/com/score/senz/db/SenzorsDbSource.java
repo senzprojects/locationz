@@ -78,6 +78,7 @@ public class SenzorsDbSource {
             // we return id as password since we no storing users password in database
             String _id = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
             String _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
+            String _image = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLOMN_NAME_IMAGE));
 
             // clear
             cursor.close();
@@ -253,6 +254,42 @@ public class SenzorsDbSource {
                         SenzorsDbContract.Senz.COLUMN_NAME_NAME + "=?",
                 new String[]{senz.getSender().getId(), senz.getAttributes().keySet().iterator().next()});
         db.close();
+    }
+
+    public void insertImageToDB(String username, String encodedImage){
+
+        ContentValues cv = new ContentValues();
+
+        cv.put(SenzorsDbContract.User.COLOMN_NAME_IMAGE, encodedImage);
+
+
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+
+        int p=db.update(SenzorsDbContract.User.TABLE_NAME, cv, SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?", new String[]{username});
+        if(p==0){
+            cv.put(SenzorsDbContract.User.COLUMN_NAME_USERNAME, username);
+            db.insert(SenzorsDbContract.User.TABLE_NAME,null,cv);
+        }
+
+
+    }
+
+    public String getImageFromDB(String username){
+
+        String selectQuery = "SELECT image from  " + SenzorsDbContract.User.TABLE_NAME + " where " + SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = '"+username+"'";
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        String image = null;
+        if (cursor.moveToFirst()) {
+            do {
+                image = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLOMN_NAME_IMAGE));
+                // get  the  data into array,or class variable
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        return image;
+
     }
 
 }

@@ -1,5 +1,6 @@
 package com.score.senz.db;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -18,7 +19,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     private static SenzorsDbHelper senzorsDbHelper;
 
     // If you change the database schema, you must increment the database version
-    private static final int DATABASE_VERSION = 17;
+    private static final int DATABASE_VERSION = 20;
     private static final String DATABASE_NAME = "Senz.db";
 
     // data types, keywords and queries
@@ -35,7 +36,8 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + SenzorsDbContract.User.TABLE_NAME + " (" +
                     SenzorsDbContract.User._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                     SenzorsDbContract.User.COLUMN_NAME_USERNAME + TEXT_TYPE + "UNIQUE NOT NULL" + "," +
-                    SenzorsDbContract.User.COLUMN_NAME_NAME + TEXT_TYPE +
+                    SenzorsDbContract.User.COLUMN_NAME_NAME + TEXT_TYPE +","+
+                    SenzorsDbContract.User.COLOMN_NAME_IMAGE + TEXT_TYPE +
             " )";
 
     private static final String SQL_DELETE_SENZ =
@@ -106,5 +108,6 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }
+
 
 }

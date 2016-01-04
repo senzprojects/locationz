@@ -29,7 +29,15 @@ public class PreferenceUtils {
         editor.putString("username", user.getUsername());
         editor.commit();
     }
+    public static void saveUserImage(Context context, String userimg) {
+        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
 
+        //keys should be constants as well, or derived from a constant prefix in a loop.
+        editor.putString("image", "564555555454");
+        //editor.putString("username", user.getUsername());
+        editor.commit();
+    }
     /**
      * Get user details from shared preference
      *
@@ -47,6 +55,18 @@ public class PreferenceUtils {
         User user = new User(id, username);
         user.setUsername(username);
         return user;
+    }
+
+    public static String getUserImage(Context context) throws NoUserException {
+        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        //String id = preferences.getString("id", "0");
+        String userimg = preferences.getString("image", "");
+
+        if (userimg.isEmpty())
+            throw new NoUserException();
+
+
+        return userimg;
     }
 
     /**
