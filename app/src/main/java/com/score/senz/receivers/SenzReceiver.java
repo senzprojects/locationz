@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.score.senz.handlers.SenzHandler;
 import com.score.senzc.pojos.Senz;
 
 
@@ -24,6 +25,7 @@ public class SenzReceiver extends BroadcastReceiver {
         Senz senz = intent.getExtras().getParcelable("SENZ");
 
         // handler senz from here
+        SenzHandler.getInstance(context).handleSenz(senz);
 
         Log.d(TAG, "Senz received " + action);
     }

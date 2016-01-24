@@ -88,11 +88,18 @@
 
         <service
             android:name=".services.GpsReadingService"
-            android:enabled="true"></service>
+            android:enabled="true">
+        </service>
 
         <service
             android:name=".services.LocationService"
-            android:enabled="true"></service>
+            android:enabled="true">
+        </service>
+
+        <service
+            android:name=".services.SenzShareHandlerService"
+            android:enabled="true">
+        </service>
 
         <receiver android:name=".receivers.SenzReceiver">
             <intent-filter>
