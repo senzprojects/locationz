@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <!-- To boot complete broadcast receiver -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -37,24 +37,17 @@
 
         <!-- production key -->
         <!--<meta-data-->
-            <!--android:name="com.google.android.maps.v2.API_KEY"-->
-            <!--android:value="AIzaSyDQBL4MsO4B5qpA3VvX3HtRCQG2I09p7t0" />-->
+        <!--android:name="com.google.android.maps.v2.API_KEY"-->
+        <!--android:value="AIzaSyDQBL4MsO4B5qpA3VvX3HtRCQG2I09p7t0" />-->
 
         <!-- debug key -->
         <meta-data
-        android:name="com.google.android.maps.v2.API_KEY"
-        android:value="AIzaSyBmbqJcnUO5up5j_DPB330nV8esjlsk32s" />
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyBmbqJcnUO5up5j_DPB330nV8esjlsk32s" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity
-            android:name=".ui.LaunchActivity"
-            android:configChanges="orientation"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.NoDisplay"
-            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ui.HomeActivity"
             android:configChanges="orientation"
@@ -84,12 +77,7 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity
-            android:name=".ui.RegistrationActivity"
-            android:configChanges="orientation"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.NoActionBar" />
+
         <activity
             android:name=".ui.SenzMapActivity"
             android:configChanges="orientation"
@@ -97,51 +85,19 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Yello"
             android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".ui.MainActivity"
-            android:configChanges="orientation"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.Yello"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
 
         <service
             android:name=".services.GpsReadingService"
-            android:enabled="true">
-
-        </service>
+            android:enabled="true"></service>
 
         <service
             android:name=".services.LocationService"
-            android:enabled="true">
-        </service>
-
-        <service
-            android:name=".services.RemoteSenzService"
-            android:enabled="true"
-            android:process=":remote">
-            <intent-filter>
-                <action android:name="com.score.senz.services.RemoteSenzService" />
-            </intent-filter>
-        </service>
-
-        <receiver android:name=".receivers.BootCompleteReceiver">
-            <intent-filter>
-                <action android:name="com.score.senz.senzservice" />
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
+            android:enabled="true"></service>
 
         <receiver android:name=".receivers.SenzReceiver">
             <intent-filter>
                 <action android:name="com.score.senz.NEW_SENZ" />
             </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name=".receivers.AlarmReceiver"
-            android:process=":remote">
         </receiver>
 
     </application>

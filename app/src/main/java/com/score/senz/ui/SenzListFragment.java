@@ -30,7 +30,6 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
 import com.score.senz.ISenzService;
 import com.score.senz.R;
-import com.score.senz.application.SenzApplication;
 import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.services.LocationAddressReceiver;
 import com.score.senz.utils.ActivityUtils;
@@ -204,22 +203,13 @@ public class SenzListFragment extends Fragment {
     }
 
     private void handleListItmeClick(Senz senz) {
-        if (senz.getAttributes().containsKey("GPIO")) {
-            // this is gpio senz
-            Intent intent = new Intent(getActivity(), SenzSwitchBoardActivity.class);
-            //intent.putExtra("extra", senz);
-            ((SenzApplication) getActivity().getApplication()).setSenz(senz);
-            getActivity().startActivity(intent);
-            getActivity().overridePendingTransition(R.anim.right_in, R.anim.stay_in);
+        // location senz
+        if (NetworkUtil.isAvailableNetwork(getActivity())) {
+            ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
+            isResponseReceived = false;
+            senzCountDownTimer.start();
         } else {
-            // location senz
-            if (NetworkUtil.isAvailableNetwork(getActivity())) {
-                ActivityUtils.showProgressDialog(getActivity(), "Please wait...");
-                isResponseReceived = false;
-                senzCountDownTimer.start();
-            } else {
-                Toast.makeText(getActivity(), "No network connection available", Toast.LENGTH_LONG).show();
-            }
+            Toast.makeText(getActivity(), "No network connection available", Toast.LENGTH_LONG).show();
         }
     }
 

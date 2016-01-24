@@ -12,7 +12,6 @@ import com.score.senz.listeners.ShareSenzListener;
 import com.score.senz.services.LocationService;
 import com.score.senz.utils.NotificationUtils;
 import com.score.senz.utils.PreferenceUtils;
-import com.score.senz.utils.SenzParser;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
@@ -45,30 +44,23 @@ public class SenzHandler {
         return instance;
     }
 
-    public void handleSenz(String senzMessage) {
-        try {
-            // parse and verify senz
-            Senz senz = SenzParser.parse(senzMessage);
-            verifySenz(senz);
-            switch (senz.getSenzType()) {
-                case PING:
-                    Log.d(TAG, "PING received");
-                    break;
-                case SHARE:
-                    Log.d(TAG, "SHARE received");
-                    handleShareSenz(senz);
-                    break;
-                case GET:
-                    Log.d(TAG, "GET received");
-                    handleGetSenz(senz);
-                    break;
-                case DATA:
-                    Log.d(TAG, "DATA received");
-                    handleDataSenz(senz);
-                    break;
-            }
-        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
-            e.printStackTrace();
+    public void handleSenz(Senz senz) {
+        switch (senz.getSenzType()) {
+            case PING:
+                Log.d(TAG, "PING received");
+                break;
+            case SHARE:
+                Log.d(TAG, "SHARE received");
+                handleShareSenz(senz);
+                break;
+            case GET:
+                Log.d(TAG, "GET received");
+                handleGetSenz(senz);
+                break;
+            case DATA:
+                Log.d(TAG, "DATA received");
+                handleDataSenz(senz);
+                break;
         }
     }
 

@@ -8,9 +8,6 @@ import android.os.Handler;
 import android.widget.TextView;
 
 import com.score.senz.R;
-import com.score.senz.exceptions.NoUserException;
-import com.score.senz.services.RemoteSenzService;
-import com.score.senz.utils.PreferenceUtils;
 
 /**
  * Splash activity, send login query from here
@@ -30,7 +27,6 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.splash_layout);
 
         initUi();
-        //initSenzService();
         initNavigation();
     }
 
@@ -44,16 +40,6 @@ public class SplashActivity extends Activity {
     }
 
     /**
-     * Initialize senz service
-     */
-    private void initSenzService() {
-        // start service from here
-        Intent serviceIntent = new Intent(SplashActivity.this, RemoteSenzService.class);
-        startService(serviceIntent);
-
-    }
-
-    /**
      * {@inheritDoc}
      */
     protected void onResume() {
@@ -64,34 +50,9 @@ public class SplashActivity extends Activity {
      * Determine where to go from here
      */
     private void initNavigation() {
-        // decide where to go
-        // 1. goto registration
-        // 2. goto home
-        try {
-            PreferenceUtils.getUser(this);
-            initSenzService();
-            navigateToHome();
-        } catch (NoUserException e) {
-            e.printStackTrace();
+        // TODO verify senz service app installed in the device
 
-            // no user means navigate to login
-            navigateToRegistration();
-        }
-    }
-
-    /**
-     * Navigate to Register activity
-     */
-    private void navigateToRegistration() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(SplashActivity.this, RegistrationActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                SplashActivity.this.startActivity(intent);
-                SplashActivity.this.finish();
-            }
-        }, SPLASH_DISPLAY_LENGTH);
+        navigateToHome();
     }
 
     /**
