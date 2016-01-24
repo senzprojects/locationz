@@ -1,3 +1,5 @@
-# How to install
+# LocationZ
+Real time location tracking application build on top of SenZ platform
 
-git clone https://github.com/iot-senz/locationz.git SenZ
+# How to install
+git clone https://github.com/iot-senz/locationz.git LocationZ
