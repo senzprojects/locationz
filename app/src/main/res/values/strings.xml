@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SenZ</string>
+    <string name="app_name">LocationZ</string>
     <string name="ns_menu_open">open</string>
     <string name="ns_menu_close">close</string>
     <string name="sample_address">No 35, Pullair kovil road \n Matale</string>

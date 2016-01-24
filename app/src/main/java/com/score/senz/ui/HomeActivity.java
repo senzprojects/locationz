@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -15,7 +14,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Base64;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,15 +21,14 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.senz.R;
 import com.score.senz.db.SenzorsDbSource;
 import com.score.senz.exceptions.NoUserException;
+import com.score.senz.utils.PreferenceUtils;
 import com.score.senzc.pojos.DrawerItem;
 import com.score.senzc.pojos.User;
-import com.score.senz.utils.PreferenceUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -63,6 +60,7 @@ public class HomeActivity extends FragmentActivity {
     private CircularImageView userImage;
     private TextView username;
     private HomeActivity curActivity;
+
     /**
      * {@inheritDoc}
      */
@@ -75,7 +73,7 @@ public class HomeActivity extends FragmentActivity {
         initDrawerUser();
         initDrawerList();
         loadSensors();
-        curActivity=this;
+        curActivity = this;
     }
 
     /**
@@ -135,26 +133,22 @@ public class HomeActivity extends FragmentActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if( requestCode == 1888 && resultCode == -1) {
+        if (requestCode == 1888 && resultCode == -1) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             userImage.setImageBitmap(photo);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             photo.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-            byte [] bytephoto = byteArrayOutputStream.toByteArray();
-            String encodeddata= Base64.encodeToString(bytephoto, Base64.DEFAULT);
+            byte[] bytephoto = byteArrayOutputStream.toByteArray();
+            String encodeddata = Base64.encodeToString(bytephoto, Base64.DEFAULT);
 
-           try {
+            try {
                 User user = PreferenceUtils.getUser(curActivity.getApplicationContext());
-                SenzorsDbSource db=new SenzorsDbSource(curActivity.getApplicationContext());
+                SenzorsDbSource db = new SenzorsDbSource(curActivity.getApplicationContext());
                 db.insertImageToDB(user.getUsername(), encodeddata);
-
-            } catch (NoUserException e ) {
-               e.printStackTrace();
-
+            } catch (NoUserException e) {
+                e.printStackTrace();
             }
-
-
         }
     }
 
@@ -163,7 +157,7 @@ public class HomeActivity extends FragmentActivity {
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.default_user_icon);
         try {
             User user = PreferenceUtils.getUser(this);
-            SenzorsDbSource db=new SenzorsDbSource(this);
+            SenzorsDbSource db = new SenzorsDbSource(this);
             byte[] decodedString = Base64.decode(db.getImageFromDB(user.getUsername()), Base64.DEFAULT);
             Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
             userImage.setImageBitmap(decodedByte);

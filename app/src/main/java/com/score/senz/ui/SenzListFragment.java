@@ -134,7 +134,7 @@ public class SenzListFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        setUpActionBarTitle("#Senz");
+        setUpActionBarTitle("#LocationZ");
         displaySensorList();
     }
 

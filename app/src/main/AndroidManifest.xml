@@ -32,7 +32,7 @@
 
     <application
         android:name=".application.SenzApplication"
-        android:icon="@drawable/senz_logo"
+        android:icon="@drawable/blue_dot_icon"
         android:label="@string/app_name">
 
         <!-- production key -->
