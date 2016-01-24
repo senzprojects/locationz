@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.score.senz"
+    package="com.score.locationz"
     android:versionCode="3"
     android:versionName="1.2">
 
@@ -31,7 +31,7 @@
         android:required="true" />
 
     <application
-        android:name=".application.SenzApplication"
+        android:name="com.score.locationz.application.SenzApplication"
         android:icon="@drawable/blue_dot_icon"
         android:label="@string/app_name">
 
@@ -49,13 +49,13 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".ui.HomeActivity"
+            android:name="com.score.locationz.ui.HomeActivity"
             android:configChanges="orientation"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Yello" />
         <activity
-            android:name=".ui.SplashActivity"
+            android:name="com.score.locationz.ui.SplashActivity"
             android:configChanges="orientation"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
@@ -67,7 +67,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.CountryListActivity"
+            android:name="com.score.locationz.ui.CountryListActivity"
             android:configChanges="orientation"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
@@ -79,7 +79,7 @@
         </activity>
 
         <activity
-            android:name=".ui.SenzMapActivity"
+            android:name="com.score.locationz.ui.SenzMapActivity"
             android:configChanges="orientation"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
@@ -87,21 +87,18 @@
             android:windowSoftInputMode="stateHidden" />
 
         <service
-            android:name=".services.GpsReadingService"
-            android:enabled="true">
-        </service>
+            android:name="com.score.locationz.services.GpsReadingService"
+            android:enabled="true"></service>
 
         <service
-            android:name=".services.LocationService"
-            android:enabled="true">
-        </service>
+            android:name="com.score.locationz.services.LocationService"
+            android:enabled="true"></service>
 
         <service
-            android:name=".services.SenzShareHandlerService"
-            android:enabled="true">
-        </service>
+            android:name=".services.ShareHandlerService"
+            android:enabled="true"></service>
 
-        <receiver android:name=".receivers.SenzReceiver">
+        <receiver android:name="com.score.locationz.receivers.SenzReceiver">
             <intent-filter>
                 <action android:name="com.score.senz.NEW_SENZ" />
             </intent-filter>
