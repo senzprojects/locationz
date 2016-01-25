@@ -124,7 +124,7 @@ public class SenzListFragment extends Fragment {
             isServiceBound = true;
         }
 
-        getActivity().registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
+        getActivity().registerReceiver(senzMessageReceiver, new IntentFilter("com.score.senz.DATA_SENZ"));
     }
 
     /**
@@ -303,7 +303,7 @@ public class SenzListFragment extends Fragment {
     private void handleMessage(Intent intent) {
         String action = intent.getAction();
 
-        if (action.equalsIgnoreCase("DATA")) {
+        if (action.equalsIgnoreCase("com.score.senz.DATA_SENZ")) {
             Senz senz = intent.getExtras().getParcelable("SENZ");
 
             if (senz.getAttributes().containsKey("lat")) {

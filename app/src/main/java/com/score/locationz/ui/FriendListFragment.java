@@ -29,14 +29,14 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.score.senz.ISenzService;
 import com.score.locationz.R;
 import com.score.locationz.db.SenzorsDbSource;
+import com.score.locationz.utils.ActivityUtils;
+import com.score.locationz.utils.NetworkUtil;
+import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
-import com.score.locationz.utils.ActivityUtils;
-import com.score.locationz.utils.NetworkUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -118,7 +118,7 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
         intent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
         getActivity().bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
 
-        getActivity().registerReceiver(senzMessageReceiver, new IntentFilter("DATA"));
+        getActivity().registerReceiver(senzMessageReceiver, new IntentFilter("com.score.senz.DATA_SENZ"));
     }
 
     /**
@@ -283,7 +283,7 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
     private void handleMessage(Intent intent) {
         String action = intent.getAction();
 
-        if (action.equalsIgnoreCase("DATA")) {
+        if (action.equalsIgnoreCase("com.score.senz.DATA_SENZ")) {
             Senz senz = intent.getExtras().getParcelable("SENZ");
 
             if (senz.getAttributes().containsKey("msg")) {
@@ -415,7 +415,6 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
             }
         }
     }
-
 
     /**
      * Display message dialog when user request(click) to delete invoice
