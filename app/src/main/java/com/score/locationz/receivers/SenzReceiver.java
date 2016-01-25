@@ -8,7 +8,6 @@ import android.util.Log;
 import com.score.locationz.handlers.SenzHandler;
 import com.score.senzc.pojos.Senz;
 
-
 /**
  * Broadcast receiver to receive senz messages which broadcast from SenzService
  *

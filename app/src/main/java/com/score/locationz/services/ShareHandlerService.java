@@ -1,10 +1,8 @@
 package com.score.locationz.services;
 
 import android.app.Service;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.database.sqlite.SQLiteConstraintException;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -23,30 +21,13 @@ import java.util.HashMap;
 /**
  * Created by eranga on 1/24/16
  */
-public class ShareHandlerService extends Service implements ServiceConnection {
+public class ShareHandlerService extends Service {
 
     private static final String TAG = ShareHandlerService.class.getName();
 
+    private SenzServiceConnection serviceConnection;
+
     private Senz senz;
-
-    private boolean isServiceConnected = false;
-
-    // service interface
-    private ISenzService senzService = null;
-
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        Log.d(TAG, "Connected with senz service");
-        senzService = ISenzService.Stub.asInterface(service);
-        isServiceConnected = true;
-    }
-
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-        senzService = null;
-        isServiceConnected = false;
-        Log.d("TAG", "Disconnected from senz service");
-    }
 
     /**
      * {@inheritDoc}
@@ -61,10 +42,22 @@ public class ShareHandlerService extends Service implements ServiceConnection {
      */
     @Override
     public void onCreate() {
+        Log.d(TAG, "Create service");
+        serviceConnection = new SenzServiceConnection(this);
+
         // bind to senz service
         Intent serviceIntent = new Intent();
         serviceIntent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
-        bindService(serviceIntent, this, Context.BIND_AUTO_CREATE);
+        bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+
+        //call back after service bind
+        serviceConnection.executeAfterServiceConnected(new Runnable() {
+            @Override
+            public void run() {
+                ISenzService senzService = serviceConnection.getInterface();
+                saveSenz(senzService, senz);
+            }
+        });
     }
 
     /**
@@ -73,14 +66,9 @@ public class ShareHandlerService extends Service implements ServiceConnection {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-
         senz = intent.getExtras().getParcelable("SENZ");
 
-        while (isServiceConnected) {
-            saveSenz(senz);
-
-            break;
-        }
+        Log.d(TAG, "Received " + senz.getSender().getUsername());
 
         return START_STICKY;
     }
@@ -91,11 +79,9 @@ public class ShareHandlerService extends Service implements ServiceConnection {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
-        unbindService(this);
     }
 
-    private void saveSenz(Senz senz) {
+    private void saveSenz(ISenzService senzService, Senz senz) {
         SenzorsDbSource dbSource = new SenzorsDbSource(this);
         User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
         senz.setSender(sender);
@@ -107,14 +93,14 @@ public class ShareHandlerService extends Service implements ServiceConnection {
             dbSource.createSenz(senz);
 
             NotificationUtils.showNotification(this, this.getString(R.string.new_senz), "LocationZ received from @" + senz.getSender().getUsername());
-            sendResponse(sender, true);
+            sendResponse(senzService, sender, true);
         } catch (SQLiteConstraintException e) {
-            sendResponse(sender, false);
+            sendResponse(senzService, sender, false);
             Log.e(TAG, e.toString());
         }
     }
 
-    private void sendResponse(User receiver, boolean isDone) {
+    private void sendResponse(ISenzService senzService, User receiver, boolean isDone) {
         Log.d(TAG, "send response");
         try {
             // create senz attributes
