@@ -6,7 +6,7 @@
         android:layout_width="fill_parent"
         android:gravity="center"
         android:orientation="vertical"
-        android:background="#fff">
+        android:background="@drawable/freee">
 
     <TextView
             android:layout_marginTop="12dp"
@@ -18,7 +18,7 @@
             android:layout_gravity="center_horizontal"
             android:textSize="58sp"
             android:textColor="#FFFFFF"
-            android:background="@drawable/circle_shape_yello">
+            android:background="@drawable/circle_shape_gray">
     </TextView>
 
     <!--<TextView-->
