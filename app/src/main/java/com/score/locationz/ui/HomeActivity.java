@@ -30,7 +30,6 @@ import android.widget.TextView;
 import com.github.siyamed.shapeimageview.CircularImageView;
 import com.score.locationz.R;
 import com.score.locationz.exceptions.NoUserException;
-import com.score.locationz.utils.ActivityUtils;
 import com.score.locationz.utils.PreferenceUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.pojos.DrawerItem;

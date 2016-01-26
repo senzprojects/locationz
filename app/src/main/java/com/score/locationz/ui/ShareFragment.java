@@ -117,7 +117,7 @@ public class ShareFragment extends android.support.v4.app.Fragment {
         intent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
         getActivity().bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
 
-        getActivity().registerReceiver(senzMessageReceiver, new IntentFilter("com.score.senz.NEW_SENZ"));
+        getActivity().registerReceiver(senzMessageReceiver, new IntentFilter("com.score.senz.DATA_SENZ"));
     }
 
     /**
