@@ -1,19 +1,24 @@
 package com.score.locationz.ui;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,10 +28,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
-import com.score.locationz.db.SenzorsDbSource;
-import com.score.locationz.exceptions.NoUserException;
 import com.score.locationz.R;
+import com.score.locationz.exceptions.NoUserException;
+import com.score.locationz.utils.ActivityUtils;
 import com.score.locationz.utils.PreferenceUtils;
+import com.score.senz.ISenzService;
 import com.score.senzc.pojos.DrawerItem;
 import com.score.senzc.pojos.User;
 
@@ -61,6 +67,40 @@ public class HomeActivity extends FragmentActivity {
     private TextView username;
     private HomeActivity curActivity;
 
+    // service interface
+    private ISenzService senzService = null;
+
+    // service status
+    boolean isServiceBound = false;
+
+    // service connection
+    private ServiceConnection senzServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d(TAG, "Connected with senz service");
+            senzService = ISenzService.Stub.asInterface(service);
+            try {
+                String user = senzService.getUser();
+                PreferenceUtils.saveUser(HomeActivity.this, new User("id", user));
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+
+            ActivityUtils.cancelProgressDialog();
+            initDrawerUser();
+
+            // unbind after config
+            if (isServiceBound) {
+                unbindService(senzServiceConnection);
+                isServiceBound = false;
+            }
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            senzService = null;
+            Log.d("TAG", "Disconnected from senz service");
+        }
+    };
+
     /**
      * {@inheritDoc}
      */
@@ -69,6 +109,7 @@ public class HomeActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_layout);
 
+        initConfig();
         initDrawer();
         initDrawerUser();
         initDrawerList();
@@ -88,6 +129,17 @@ public class HomeActivity extends FragmentActivity {
      */
     protected void onPause() {
         super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Unbind from the service
+        if (isServiceBound) {
+            unbindService(senzServiceConnection);
+            isServiceBound = false;
+        }
     }
 
     /**
@@ -110,6 +162,25 @@ public class HomeActivity extends FragmentActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void initConfig() {
+        try {
+            PreferenceUtils.getUser(this);
+        } catch (NoUserException e) {
+            e.printStackTrace();
+
+            ActivityUtils.showProgressDialog(this, "Configuring...");
+
+            // get user from service
+            // bind to senz service
+            if (!isServiceBound) {
+                Intent intent = new Intent();
+                intent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
+                bindService(intent, senzServiceConnection, BIND_AUTO_CREATE);
+                isServiceBound = true;
+            }
+        }
     }
 
     /**
@@ -142,27 +213,21 @@ public class HomeActivity extends FragmentActivity {
             byte[] bytephoto = byteArrayOutputStream.toByteArray();
             String encodeddata = Base64.encodeToString(bytephoto, Base64.DEFAULT);
 
-            try {
-                User user = PreferenceUtils.getUser(curActivity.getApplicationContext());
-                SenzorsDbSource db = new SenzorsDbSource(curActivity.getApplicationContext());
-                db.insertImageToDB(user.getUsername(), encodeddata);
-            } catch (NoUserException e) {
-                e.printStackTrace();
-            }
+            // save image in shared preference
+            PreferenceUtils.saveUserImage(this, encodeddata);
         }
     }
 
     private void initDrawerUser() {
         userImage = (CircularImageView) findViewById(R.id.contact_image);
         Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.default_user_icon);
-        try {
-            User user = PreferenceUtils.getUser(this);
-            SenzorsDbSource db = new SenzorsDbSource(this);
-            byte[] decodedString = Base64.decode(db.getImageFromDB(user.getUsername()), Base64.DEFAULT);
+        String encodedImage = PreferenceUtils.getUserImage(this);
+
+        if (!encodedImage.isEmpty()) {
+            byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
             Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
             userImage.setImageBitmap(decodedByte);
-
-        } catch (Exception e) {
+        } else {
             userImage.setImageBitmap(largeIcon);
         }
 
@@ -199,7 +264,7 @@ public class HomeActivity extends FragmentActivity {
         // initialize drawer content
         // need to determine selected item according to the currently selected sensor type
         drawerItemList = new ArrayList();
-        drawerItemList.add(new DrawerItem("#Senz", R.drawable.my_sensz_normal, R.drawable.my_sensz_selected, true));
+        drawerItemList.add(new DrawerItem("#LocationZ", R.drawable.my_sensz_normal, R.drawable.my_sensz_selected, true));
         drawerItemList.add(new DrawerItem("#Friend", R.drawable.friends_normal, R.drawable.friends_selected, false));
         drawerItemList.add(new DrawerItem("#Share", R.drawable.friends_normal, R.drawable.friends_selected, false));
 

@@ -256,7 +256,7 @@ public class SenzorsDbSource {
         db.close();
     }
 
-    public void insertImageToDB(String username, String encodedImage){
+    public void insertImageToDB(String username, String encodedImage) {
 
         ContentValues cv = new ContentValues();
 
@@ -265,18 +265,18 @@ public class SenzorsDbSource {
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
 
-        int p=db.update(SenzorsDbContract.User.TABLE_NAME, cv, SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?", new String[]{username});
-        if(p==0){
+        int p = db.update(SenzorsDbContract.User.TABLE_NAME, cv, SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?", new String[]{username});
+        if (p == 0) {
             cv.put(SenzorsDbContract.User.COLUMN_NAME_USERNAME, username);
-            db.insert(SenzorsDbContract.User.TABLE_NAME,null,cv);
+            db.insert(SenzorsDbContract.User.TABLE_NAME, null, cv);
         }
 
 
     }
 
-    public String getImageFromDB(String username){
+    public String getImageFromDB(String username) {
 
-        String selectQuery = "SELECT image from  " + SenzorsDbContract.User.TABLE_NAME + " where " + SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = '"+username+"'";
+        String selectQuery = "SELECT image from  " + SenzorsDbContract.User.TABLE_NAME + " where " + SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = '" + username + "'";
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 

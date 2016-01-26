@@ -52,7 +52,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="5dp"
-                    android:text="eranga"
+                    android:text="Username"
                     android:textColor="#4a4a4a"
                     android:textSize="25sp">
                 </TextView>

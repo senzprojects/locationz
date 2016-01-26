@@ -3,8 +3,8 @@ package com.score.locationz.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.score.locationz.exceptions.NoUserException;
 import com.score.locationz.R;
+import com.score.locationz.exceptions.NoUserException;
 import com.score.senzc.pojos.User;
 
 /**
@@ -29,15 +29,7 @@ public class PreferenceUtils {
         editor.putString("username", user.getUsername());
         editor.commit();
     }
-    public static void saveUserImage(Context context, String userimg) {
-        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
 
-        //keys should be constants as well, or derived from a constant prefix in a loop.
-        editor.putString("image", "564555555454");
-        //editor.putString("username", user.getUsername());
-        editor.commit();
-    }
     /**
      * Get user details from shared preference
      *
@@ -45,7 +37,7 @@ public class PreferenceUtils {
      * @return user object
      */
     public static User getUser(Context context) throws NoUserException {
-        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_MULTI_PROCESS);
+        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         String id = preferences.getString("id", "0");
         String username = preferences.getString("username", "");
 
@@ -57,16 +49,20 @@ public class PreferenceUtils {
         return user;
     }
 
-    public static String getUserImage(Context context) throws NoUserException {
+    public static void saveUserImage(Context context, String encodedImage) {
         SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        //String id = preferences.getString("id", "0");
-        String userimg = preferences.getString("image", "");
+        SharedPreferences.Editor editor = preferences.edit();
 
-        if (userimg.isEmpty())
-            throw new NoUserException();
+        //keys should be constants as well, or derived from a constant prefix in a loop.
+        editor.putString("user_image", encodedImage);
+        editor.commit();
+    }
 
+    public static String getUserImage(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        String encodedImage = preferences.getString("user_image", "");
 
-        return userimg;
+        return encodedImage;
     }
 
     /**
