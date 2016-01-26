@@ -85,7 +85,6 @@ public class HomeActivity extends FragmentActivity {
                 e.printStackTrace();
             }
 
-            ActivityUtils.cancelProgressDialog();
             initDrawerUser();
 
             // unbind after config
@@ -169,8 +168,6 @@ public class HomeActivity extends FragmentActivity {
             PreferenceUtils.getUser(this);
         } catch (NoUserException e) {
             e.printStackTrace();
-
-            ActivityUtils.showProgressDialog(this, "Configuring...");
 
             // get user from service
             // bind to senz service
