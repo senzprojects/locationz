@@ -121,7 +121,7 @@ public class SenzHandler {
     }
 
     private void handleGetSenz(Senz senz) {
-        Log.d("Tag", senz.getSender() + " : " + senz.getSenzType().toString());
+        Log.d(TAG, senz.getSender() + " : " + senz.getSenzType().toString());
 
         Intent serviceIntent = new Intent(context, LocationService.class);
         serviceIntent.putExtra("USER", senz.getSender());
@@ -130,14 +130,7 @@ public class SenzHandler {
     }
 
     private void handleDataSenz(Senz senz) {
-        // sync data with db data
-        SenzorsDbSource dbSource = new SenzorsDbSource(context);
-        User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
-        senz.setSender(sender);
-
         // broadcast received senz
-        Intent intent = new Intent("com.score.senz.DATA_SENZ");
-        intent.putExtra("SENZ", senz);
-        context.sendBroadcast(intent);
+        Log.d(TAG, "Nothing to handler data senz from here, already broadcasted");
     }
 }

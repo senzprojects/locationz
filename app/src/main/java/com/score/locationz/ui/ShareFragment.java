@@ -27,10 +27,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.score.senz.ISenzService;
 import com.score.locationz.R;
+import com.score.locationz.db.SenzorsDbSource;
 import com.score.locationz.utils.ActivityUtils;
 import com.score.locationz.utils.NetworkUtil;
+import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
@@ -219,14 +220,6 @@ public class ShareFragment extends android.support.v4.app.Fragment {
         }
     }
 
-    /**
-     * Clear input fields and reset activity components
-     */
-    private void onPostShare() {
-        usernameEditText.setText("");
-        Toast.makeText(getActivity(), "Successfully shared SenZ", Toast.LENGTH_LONG).show();
-    }
-
     private BroadcastReceiver senzMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -255,7 +248,7 @@ public class ShareFragment extends android.support.v4.app.Fragment {
 
                 String msg = senz.getAttributes().get("msg");
                 if (msg != null && msg.equalsIgnoreCase("ShareDone")) {
-                    onPostShare();
+                    onPostShare(senz);
                 } else {
                     String user = usernameEditText.getText().toString().trim();
                     String message = "<font color=#000000>Seems we couldn't share the senz with </font> <font color=#eada00>" + "<b>" + user + "</b>" + "</font>";
@@ -263,6 +256,18 @@ public class ShareFragment extends android.support.v4.app.Fragment {
                 }
             }
         }
+    }
+
+    /**
+     * Clear input fields and reset activity components
+     */
+    private void onPostShare(Senz senz) {
+        // Create user with senz sender(he is a friend)
+        SenzorsDbSource dbSource = new SenzorsDbSource(getActivity());
+        dbSource.getOrCreateUser(senz.getSender().getUsername());
+
+        usernameEditText.setText("");
+        Toast.makeText(getActivity(), "Successfully shared SenZ", Toast.LENGTH_LONG).show();
     }
 
     /**

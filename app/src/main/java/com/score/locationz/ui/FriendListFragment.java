@@ -294,7 +294,7 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
 
                 String msg = senz.getAttributes().get("msg");
                 if (msg != null && msg.equalsIgnoreCase("ShareDone")) {
-                    onPostShare();
+                    onPostShare(senz);
                 } else {
                     String message = "<font color=#000000>Seems we couldn't share the senz with </font> <font color=#eada00>" + "<b>" + selectedUser.getUsername() + "</b>" + "</font>";
                     displayInformationMessageDialog("#Share Fail", message);
@@ -331,7 +331,11 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
     /**
      * Clear input fields and reset activity components
      */
-    private void onPostShare() {
+    private void onPostShare(Senz senz) {
+        // Create user with senz sender(he is a friend)
+        SenzorsDbSource dbSource = new SenzorsDbSource(getActivity());
+        dbSource.getOrCreateUser(senz.getSender().getUsername());
+
         Toast.makeText(getActivity(), "Successfully shared SenZ", Toast.LENGTH_LONG).show();
     }
 
