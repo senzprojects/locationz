@@ -56,7 +56,10 @@ public class SenzHandler {
                 break;
             case SHARE:
                 Log.d(TAG, "SHARE received");
-                handleShareSenz(senz);
+                if (senz.getAttributes().containsKey("lat") || senz.getAttributes().containsKey("lon")) {
+                    Log.d(TAG, "#lat #lon SHARE received");
+                    handleShareSenz(senz);
+                }
                 break;
             case GET:
                 Log.d(TAG, "GET received");
